@@ -1,0 +1,88 @@
+# Template Instruction Reference
+
+The following document should be used for reference only. When getting started with the language it is recommended to take the Entity Compiler Tutorial, then use this document once you understand the concepts and just need specific information about particular instructions.
+
+There are two types of instructions, ones that represent a single statement and ones that also define a block of template code associated with it. This is similar to many other programming languages such as C and Java that use `{` and `}` to surround a block of code for statements such as `for` or `if`. In the template language, these instructions are referred to as **block** instructions. A **block** instruction has the form: `${$}[`*instruction* *args*`]` ... *block of code* ... `${$}[/`*instruction*`]`. It's important to keep the instruction block end balanced with its start.
+
+> **NOTE:** Instruction usage will use *italics* to indicate an instruction argument and square brackets - 
+> e.g. [ *optional* ] - to indicate an optional part of the instruction. 
+
+This document covers all the instructions of the template language, grouped by category.
+
+$[let manager = __documentationManager]
+| Category | Description |
+|----------|-------------|
+$[foreach category in manager.instructionCategories]
+$[if manager.hasInstructionsForCategory(category)]
+| [${category.title}](#category_${category.name|lowercase})  | ${category.description} |
+$[/if]
+$[/foreach]
+
+$[foreach category in manager.instructionCategories]
+$[if manager.hasInstructionsForCategory(category)]
+<a name="category_${category.name|lowercase}"></a>
+## ${category.title}
+
+${category.description}
+
+| Instruction | Summary |
+|-------------|---------|
+$[foreach instruction in manager.instructionsForCategory(category)]
+| [`${instruction.name}`](#instruction_${instruction.name}) | ${instruction.summary} |
+$[/foreach]
+
+$[foreach instruction in manager.instructionsForCategory(category)]
+<hr/>
+
+<a name="instruction_${instruction.name}"></a>
+### `${instruction.name}`
+
+${instruction.description}
+
+#### Usage
+
+$[capture templateBlockText]...***template-block***...$[/capture]
+$[if instruction.hasMultipleUsages]
+${instruction.primaryUsage}
+
+$[foreach usageMeta in instruction.usages]
+##### ${usageMeta.title}
+
+> ${usageMeta.usage}$[if instruction.isBlockType] ${templateBlockText} `${$}[/${instruction.name}]`$[/if]
+
+
+${usageMeta.description}
+
+$[/foreach]
+$[else]
+> ${instruction.primaryUsage}$[if instruction.isBlockType && !instruction.isFullUsage] ${templateBlockText} `${$}[/${instruction.name}]`$[/if]
+
+
+$[/if]
+$[if instruction.hasArguments]
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+$[foreach arg in instruction.arguments]
+$[capture argName]$[if arg.isKeyword]`${arg.name}`$[else]*${arg.name}*$[/if]$[/capture]
+$[capture argType]$[if arg.isKeyword]option$[else]`${arg.typeName}`$[/if]$[/capture]
+| ${argName} | ${argType} | ${arg.description} |
+$[/foreach]
+
+$[/if]
+$[if instruction.isBlockType]
+#### *template-block*
+
+${instruction.contents}
+
+$[/if]
+$[if instruction.hasSeeAlso]
+#### See Also
+
+$[foreach seeAlso in instruction.seeAlso][`${seeAlso.name}`](#instruction_${seeAlso.name})$[if !seeAlso#last],$[/if]$[/foreach]
+
+$[/if]
+$[/foreach]
+$[/if]
+$[/foreach]

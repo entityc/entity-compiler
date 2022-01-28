@@ -1,0 +1,13 @@
+
+Enum: SpellType
+  Item: Transport = 1
+  Item: Zap = 2
+  Item: Shield = 3
+
+Entity: MagicSpell
+  Attribute: SpellType type
+  Attribute: string name
+  Attribute: int32 castEnergy
+  Attribute: int64 price
+  Attribute: int32 weight
+

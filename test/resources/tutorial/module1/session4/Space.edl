@@ -1,0 +1,57 @@
+space Module1
+{
+}
+
+entity Player {
+    D "A player in the game."
+    primarykey uuid playerId
+
+    attributes {
+        unique string name { D "Name of the player." }
+        creation date createdOn { D "The date this player was created." }
+        modification date modifiedOn { D "The date this player was last modified." }
+        int64 experiencePoints { D "Experience Points" }
+        int32 level { D "Level achieved." }
+        int32 health { D "Amount of health remaining." }
+        int64 coins { D "Number of coins the player has." }
+        float height in millimeters
+        optional string bio { D "Optional information about the player." }
+        many string skills
+    }
+
+    relationships {
+        many PlayerMagicSpell magicSpells
+    }
+}
+
+entity PlayerMagicSpell {
+    D "Represents a magic spell in a players inventory of spells."
+
+    primarykey uuid playerMagicSpellId
+
+    attributes {
+        int32 remainingCasts { D "Number of casts a player has left for this magic spell." }
+    }
+
+    relationships {
+        parent one Player player { D "A player that has one of these magic spells." }
+        one MagicSpell magicSpell { D "The magic spell the player has." }
+    }
+}
+
+entity MagicSpell {
+    D "Gives you the ability to do magical things."
+    primarykey uuid magicSpellId
+
+    attributes {
+        string name { D "Name of the magic spell." }
+        int32 castEnergy { D "The amount of energy it requires to cast it." }
+        int64 price { D "How much it costs to buy." }
+        int32 weight { D "How much it weighs. This affects how many spells a player can carry." }
+    }
+
+    relationships {
+        // there is an implied many relationship with PlayerMagicSpell but we
+        // don't have to specify unless we want to access that relationship.
+    }
+}

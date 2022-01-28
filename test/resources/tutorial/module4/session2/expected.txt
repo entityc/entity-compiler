@@ -1,0 +1,40 @@
+
+Enum: PlayerRank
+    1) Rookie
+    2) Bronze
+    3) Silver
+    4) Gold
+    5) SuperDuperRank
+
+Enum: SpellType
+    1) Transport
+    2) Zap
+    3) Shield
+
+Entity: MagicSpell
+    Attribute: castEnergy
+    Attribute: name
+    Attribute: price
+    Attribute: type
+    Attribute: weight
+
+Entity: Player
+    Attribute: experiencePoints
+    Attribute: health
+    Attribute: level
+    Attribute: name
+    Attribute: primaryColor
+    Attribute: rank
+    Attribute: social
+    Attribute: strength
+
+Entity: Social
+    Attribute: email
+    Attribute: forumId
+    Attribute: forumName
+
+String Attribute: email
+String Attribute: forumName
+String Attribute: name
+String Attribute: name
+

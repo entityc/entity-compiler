@@ -1,0 +1,15 @@
+space TemplateDoc {
+}
+
+configuration Config
+{
+    directory testOutput {
+        path $(TEMP_DIR:"/tmp")
+    }
+
+    templates {
+        template TemplateDocTemplate {
+            output primary testOutput
+        }
+    }
+}

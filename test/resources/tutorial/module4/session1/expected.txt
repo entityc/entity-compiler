@@ -1,0 +1,70 @@
+Original:     playerAchievement
+
+Case)
+
+Capitalize:   PlayerAchievement
+Uncapitalize: playerAchievement
+Uppercase:    PLAYERACHIEVEMENT
+Lowercase:    playerachievement
+
+Words)
+
+Words:        player Achievement
+Title:        Player Achievement
+Dashes:       player-Achievement
+
+Combination)
+
+Words Uppercase:  PLAYER ACHIEVEMENT
+Words Lowercase:  player achievement
+Dashes Lowercase: player-achievement
+
+Model)
+
+Enum: PLAYER RANK
+    1) Rookie
+    2) Bronze
+    3) Silver
+    4) Gold
+    5) Super Duper Rank
+
+Entity: PLAYER
+    Attribute: Rank
+    Attribute: Name
+    Attribute: Primary Color
+    Attribute: Experience Points
+    Attribute: Level
+    Attribute: Health
+    Attribute: Strength
+    Attribute: Social
+
+Entity: SOCIAL
+    Attribute: Email
+    Attribute: Forum Name
+    Attribute: Forum Id
+
+Wrap)
+
+Raw Paragraph:
+In this exercise we will work with entities
+Player and Social so that we can see how wrapping works to create a comment
+block
+to be used in code generation.
+
+
+Line Comments (default width of 80):
+// Paragraph: In this exercise we will work with entities Player and Social so that we can
+//            see how wrapping works to create a comment block to be used in code
+//            generation.
+
+Line Comments (width of 100):
+// Paragraph: In this exercise we will work with entities Player and Social so that we can see how wrapping works to
+//            create a comment block to be used in code generation.
+
+Block Comment:
+/*
+ * Paragraph: In this exercise we will work with entities Player
+ *            and Social so that we can see how wrapping works to
+ *            create a comment block to be used in code generation.
+ */
+

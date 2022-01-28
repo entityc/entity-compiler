@@ -1,0 +1,26 @@
+$[log]
+$[foreach typedef in space.typedefs]
+
+Typedef: ${typedef.name}
+$[foreach bitField in typedef.bitFields]
+    BitField: ${bitField.name} [${bitField.width + bitField.low - 1}:${bitField.low}] (${bitField.width})
+$[/foreach]
+$[/foreach]
+$[foreach entity in space.entities]
+
+$[let qualifier = entity.isSecondary ? "Secondary " : ""]
+${qualifier}Entity: ${entity.name}
+$[foreach attribute in entity.attributes]
+$[let attributeType = attribute.type]
+$[let bitFields = attribute.bitFields]
+$[if attribute.type.isTypedef]
+$[let attributeType = attribute.type.name]
+$[let bitFields = attribute.type.bitFields]
+$[/if]
+  Attribute: ${attributeType} ${attribute.name}
+$[foreach bitField in bitFields]
+    BitField: ${bitField.name} [${bitField.width + bitField.low - 1}:${bitField.low}] (${bitField.width})
+$[/foreach]
+$[/foreach]
+$[/foreach]
+$[/log]

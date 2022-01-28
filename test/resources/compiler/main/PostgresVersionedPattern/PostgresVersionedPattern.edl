@@ -1,0 +1,75 @@
+space Space {
+}
+
+entity Release {
+
+    primarykey uuid releaseId
+
+    attributes {
+        creation date createdOn
+        boolean prodEnabled
+        date releaseDate
+        int32 version
+        optional string description
+    }
+
+    relationships {
+        many ReleaseVersion<unique Thing, unique ThingVersion> as ReleaseThing
+    }
+}
+
+entity ReleaseVersion<P,C> {
+    primarykey uuid releaseVersionId
+    relationships {
+        parent one Release release
+        one P
+        one C
+    }
+}
+
+entity Thing {
+    primarykey uuid thingId
+
+    attributes {
+        unique string name
+        modification date modifiedOn
+    }
+
+    relationships {
+        many ThingVersion
+    }
+}
+
+entity ThingVersion {
+    primarykey uuid thingVersionId
+
+    attributes {
+        string notes
+    }
+
+    relationships {
+        parent one Thing
+    }
+}
+
+domain Database
+{
+    naming entity {
+        method underscoreLowercase
+    }
+
+    naming attribute {
+        method underscoreLowercase
+    }
+}
+
+configuration Config
+{
+    output Database {
+        path $(TEMP_DIR:"/tmp")
+    }
+    transform Postgres {
+        output primary Database
+        output schema Database
+    }
+}

@@ -1,0 +1,15 @@
+$[log]
+$[foreach entity in space.entities]
+
+$[let qualifier = entity.isSecondary ? "Secondary " : ""]
+${qualifier}Entity: ${entity.name}
+$[foreach attribute in entity.attributes]
+$[let attributeType = attribute.type]
+$[if attribute.isSecondaryEntityType]
+  $[let attributeType = attribute.typeEntity.name]
+$[/if]
+$[if attribute.isArray]$[let attributeType = attributeType + "[]"]$[/if]
+  Attribute: ${attributeType} ${attribute.name}
+$[/foreach]
+$[/foreach]
+$[/log]

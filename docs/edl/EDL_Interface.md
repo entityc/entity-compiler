@@ -1,0 +1,275 @@
+# Interfaces
+
+Interfaces primarily describe how entities are communicated between client and server. They can also be used to describe an entire server API (such as a REST API).
+
+> **NOTE:** Presently the available template libraries **do not** support interfaces; instead the server endpoint code they generate is based on essentially baked-in interface definitions. Although the compiler can compile the interface constructs and syntax explained here, you would have to develop your own templates that support these constructs and generate code from them.
+
+An interface is declared as:
+
+	interface name {
+	
+	}
+
+Where `name` is the name of the interface.
+
+> There can be different types of interfaces, however, presently only HTTP interfaces are supported. Much of the language contained within the `interface` block are thus geared toward HTTP constructs.
+
+## Operations
+
+An interface is broken down into operations. An operation represents an action that is performed, most commonly with respect to an entity, such as creating an object of an entity, fetching entity objects, updating entity objects and removing entity objects.
+
+### Basic Structure
+
+The basic structure of an operation looks like the following, using **Book** as an example entity:
+
+	operation GetBookById {
+        D "This is used to get a book object by its ID."
+        request {
+            method GET
+            path "/book/(id)" {
+                param int64 id { ]=] "The ID of the book object." }
+                query param boolean includeDescription {
+                    D "If the book description should be included in the response."
+                }
+            }
+        }
+        response {
+            body {
+                D "The book object is returned here."
+                contentType "application/json"
+                view Book.Simple
+                domain DTO
+            }
+            status OK {
+                D "The user successfully got the book object by its ID."
+            }
+        }
+    }
+
+Operations of type HTTP have two parts, a request to the server followed by a response from the server. Each can be described separately.
+
+### Operation Request
+
+This part of the operation involves the client sending information to the server about the operation it wants to perform.
+
+#### Request Method
+
+For HTTP the type of operation being requested is known as the method which is most commonly one of: POST, GET, PUT, and DELETE. For instance:
+
+	method GET
+
+Specifies a get type operation - one that fetches data and returns it.
+
+#### Request Path
+
+The next part of a request is the server path associated with this operation. The path can and often contains parameters that must be declared along with it. An example path is:
+
+	path "/book/{id}"
+
+Parameters are included in the path by surround them in curly brackets, in this case `{id}` for the parameter `id`. This is saying that the ID for the book being fetched is located in that part of the path. Any number of parameters can be included as long as they are declared as part of the path. Declaring the parameters is done inside the `path` block as follows:
+
+	path "/book/{id}" {
+	    param int64 id
+	}
+
+If the operation has other options available, they are made available via query parameters. Query parameters are added to the end of the path by the client in standard HTTP format. Declaring these query parameters is achieved as follows:
+
+	path "/book/{id}" {
+	    param int64 id
+	    query param boolean includeDescription
+	}
+
+The `query` parameter here is being used to control if the description of the book should be returned, but it can be any type of query parameter that modifies the operation behavior.
+
+#### Request Body
+
+The body part of the request is only really appropriate for the POST and PUT methods but in theory could be used for any method. For the POST and PUT methods it is used to contain the data for the object being created or updated.
+
+The following are needed in order to adequately describe the contents of the body:
+
+1. Content Type - format of the entity data.
+2. Entity / View
+3. Domain used in representing the entity when transferring in and out of the server.
+
+These are specified using a `body` block as follows:
+
+	domain RestDomain {
+	    entity Book {
+	        interface RestAPI {
+	            operation CreateBook {
+	                request {
+	                    method POST
+	                    body {
+	                        contentType "application/json"
+	                        view BookCreate
+	                        domain DTO
+	                    }
+	                }
+	            }
+	        }
+	    }
+	}
+
+### Operation Response
+
+After the server has had time to process the request, it will come back with a response. This block defines what is expected in the response - including possible error responses and why they would happen.
+
+#### Response Body
+
+This defines what is expected in the body of the response. It is pretty much the same as the request body in terms of what has to be specified:
+
+1. Content Type - format of the entity data.
+2. Entity / View
+3. Domain used in representing the entity when transferring in and out of the server.
+
+For instance, it may look like the following:
+
+	domain RestDomain {
+	    entity Book {
+	        interface RestAPI {
+	            operation GetBook {
+	                response {
+	                    body {
+	                        contentType "application/json"
+	                        view BookFull
+	                        domain DTO
+	                    }
+	                }
+	            }
+	        }
+	    }
+	}
+
+#### Response Status
+
+Each operation can return one of many status codes based on how it processed the request. Each potential HTTP status code should be described using a status block, as follows:
+
+	status OK { D "Success" }
+	status NOT_FOUND { D "Unable to find the specified book." }
+
+The status code can either be the standard name for the code or the numeric code itself. For instance, the last one above could have been specified as `status 404`.
+
+## Abstract Operations
+
+Since there are common operations that are often shared among entities, a special type of abstract operation can be defined.
+
+An abstract operation defines an operation with respect to an arbitrary entity - not to one specific entity. It is essentially a "configurable" operation that can be made specific to an entity and domain as desired - this is known as **extending** an abstract operation.
+
+	interface RestAPI {
+	    abstract operation GetById {
+	        config {
+	        
+	        }
+	    }
+	}
+
+The `config` block defines how the abstract operation is configurable. This include two ways it can be configured:
+
+- **Contextually** - the location where the operation is extended to define an entity specific operation.
+- **Explicitly** - much like arguments to a function that specialize the operation to specific parameters.
+
+### Contextual Configuration Parameters
+
+These parameters are used to define how the location where you extend the abstract operation should affect the final generation of the operation.
+
+Currently there are only the following context based parameters:
+
+| Param Type | Description |
+| :----: | :---- |
+|`domain`| When the operation is expanded in a domain block, that domain is fed into this parameter.|
+|`entity`| When the operation is expanded in an entity block, that entity is fed into this parameter.|
+
+For instance, lets define an operation with both types of parameters:
+
+	config {
+	    context domain aDomain
+	    context entity anEntity
+	}
+
+We will look more at extending abstract operations later but this will serve as a simple example for contextual configuration:
+
+	domain RestDomain {
+	    entity Book {
+	        interface RestAPI {
+	            operation GetBookById extends GetById {
+	                // aDomain is set to RestDomain
+	                // anEntity is set to Book
+	            }
+	        }
+	    }
+	}
+
+### Explicit Configuration Arguments
+
+There is an other type of parameter that can be explicitly specified where the operation is extended. They are declared as follows:
+
+	config {
+	    argument domain representationDomain
+	    argument view returningView
+	    argument int32 defaultLimit
+	}
+
+These are defined by the extending operation more explicitly as follows:
+
+	operation GetBooks extends GetObjects {
+	    config {
+	        domain = DTO
+	        view = FeedCell
+	        defaultLimit = 20
+	    }
+	}
+
+Both contextual and explicit parameters can be defined.
+
+### Parameterized Strings
+
+One of the issues with creating an abstract operation is that the path as well as description strings need to also be parameterized in order for them to render out to specific entities when they are extended.
+
+To support this special tags are supported in strings and when an abstract operation is extended the tags are replaced with values appropriate to the extending context.
+
+For instance, the `path` could be declared as:
+
+	path "/api/$(entity.name|domain)/{id}
+
+Then when that operation was extended by the `Book` entity, the path statement would render as:
+
+	path "/api/book/{id}"
+
+Likewise for an entity named `TrainingPlan`:
+
+	path "/api/training-plan/{id}
+
+In addition description strings can also include tags in the same way:
+
+	operation GetObjects {
+	    D "Gets a list of $(entity.name) objects."
+	}
+	
+When this operation is extended by the `Book` entity, this description would render as:
+
+	D "Gets a list of Book objects."
+
+
+## Extending Abstract Operations
+
+As you can see in the section above, abstract operations provide a powerful way to describe operations in a non-entity or domain way. This encourages consistency in how interfaces are created across all your entities. However, often it is necessary for some entity to make an exception in some places. To support this, there is the ability to override parts of the abstract operation when extending it.
+
+Extending an abstract operation is done simply by using the `extends` keyword as follows:
+
+	operation GetBooks extends GetObjects {
+	
+	}
+
+If that is all you do, you will get a `GetBooks` operation that has replaced the tags in `GetObjects` as appropriate and that's it. This may be fine in some cases, but let's say you want to add a query parameter that allows you to sort by some field in the Book entity. In this case, we would do the following:
+
+	operation GetBooks extends GetObjects {
+	    request {
+	        path inherited {
+	            query param boolean sortByName { D "When set to true, the returned list of books are sorted by their name." }
+	        }
+	    }
+	}
+
+Since we don't want to change the `path` we simply follow it with the keyword `inherited` to say we want to take it from the abstract operation as is.
+
+Likewise we can add to other parts of the operation such as in the response to say add additional status. It can also be done to write a better description for something.

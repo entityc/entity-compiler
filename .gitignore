@@ -1,0 +1,12 @@
+out
+entities/srcout
+schema
+server/generated
+client/javaclient/generated/src
+client/javaclient/generated/target
+client/zcios/generated
+server/simple
+client/javaclient/clubs
+client/zcios/ClubsProto
+server/clubs
+*.idea

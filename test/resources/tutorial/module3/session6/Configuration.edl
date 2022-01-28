@@ -1,0 +1,10 @@
+configuration Tutorial
+{
+    templates {
+        template SimpleTemplate {
+            config {
+                "type": "int32"
+            }
+        }
+    }
+}

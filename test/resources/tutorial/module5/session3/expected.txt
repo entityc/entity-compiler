@@ -1,0 +1,107 @@
+=========== DATABASE ===========
+
+Table: person
+    PK:     player_id
+    Column: strength
+    Column: level
+    Column: social
+    Column: xp
+    Column: name
+    Column: primary_color
+    Column: rank
+    Column: health
+
+Table: magic_spell
+    PK:     magic_spell_id
+    Column: price
+    Column: options
+    Column: name
+    Column: type
+
+Table: social
+    Column: forum_name
+    Column: email
+    Column: forum_id
+
+=========== DTO ===========
+
+Class: com.example.dto.ZDHumanPlayerDto
+    PK:     id
+    Member: strength
+    Member: level
+    Member: social
+    Member: name
+    Member: primaryColor
+    Member: experiencePoints
+    Member: rank
+    Member: health
+
+Class: com.example.dto.ZDMagicSpellDto
+    PK:     id
+    Member: price
+    Member: name
+    Member: weight
+    Member: type
+    Member: castEnergy
+
+Class: com.example.dto.ZDSocialDto
+    Member: forumName
+    Member: email
+    Member: forumId
+
+=========== MODEL ===========
+
+MODULE: Accessories
+
+  Enum: ZESpellType
+    1) TRANSPORT
+    2) ZAP
+    3) SHIELD
+
+  Class: com::example::model::ZMMagicSpell
+      PK:     id
+      Member: type
+      Member: name
+      Member: castEnergy
+      Member: price
+      Member: weight
+
+MODULE: Graphics
+
+  Typedef: HighColor16Type
+
+MODULE: User
+
+  Enum: ZEPlayerRank
+    1) ROOKIE
+    5) SUPER_DUPER_RANK
+    2) BRONZE
+    3) SILVER
+    4) GOLD
+
+  Class: com::example::model::ZMHumanPlayer
+      PK:     id
+      Member: rank
+      Member: name
+      Member: primaryColor
+      Member: experiencePoints
+      Member: level
+      Member: health
+      Member: strength
+      Member: social
+
+  Class: com::example::model::ZMSocial
+      Member: email
+      Member: forumName
+      Member: forumId
+
+=========== API ===========
+
+API Class: ZAHumanPlayerController
+Get Human Player List: GET /api/human-player
+Returns objects of class ZDHumanPlayerDto
+
+API Class: ZAMagicSpellController
+Get Magic Spell List: GET /api/magic-spell
+Returns objects of class ZDMagicSpellDto
+

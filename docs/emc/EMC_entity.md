@@ -1,0 +1,1447 @@
+# Entity Model Classes
+
+Model classes of this type are directly related to the entities in your model. The classes are briefly described in the following table, then each will be described in more detail in the sub-sections below the table.
+
+| Class | Description |
+|-----|-----|
+|[`MTAttribute`](#class_MTAttribute)|Represents an attribute of an entity.|
+|[`MTAttributeConstraint`](#class_MTAttributeConstraint)|Represents some type of constraint placed upon an attribute. Constraints can help prevent attributes from receiving values that are not valid for a specific application.|
+|[`MTBitField`](#class_MTBitField)|Represents a bit field of an attribute.|
+|[`MTEntity`](#class_MTEntity)|Represents an entity in your model.|
+|[`MTEntityTemplate`](#class_MTEntityTemplate)|An Entity Template is the declaration of an entity in a parameterized way, such as `MyEntity<T,S>` where `T` and `S` are parameters that are used in the body of the definition to parameterize the entity. This entity template can then be used as a template to create other entities. Currently template entites can only be used in a special usage of a relationship.|
+|[`MTEnum`](#class_MTEnum)|Represents an enum in your model.|
+|[`MTEnumItem`](#class_MTEnumItem)|Represents an enum item.|
+|[`MTModule`](#class_MTModule)|Represents a grouping of entities.|
+|[`MTNativeType`](#class_MTNativeType)|Represents a native data type such as `int32`, `float`, `string`, etc. Basically anything except a secondary entity type.|
+|[`MTPrimaryKey`](#class_MTPrimaryKey)|Represents the primary key of an entity.|
+|[`MTRelationship`](#class_MTRelationship)|Represents a relationship of an entity.|
+|[`MTType`](#class_MTType)|Represents a data type of an attribute. Such types can be as simple as a primitive (native) type (like `int32`) and as complex as a secondary entity.|
+|[`MTTypedef`](#class_MTTypedef)|Represents a type definition useful in dealing with bit fields.|
+|[`MTUnit`](#class_MTUnit)|Represents a unit of measure used in the naming and/or source of info of an attribute. When declaring attributes that is associated with some unit of measure, its best to assign a unit to the attribute. Not only does it help other people working with this attribute, it can be used by templates to automatically add code to convert from one unit to another as data flows from one domain to another. Units are easily defined and imported from a central repository. Units can be based on other units with an associated multiplier.|
+
+<a name="class_MTAttribute"></a>
+## MTAttribute Class
+
+Represents an attribute of an entity.
+
+The following properties and methods, grouped by category, are available for this class:
+
+### Primary Key Category
+
+These methods relate to a primary key.
+
+<hr/>
+
+#### `boolean` **`isPrimaryKey`**
+
+Indicates if this attribute represents the primary key of its entity.
+
+<hr/>
+
+#### `MTType` **`nonPrimaryKeyType`**
+
+An attribute that represents a primary key has a type that indicates it is a primary key. This method returns the type but with the primary key indicator set to false.
+
+
+### Attribute Category
+
+These methods relate to attributes.
+
+<hr/>
+
+#### `List` **`bitFields`**
+
+Returns the bit fields declared as part of this attribute.
+
+<hr/>
+
+#### `Integer` **`byteArraySize`**
+
+For those attributes that are defined as the `byte` data type, this returns the size of an array that is holding values for this attribute.
+
+<hr/>
+
+#### `List` **`constraints`**
+
+Returns an optional list of constraints defined for this attribute.
+
+<hr/>
+
+#### `String` **`contentType`**
+
+For attributes that represent an asset and have been defined with a content type, this will return that defined content type.
+
+<hr/>
+
+#### `MTConstant` **`defaultValue`**
+
+Returns an optional default value declaration of the attribute.
+
+<hr/>
+
+#### `MTEntity` **`entity`**
+
+Returns the parent entity of this attribute.
+
+<hr/>
+
+#### `String` **`entityName`**
+
+Returns the name of the parent entity of this attribute as it was declared in the model.
+
+<hr/>
+
+#### `boolean` **`hasBitFields`**
+
+Indicates whether this attribute was declared with bit fields.
+
+<hr/>
+
+#### `boolean` **`hasConstraints`**
+
+Indicates whether this attribute has any defined constraints.
+
+<hr/>
+
+#### `boolean` **`hasDefaultValue`**
+
+Indicates whether this attribute was declared with a default value. If so, you can obtain the default value from the `defaultValue` property of this attribute.
+
+<hr/>
+
+#### `boolean` **`hasUnit`**
+
+Indicates whether this attribute has been defined with a unit.
+
+<hr/>
+
+#### `boolean` **`isArray`**
+
+Indicates whether this attribute was declared using the `many` keyword.
+
+<hr/>
+
+#### `boolean` **`isCreation`**
+
+Indicates whether this attribute was declared with the `creation` qualifier. This should only occur with a `date` attribute that represents the creation date for objects of this entity.
+
+<hr/>
+
+#### `boolean` **`isModification`**
+
+Indicates whether this attribute was declared with the `modification` qualifier. This should only occur with a `date` attribute that represents the last modification date for objects of this entity.
+
+<hr/>
+
+#### `boolean` **`isNullable`**
+
+Indicates whether this attribute has been declared `optional`. When an attribute is declared as `optional` it means that it can be null. For secondary entities, if the instantiation of a secondary entity is declared as `optional` then all its attributes are nullable in that context.
+
+<hr/>
+
+#### `boolean` **`isOptional`**
+
+Indicates whether this attribute has been declared as `optional`.
+
+<hr/>
+
+#### `boolean` **`isOrdered`**
+
+Indicates whether this attribute was declared using the `ordered` keyword. This only applies to array type attributes (that is, have been declared with `many` also). Using the `ordered` keyword should cause this attribute to have a field in the database to keep track of the order for each item in the array of objects for this attribute.
+
+<hr/>
+
+#### `boolean` **`isParent`**
+
+Indicates whether this attribute was declared using the `parent` keyword. Attributes declared this way is intended to indicate that objects of this entity will likely be grouped by this attribute. Its up to the templates to look at this flag and synthesize appropriate code to provide the grouped representation.
+
+<hr/>
+
+#### `boolean` **`isParentUnique`**
+
+Indicates whether an attribute has been defined using **both** the `unique` and `parent` keywords. This can be used to establish unique constraints such that objects of this entity must have unique values of this attribute per parent object.
+
+<hr/>
+
+#### `boolean` **`isSecondary`**
+
+Indicates whether this attribute is an attribute of a secondary entity.
+
+<hr/>
+
+#### `boolean` **`isSecondaryEntityType`**
+
+Indicates whether the the data type of this attribute is a secondary entity.
+
+<hr/>
+
+#### `boolean` **`isSequential`**
+
+Indicates whether this attribute was declared using the `sequential` keyword. When you use this keyword it means you want this attribute to be auto incremented for each new object of its entity that is created.
+
+<hr/>
+
+#### `boolean` **`isUnique`**
+
+Indicates whether this attribute was declared as `unique`. If so, the database should be configured or code should be synthesized so as to assure that all objects of its entity will have a unique value across all values of this attribute.
+
+<hr/>
+
+#### `boolean` **`isVirtual`**
+
+Indicates whether this attribute has been declared `virtual`. A virtual attribute is one that is not persistent and is backed by code to create its value - code that a developer writes.
+
+<hr/>
+
+#### `String` **`name`**
+
+Returns the name of this attribute as it was declared in the model.
+
+<hr/>
+
+#### `int` **`order`**
+
+Returns the order in which this attribute was declared among the other attributes of this entity.
+
+<hr/>
+
+#### `MTSpace` **`space`**
+
+Returns the space associated with this attribute. This property is provided more out of convenience as you can also obtain this from its entity.
+
+<hr/>
+
+#### `MTType` **`type`**
+
+Returns the data type of this attribute. The type can be a native type (such as an int32, string, etc.) or can be a secondary entity. If you are looking for it to be a secondary entity, it would be better to use the `isSecondaryEntityType` property then `typeEntity` if it is a secondary entity.
+
+<hr/>
+
+#### `MTEntity` **`typeEntity`**
+
+If the data type of this attribute is a secondary entity, then it returns that secondary entity. Otherwise it returns `null`.
+
+<hr/>
+
+#### `String` **`typeName`**
+
+Returns a string that represents the textual representation of the data type for this attribute. This is not intended to be used to generate code - its best to use the `getType()` method and send it through the `language` filter which will result in a language specific representation of the type (assuming you have the language definition for your target language). You can also use this for debug purposes.
+
+<hr/>
+
+#### `MTUnit` **`unit`**
+
+Returns the declared unit of this attribute as a unit object.
+
+
+### Relationship Category
+
+These methods relate to relationships.
+
+<hr/>
+
+#### `boolean` **`isParentRelationship`**
+
+For attributes that were created from relationships (effective attributes), this indicates whether the relationship it was created from is declared as a `parent` relationship.
+
+<hr/>
+
+#### `MTRelationship` **`relationship`**
+
+When an attribute is created for the purpose of returning the effective set of attributes, attributes created due to a relationship, then this returns the relationship that this attribute represents. For example, if you have a many-to-one relationship, an effective attribute will be created to contain the unique ID of the other end of this relationship.
+
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+<hr/>
+
+#### `boolean secondaryEntityIsTagged(String tag)`
+
+For attributes that are of a secondary entity type, this indicates whether the attribute as been tagged with the specified tag..
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to check. |
+
+
+
+<a name="class_MTAttributeConstraint"></a>
+## MTAttributeConstraint Class
+
+Represents some type of constraint placed upon an attribute. Constraints can help prevent attributes from receiving values that are not valid for a specific application.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `MTAttribute` **`attribute`**
+
+Returns the attribute of this attribute constraint.
+
+<hr/>
+
+#### `MTExpression` **`expression`**
+
+Returns the expression of this attribute constraint.
+
+<hr/>
+
+#### `String` **`name`**
+
+Returns the name of this attribute constraint.
+
+
+
+<a name="class_MTBitField"></a>
+## MTBitField Class
+
+Represents a bit field of an attribute.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `int` **`high`**
+
+The high bit number of the bit field.
+
+<hr/>
+
+#### `boolean` **`isUnused`**
+
+Indicates this bit field is declared as not used.
+
+<hr/>
+
+#### `int` **`low`**
+
+The low bit number of the bit field.
+
+<hr/>
+
+#### `int` **`width`**
+
+The number of bits wide of the bit field.
+
+
+
+<a name="class_MTEntity"></a>
+## MTEntity Class
+
+Represents an entity in your model.
+
+The following properties and methods, grouped by category, are available for this class:
+
+### Module Category
+
+These methods relate to a module.
+
+<hr/>
+
+#### `MTModule` **`module`**
+
+Returns the module associated with this entity.
+
+
+### Entity Category
+
+These methods relate to an entity.
+
+<hr/>
+
+#### `boolean` **`isDeclaredAsPrimary`**
+
+Indicates whether this entity was **declared** `primary`. If the entity was **not** declared with the `primary` keyword then this will return false even if it is implied as primary.
+
+<hr/>
+
+#### `boolean` **`isDeclaredAsSecondary`**
+
+Indicates whether this entity was **declared** `secondary`. If the entity was **not** declared with the `secondary` keyword then this will return false even if it is implied as secondary.
+
+<hr/>
+
+#### `boolean` **`isExtern`**
+
+Indicates whether an entity was declared with the `extern` keyword. This would happen if reference is made to an entity but the entity is not implemented in this application space.
+
+<hr/>
+
+#### `boolean` **`isImplicit`**
+
+Indicates whether this entity was created by the compiler because it represents an implicit entity, such as in a many-to-many relationship.
+
+<hr/>
+
+#### `boolean` **`isPrimary`**
+
+Indicates whether this entity was declared `primary` or if it was inferred as primary. If an entity has a primary key it is inferred to be a primary entity.
+
+<hr/>
+
+#### `boolean` **`isSecondary`**
+
+Indicates whether this entity is a secondary entity, either because it is declared as one or implied. If the entity does not have a primary key, then it is implied to be a secondary entity.
+
+<hr/>
+
+#### `boolean` **`isTransient`**
+
+Indicates whether this entity was declared `transient`. Transient entities are those which have objects at runtime but are not persisted in any way.
+
+<hr/>
+
+#### `String` **`name`**
+
+Returns the name of this entity as it was declared in the model.
+
+<hr/>
+
+#### `List` **`primaryParentAncestory`**
+
+Returns the list of entities representing the a chain of primary parents to this entity. At the top of the list is the top parent and at the bottom is this entity.
+
+<hr/>
+
+#### `MTSpace` **`space`**
+
+Returns the space in which this entity was declared.
+
+
+### Entity Template Category
+
+These methods relate to entity templates.
+
+<hr/>
+
+#### `MTEntity entityOfTemplateArg(String templateArgName)`
+
+Returns the entity associated with a specified entity template argument.
+
+| Parameter | Description |
+|-----|-----|
+|`String templateArgName` | The convention is usually an upper case letter but depends on how the entity template was defined. For instance, if it is defined as: `Factory<C>` then you would pass the string "C" to get the entity associated with that argument that was used when instantiating this entity template. |
+
+<hr/>
+
+#### `boolean` **`isMadeFromTemplate`**
+
+Indicates whether this entity was made as a result of expanding an entity template.
+
+<hr/>
+
+#### `String` **`templateName`**
+
+If this entity was created from the declaration of an entity template, then this will return the name of that entity template.
+
+
+### Primary Key Category
+
+These methods relate to a primary key.
+
+<hr/>
+
+#### `boolean` **`hasPrimaryKey`**
+
+Indicates whether this entity is declared to have a primary key attribute.
+
+<hr/>
+
+#### `MTType` **`pkType`**
+
+Returns the data type of the primary key of this entity. If the entity does not have a primary key then `null` is returned.
+
+<hr/>
+
+#### `MTPrimaryKey` **`primaryKey`**
+
+Returns the primary key associated with this entity.
+
+<hr/>
+
+#### `MTAttribute` **`primaryKeyAttribute`**
+
+Returns the attribute of the primary key for this entity. If the entity does not have a primary key then `null` is returned.
+
+
+### Attribute Category
+
+These methods relate to attributes.
+
+<hr/>
+
+#### `MTAttribute attributeByFullName(String fullName)`
+
+Returns an attribute by its full name, where the full name is with regards to secondary entities being used as attributes. For instance, If an entity instantiates a secondary entity named say `Profile` as `profile`, and that secondary entity instantiates another secondary entity named `Picture` as `picture` which has an attribute say `size`, then the full name of the `size` attribute would be `profile.picture.size`. So this method is called on the top primary entity.
+
+| Parameter | Description |
+|-----|-----|
+|`String fullName` | The full name of the attribute based on its secondary entity hierarchy. |
+
+<hr/>
+
+#### `int` **`attributeCount`**
+
+Returns the number of attributes declared in this entity.
+
+<hr/>
+
+#### `MTAttribute attributeNamed(String name)`
+
+Returns an attribute of this entity with the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the attribute to return. |
+
+<hr/>
+
+#### `List` **`attributes`**
+
+Returns the list of attributes of this entity.
+
+<hr/>
+
+#### `List` **`effectiveAttributes`**
+
+Returns a list of attributes that are either directly declared or are inferred to be present from its relationships. An attribute is inferred if its associated relationship is **to** a single entity (one-to-one or many-to-one) and will be the same type as the primary key of that other entity. Essentially it is intended to contain the unique ID of the other entity object much like a foreign key column in an SQL database.
+
+<hr/>
+
+#### `int fieldNumber(MTAttribute attribute)`
+
+Returns the field number of the specified attribute. Field numbers are assigned to attributes in the order in which they are read from the model source file.
+
+| Parameter | Description |
+|-----|-----|
+|`MTAttribute attribute` | The attribute associated with the field number that you want returned. |
+
+<hr/>
+
+#### `int fieldNumberByName(String fieldName)`
+
+Returns the field number of the specified field name. Field numbers are assigned to attributes in the order in which they are read from the model source file.
+
+| Parameter | Description |
+|-----|-----|
+|`String fieldName` | The field name (attribute or relationship) associated with the field number that you want returned. |
+
+<hr/>
+
+#### `List` **`flatAttributeList`**
+
+This attribute list includes not just those attributes directly declared in its entity but also those attributes declared in instantiated secondary entities.
+
+<hr/>
+
+#### `List` **`flatAttributeNameList`**
+
+This list contains all the attribute names of not just the directly declared attributes in its entity but also those of instantiated secondary entities.
+
+<hr/>
+
+#### `boolean hasAttributeNamed(String name)`
+
+Indicates whether this entity has an attribute with the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the attribute. |
+
+<hr/>
+
+#### `boolean hasAttributeOfDataType(DataType dataType)`
+
+Indicates whether any of the attributes of this entity are of the specified data type.
+
+| Parameter | Description |
+|-----|-----|
+|`DataType dataType` | The data type of which to search for attributes. |
+
+<hr/>
+
+#### `boolean` **`hasAttributes`**
+
+Indicates whether this entity has any attributes.
+
+<hr/>
+
+#### `boolean` **`hasBitFields`**
+
+Indicates whether this entity defines any bit fields.
+
+
+### Relationship Category
+
+These methods relate to relationships.
+
+<hr/>
+
+#### `boolean` **`allParentRelationshipsOptional`**
+
+Indicates whether all relationships of this entity that are declared as `parent` are also declared as `optional`.
+
+<hr/>
+
+#### `int fieldNumberByDomainRelationship(MTDERelationship relationship)`
+
+Returns the field number of the specified *domain* relationship. This is the same order as the non-domain specific relationship.
+
+| Parameter | Description |
+|-----|-----|
+|`MTDERelationship relationship` | The domain relationship associated with the field number that you want returned. |
+
+<hr/>
+
+#### `int fieldNumberByRelationship(MTRelationship relationship)`
+
+Returns the field number of the specified relationship. Field numbers are assigned to relationships in the order in which they are read from the model source file.
+
+| Parameter | Description |
+|-----|-----|
+|`MTRelationship relationship` | The relationship associated with the field number that you want returned. |
+
+<hr/>
+
+#### `List findPossibleRelationshipsWithEntity(MTEntity entity)`
+
+Given an entity, this method finds possible relationships to this entity.
+
+| Parameter | Description |
+|-----|-----|
+|`MTEntity entity` | The entity from which to find relationships. |
+
+<hr/>
+
+#### `MTRelationship findRelationshipWithToEntity(MTEntity entity)`
+
+Given an entity object, this method will try to find and return a relationship on this entity that is to the provided entity. If none is found, `null` will be returned.
+
+| Parameter | Description |
+|-----|-----|
+|`MTEntity entity` | The entity of which to search. |
+
+<hr/>
+
+#### `boolean` **`hasImplicitRelationships`**
+
+Indicates whether this entity has any implicit relationships. Implicit means undeclared relationships that are inferred as a result of declared relationships in other entities.
+
+<hr/>
+
+#### `boolean` **`hasParentRelationship`**
+
+Indicates whether it has a least one relationship declared as parent.
+
+<hr/>
+
+#### `boolean` **`hasPrimaryParentRelationship`**
+
+Indicates whether this entity has a primary parent relationship. A primary parent relationship is one which is declared `parent` and **not** declared `optional`.
+
+<hr/>
+
+#### `boolean` **`hasRelationships`**
+
+Indicates whether this entity defines any relationships.
+
+<hr/>
+
+#### `List` **`implicitRelationships`**
+
+Returns the list of implicit relationships, where an implicit relationship is one that is to an implicit entity. An implicit entity is created by the compiler when it transforms a many-to-many relationship into this implicit entity along with implicit one-to-many and many-to-one relationships.
+
+<hr/>
+
+#### `List` **`parentRelationships`**
+
+Returns the list of parent relationships of this entity. A parent relationship is one that is declared with the `parent` keyword to indicate that their identity is fully or partially scoped by this parent entity.
+
+<hr/>
+
+#### `MTEntity` **`primaryParentEntity`**
+
+Using the relationship that is both a `parent` relationship and **not optional**, it returns the "to" entity of the relationship.
+
+<hr/>
+
+#### `MTRelationship` **`primaryParentRelationship`**
+
+Returns the relationship that is both a `parent` relationship and **not** `optional`
+
+<hr/>
+
+#### `MTRelationship primaryParentRelationship(String entityName)`
+
+Returns the one relationship of this entity that is both declared as `parent` and **not** declared as `optional` and is **to** the named entity.
+
+| Parameter | Description |
+|-----|-----|
+|`String entityName` | The name of the entity that the relationship is **to**. |
+
+<hr/>
+
+#### `MTRelationship relationshipByName(String relationshipName)`
+
+Returns a relationship of this entity by name. If a relationship is not found with this name `null` will be returned.
+
+| Parameter | Description |
+|-----|-----|
+|`String relationshipName` | The name of the relationship to return. |
+
+<hr/>
+
+#### `int` **`relationshipCount`**
+
+Returns the number of declared relationships.
+
+<hr/>
+
+#### `List` **`relationships`**
+
+Returns the list of relationships of this entity.
+
+<hr/>
+
+#### `List relationshipsWithToEntity(MTEntity toEntity)`
+
+Returns a list of relationships from this entity to a specified entity.
+
+| Parameter | Description |
+|-----|-----|
+|`MTEntity toEntity` | The entity that the relationships are **to**. |
+
+<hr/>
+
+#### `MTRelationship` **`singleParentRelationship`**
+
+Returns a relationship of this entity that is declared as `parent` and **not** declared as `optional`.
+
+<hr/>
+
+#### `List` **`uniquenesses`**
+
+Returns the list of declared uniqueness constraints between relationships.
+
+
+### View Category
+
+These methods relate to views.
+
+<hr/>
+
+#### `boolean` **`isView`**
+
+Indicates whether this entity is really a View.
+
+
+### Enum Category
+
+These methods relate to enums.
+
+<hr/>
+
+#### `MTEnum enum(String name)`
+
+Returns an enum declared in this entity by a specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the enum to return. |
+
+<hr/>
+
+#### `List` **`enums`**
+
+Returns a list of enums that have been declared in this entity.
+
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+<hr/>
+
+#### `MTAttribute attributeOfTypeTagged(String tag)`
+
+Returns an attribute of this entity that has a type (which can be another entity) that is tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<hr/>
+
+#### `MTAttribute attributeTagged(String tag)`
+
+Returns an attribute of this entity that is tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<hr/>
+
+#### `boolean hasAttributeOfTypeTagged(String tag)`
+
+Indicates whether this entity has a type (which can be another entity) that is tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<hr/>
+
+#### `boolean hasAttributeTagged(String tag)`
+
+Indicates whether this entity has at least one attribute with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<hr/>
+
+#### `boolean hasRelationshipTagged(String tag)`
+
+Indicates whether this entity has at least one relationship with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<hr/>
+
+#### `boolean hasRelationshipToEntityTagged(String tag)`
+
+Indicates whether the entity **to** which a relationship references is tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<hr/>
+
+#### `MTRelationship relationshipTagged(String tag)`
+
+Returns a relationship of this entity that is tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<hr/>
+
+#### `MTRelationship relationshipToEntityTagged(String tag)`
+
+Returns the entity **to** which a relationship references that is tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+
+
+<a name="class_MTEntityTemplate"></a>
+## MTEntityTemplate Class
+
+An Entity Template is the declaration of an entity in a parameterized way, such as `MyEntity<T,S>` where `T` and `S` are parameters that are used in the body of the definition to parameterize the entity. This entity template can then be used as a template to create other entities. Currently template entites can only be used in a special usage of a relationship.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `List` **`templateArgs`**
+
+Returns the list of template arguments.
+
+
+
+<a name="class_MTEnum"></a>
+## MTEnum Class
+
+Represents an enum in your model.
+
+The following properties and methods, grouped by category, are available for this class:
+
+### Enum Category
+
+These methods relate to enums.
+
+<hr/>
+
+#### `boolean` **`hasParentEntity`**
+
+Indicates if this enum was defined inside an entity.
+
+<hr/>
+
+#### `boolean` **`hasParentModule`**
+
+Indicates if this enum was defined inside a module.
+
+<hr/>
+
+#### `boolean` **`isExtern`**
+
+Indicates whether this was declared as `extern`.
+
+<hr/>
+
+#### `List` **`items`**
+
+Gets the enum items.
+
+<hr/>
+
+#### `MTModule` **`module`**
+
+Gets the module in which this enum was defined.
+
+<hr/>
+
+#### `String` **`name`**
+
+Gets the name of this enum.
+
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+<hr/>
+
+#### `boolean hasItemTagged(String tag)`
+
+Indicates if any of the enum's items have been tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<hr/>
+
+#### `Collection itemsTagged(String tag)`
+
+Returns any of the enum items tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+
+
+<a name="class_MTEnumItem"></a>
+## MTEnumItem Class
+
+Represents an enum item.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `MTEnum` **`enum`**
+
+Gets the enum of this item.
+
+<hr/>
+
+#### `String` **`name`**
+
+Gets the name of this item.
+
+<hr/>
+
+#### `int` **`value`**
+
+Gets the numeric value of this item.
+
+
+
+<a name="class_MTModule"></a>
+## MTModule Class
+
+Represents a grouping of entities.
+
+The following properties and methods, grouped by category, are available for this class:
+
+### Module Category
+
+These methods relate to a module.
+
+<hr/>
+
+#### `String` **`name`**
+
+Returns the name of this module.
+
+<hr/>
+
+#### `List` **`referencedModules`**
+
+Returns all the other modules that entities of this module make reference to.
+
+<hr/>
+
+#### `List referencedModules(Boolean includeToOneRelationships)`
+
+Returns all the other modules that entities of this module make reference to.
+
+| Parameter | Description |
+|-----|-----|
+|`Boolean includeToOneRelationships` | Whether to include one-to-one or many-to-one relationships when determining references. |
+
+
+### Entity Category
+
+These methods relate to an entity.
+
+<hr/>
+
+#### `List` **`entities`**
+
+Returns all the entities of this module.
+
+<hr/>
+
+#### `MTEntity entity(String name)`
+
+Returns an entity of this module by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the entity to return. |
+
+<hr/>
+
+#### `int` **`entityCount`**
+
+Returns the number of entities declared in this module.
+
+<hr/>
+
+#### `List` **`enums`**
+
+Returns all the enums of this module.
+
+<hr/>
+
+#### `boolean` **`hasPrimaryEntities`**
+
+Indicates if this module contains any primary entities. If it contains at least one it would return `true`, otherwise it would mean that it only contains secondary entities and would return `false`.
+
+<hr/>
+
+#### `boolean isExternEntity(String entityName)`
+
+Indicates whether the specified entity is externally declared (such as in a different space).
+
+| Parameter | Description |
+|-----|-----|
+|`String entityName` | The name of the entity to check. |
+
+
+### Enum Category
+
+These methods relate to enums.
+
+<hr/>
+
+#### `MTEnum enum(String name)`
+
+Returns an enum of this module by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the enum to return. |
+
+<hr/>
+
+#### `int` **`enumCount`**
+
+Returns the number of enums in this module.
+
+
+### Typedef Category
+
+These methods relate to typedefs.
+
+<hr/>
+
+#### `MTTypedef typedef(String name)`
+
+Returns a typedef of this module by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the typedef to return. |
+
+<hr/>
+
+#### `int` **`typedefCount`**
+
+Returns the number of typedefs in this module.
+
+<hr/>
+
+#### `List` **`typedefs`**
+
+Returns all the typedefs of this module.
+
+
+### Configuration Category
+
+These methods relate to a part of application configuration.
+
+<hr/>
+
+#### `MTSpace` **`space`**
+
+Returns the space in which this module was declared.
+
+
+
+<a name="class_MTNativeType"></a>
+## MTNativeType Class
+
+Represents a native data type such as `int32`, `float`, `string`, etc. Basically anything except a secondary entity type.
+
+The following properties and methods, grouped by category, are available for this class:
+
+### Primary Key Category
+
+These methods relate to a primary key.
+
+<hr/>
+
+#### `boolean` **`isPrimaryKey`**
+
+Indicates whether this native type object is being used in a primary key attribute.
+
+
+### Type Category
+
+These methods relate to data types.
+
+<hr/>
+
+#### `int` **`arraySize`**
+
+Returns the array size of this type if it is of type `byte[]``.
+
+<hr/>
+
+#### `DataType` **`dataType`**
+
+Returns the data type enum of this native type.
+
+<hr/>
+
+#### `boolean isDataType(DataType dataType)`
+
+Indicates whether this is of the specified data type.
+
+| Parameter | Description |
+|-----|-----|
+|`DataType dataType` | The data type with which to compare. |
+
+<hr/>
+
+#### `boolean` **`isUUIDType`**
+
+Indicates whether this native type is a `uuid`.
+
+<hr/>
+
+#### `boolean` **`isVariableSizeArray`**
+
+Indicates whether this is of a `byte[]` type but with a variable (not declared) array size.
+
+<hr/>
+
+#### `String` **`toString`**
+
+Returns the string representation of this native type.
+
+
+
+<a name="class_MTPrimaryKey"></a>
+## MTPrimaryKey Class
+
+Represents the primary key of an entity.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `MTType` **`type`**
+
+Gets the data type of the primary key.
+
+
+
+<a name="class_MTRelationship"></a>
+## MTRelationship Class
+
+Represents a relationship of an entity.
+
+The following properties and methods, grouped by category, are available for this class:
+
+### Attribute Category
+
+These methods relate to attributes.
+
+<hr/>
+
+#### `MTAttribute` **`effectiveAttribute`**
+
+Returns the effective attribute associated with this relationship. The effective attribute can help you persist the relationship in a database.
+
+
+### Relationship Category
+
+These methods relate to relationships.
+
+<hr/>
+
+#### `MTRelationshipHalf` **`from`**
+
+Returns the "from" part of the relationship which references the entity in which this relationship is defined.
+
+<hr/>
+
+#### `boolean` **`isImplicit`**
+
+Indicates whether the relationship was created because although it was not declared it can be implied based on relationships declared to this entity.
+
+<hr/>
+
+#### `boolean` **`isManyToMany`**
+
+Indicates whether this relationship is a many-to-many; where in a many-to-many relationship multiple objects of this entity can have multiple relationships with objects of another entity.
+
+<hr/>
+
+#### `boolean` **`isOneToMany`**
+
+Indicates whether this relationship is a one-to-many; where in a one-to-many relationship an object of this entity can have multiple relationships with objects of another entity but not the other way around.
+
+<hr/>
+
+#### `boolean` **`isOptional`**
+
+Indicates whether this relationship was defined with the `optional` keyword, indicating that relationships to the other entity is not required.
+
+<hr/>
+
+#### `boolean` **`isParent`**
+
+Indicates whether this relationship was defined with the `parent` keyword. Relationships defined this way are ones that imply that this entity considers its identity as being the combination of its parent entity and itself.
+
+<hr/>
+
+#### `boolean` **`isPrimaryParent`**
+
+Indicates whether this relationship was defined with the `parent` keyword and **not** with the `optional` keyword. Within the set of relationships of an entity, only one relationship should be defined this way.
+
+<hr/>
+
+#### `String` **`name`**
+
+Gets the name of the relationship.
+
+<hr/>
+
+#### `String` **`reverseName`**
+
+Returns the name of the reverse relationship.
+
+<hr/>
+
+#### `MTRelationship` **`reverseRelationship`**
+
+Returns the relationship from the perspective "to" entity to this entity, that is, the reverse relationship.
+
+<hr/>
+
+#### `String` **`templateArgName`**
+
+When a relationship is defined as part of an entity template, it has a template argument that will be used when an entity is created from it. This will return the name of that argument.
+
+<hr/>
+
+#### `MTRelationshipHalf` **`to`**
+
+Returns the "to" part of the relationship. This part tells you about the entity to which this relationship is bound.
+
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+<hr/>
+
+#### `boolean hasToEntityTagged(String tag)`
+
+Indicates whether the "to" entity of this relationship has been tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+
+
+<a name="class_MTType"></a>
+## MTType Class
+
+Represents a data type of an attribute. Such types can be as simple as a primitive (native) type (like `int32`) and as complex as a secondary entity.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `String` **`asString`**
+
+Returns the string representation of the type. This would be used for debug purposes.
+
+<hr/>
+
+#### `MTEnum` **`enumType`**
+
+If this type is an enum type then it returns the enum type object. Otherwise it returns `null`.
+
+<hr/>
+
+#### `boolean` **`isByteArrayType`**
+
+Indicates whether this type is both an array type and also `byte` data type.
+
+<hr/>
+
+#### `boolean` **`isDateType`**
+
+Indicates whether this type is the `date` data type.
+
+<hr/>
+
+#### `boolean` **`isEntityType`**
+
+Indicates whether this type is an entity.
+
+<hr/>
+
+#### `boolean` **`isEnumType`**
+
+Indicates whether this type is of `enum` type.
+
+<hr/>
+
+#### `boolean` **`isIntegerType`**
+
+Indicates whether this type is one of the integer data types.
+
+<hr/>
+
+#### `boolean isNativeDataType(DataType dataType)`
+
+Indicates whether this type is of the specified data types.
+
+| Parameter | Description |
+|-----|-----|
+|`DataType dataType` | The native data type from which to compare. |
+
+<hr/>
+
+#### `boolean` **`isNativeType`**
+
+Indicates whether this type is one of the native types (`int32`, `string`, etc.)
+
+<hr/>
+
+#### `boolean` **`isTypedef`**
+
+Indicates whether this type is a `typedef` type.
+
+<hr/>
+
+#### `boolean` **`isUUIDType`**
+
+Indicates whether this type is a UUID.
+
+
+
+<a name="class_MTTypedef"></a>
+## MTTypedef Class
+
+Represents a type definition useful in dealing with bit fields.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `List` **`bitFields`**
+
+Returns the bit fields declared in this typedef.
+
+<hr/>
+
+#### `int` **`bitWidth`**
+
+Returns the bit width of this typedef.
+
+<hr/>
+
+#### `MTModule` **`module`**
+
+Returns the module in which this typedef was declared.
+
+<hr/>
+
+#### `String` **`name`**
+
+Returns the name of this typedef.
+
+
+
+<a name="class_MTUnit"></a>
+## MTUnit Class
+
+Represents a unit of measure used in the naming and/or source of info of an attribute. When declaring attributes that is associated with some unit of measure, its best to assign a unit to the attribute. Not only does it help other people working with this attribute, it can be used by templates to automatically add code to convert from one unit to another as data flows from one domain to another. Units are easily defined and imported from a central repository. Units can be based on other units with an associated multiplier.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `String` **`abbreviation`**
+
+Returns an abbreviation of this unit. 
+
+<hr/>
+
+#### `MTUnit` **`baseUnit`**
+
+When a unit is based from another unit, this returns that base unit. 
+
+<hr/>
+
+#### `boolean` **`hasBaseUnit`**
+
+Indicates whether this unit extends from a base unit. 
+
+<hr/>
+
+#### `double` **`multiplier`**
+
+When a unit is based from another unit, it should have a multiplier. A multiplier is defined as the number of items in this unit per the number of items in base unit. For example, if this unit is millimeters and the base unit is meters, then the multiplier would be 1000. This method returns the units multiplier. 
+
+<hr/>
+
+#### `String` **`name`**
+
+Returns the name of the unit. 
+
+
+
+

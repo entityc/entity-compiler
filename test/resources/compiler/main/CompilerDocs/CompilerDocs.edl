@@ -1,0 +1,52 @@
+space BasicEntity {
+}
+
+entity TestEntityA {
+    D "A test entity"
+    T "Cat-egory:1:tag"
+    primarykey uuid pka { D "description of pka" }
+
+    attributes {
+        int32 someInt { D "someint description" }
+        int64 someLong { D "someLong description" }
+        float someFloat { D "someFloat description" }
+        double someDouble { D "someDouble description" }
+        string someString { D "someString description" }
+        date someDate { D "someDate description" }
+    }
+
+    relationships {
+        many TestEntityB tebs { D "description for tebs" }
+    }
+}
+
+entity TestEntityB {
+    D "B test entity"
+    primarykey uuid pkb { D "description of pkb" }
+
+    attributes {
+        int32 someInt2 { D "someint2 description" }
+        int64 someLong2 { D "someLong2 description" }
+        float someFloat2 { D "someFloat2 description" }
+        double someDouble2 { D "someDouble2 description" }
+        string someString2 { D "someString2 description" }
+        date someDate2 { D "someDate2 description" }
+    }
+
+    relationships {
+        parent one TestEntityA tea { D "description for tea" }
+    }
+}
+
+configuration Config
+{
+    output testOutput {
+        path $(TEMP_DIR:"/tmp")
+    }
+
+    templates {
+        template CompilerDocsTemplate {
+            output primary testOutput
+        }
+    }
+}

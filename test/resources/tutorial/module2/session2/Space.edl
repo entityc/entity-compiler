@@ -1,0 +1,29 @@
+space Space
+{
+}
+
+entity Player {
+    D "A player in the game."
+    primarykey uuid playerId
+
+    attributes {
+        string name {
+            D "Name of the player."
+            constraint correctLength {
+                length(name) >=3 && length(name) <= 20
+            }
+        }
+        int64 experiencePoints { D "Experience Points" }
+        int32 level {
+            D "Level achieved."
+            constraint levelValue {
+                level <= 12
+            }
+        }
+        int32 health { D "Amount of health remaining." }
+        int64 coins { D "Number of coins the player has." }
+    }
+
+    relationships {
+    }
+}

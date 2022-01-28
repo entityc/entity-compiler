@@ -1,0 +1,12 @@
+
+Entity: Player
+  Attribute: string name
+    Constraint: correctLength
+      Expression: length(name) >= 3 && length(name) <= 20
+  Attribute: int64 experiencePoints
+  Attribute: int32 level
+    Constraint: levelValue
+      Expression: level <= 12
+  Attribute: int32 health
+  Attribute: int64 coins
+

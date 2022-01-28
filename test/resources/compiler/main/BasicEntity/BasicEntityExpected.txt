@@ -1,0 +1,20 @@
+<E|N:TestEntityA|D:A test entity>
+<PK|N:pka|T:uuid|D:description of pka/>
+<A|N:someInt|T:int32|D:someint description/>
+<A|N:someLong|T:int64|D:someLong description/>
+<A|N:someFloat|T:float|D:someFloat description/>
+<A|N:someDouble|T:double|D:someDouble description/>
+<A|N:someString|T:string|D:someString description/>
+<A|N:someDate|T:date|D:someDate description/>
+<R|N:tebs|P:MANY|D:description for tebs/>
+</E>
+<E|N:TestEntityB|D:B test entity>
+<PK|N:pkb|T:uuid|D:description of pkb/>
+<A|N:someInt2|T:int32|D:someint2 description/>
+<A|N:someLong2|T:int64|D:someLong2 description/>
+<A|N:someFloat2|T:float|D:someFloat2 description/>
+<A|N:someDouble2|T:double|D:someDouble2 description/>
+<A|N:someString2|T:string|D:someString2 description/>
+<A|N:someDate2|T:date|D:someDate2 description/>
+<R|N:tea|P:ONE|D:description for tea/>
+</E>

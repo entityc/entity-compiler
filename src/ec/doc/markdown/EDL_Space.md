@@ -1,0 +1,147 @@
+# Space
+
+An enterprise space is defined as a place where entities are rendered into an implementation of just one portion of the entire enterprise application.
+
+Example spaces include:
+
+* Microservice
+* Mobile Application
+* Web Application
+* Desktop Application
+
+A space can interface with other spaces by importing them. Spaces often share entity definitions, but they can also define ones that are specific to themselves.
+
+An application must define at least one space from which it defines (or imports) the entities, domains, etc. for the application.
+
+The space is given a name. In a single space application, the name is never referenced but should still reflect the type of application you are building (e.g., SuperAmazingMicroservice).
+
+A space consists of the following:
+
+* Namespace
+* Metadata
+* Repositories
+* Entities (Model) ‡
+* Domains ‡
+* Languages ‡
+* Units ‡
+
+‡ Should be defined in separate files and **imported**. This allows these elements to not only be shared across your enterprise but also be under revision control. The process of importing allows you to control the version of these elements you are importing.
+
+The following is an example space declaration:
+
+	space SuperAmazingMicroservice {
+	
+	    namespace com.example.sam
+	    
+	    metadata {
+            "microserviceIdentifier" : "sam",
+            "appBaseUrlPath" : "example/sam",
+	    }
+
+	    // repositories
+	
+	    repository EntityRepo {
+	        type github
+	        organization "example"
+	        name "sam"
+	        path "entites"
+	        tag "v1.3.5"
+	    }
+
+	    repository DomainRepo {
+	        type github
+	        organization "entityc"
+	        name "ec-std-lib"
+	        path "domains"
+	        tag "v1.0.1"
+	    }
+
+	    repository StandardsRepo {
+	        type github
+	        organization "entityc"
+	        name "ec-std-lib"
+	        path "standards"
+	        tag "v1.0.2"
+	    }
+
+	    // import model files
+	    import SAM, Platform from EntityRepo
+        
+	    // import domains
+	    import Database, Model, Repository, Service, Controller from DomainRepo
+        
+	    // import languages and units
+	    import Languages, Units from StandardsRepo
+	}
+
+Each of the elements of a space declaration are described in the following subsections.
+
+## Namespace
+
+The namespace of a space is basically a unique identifier not just across your enterprise but across the industry. For this reason this namespace is typically a reverse internet domain name that is owned by the authoring entity (in most cases, your company). A convention is for Entity Compiler domains is to extend the space's declared namespace so that any code generated with respect to that domain is relative to the space's namespace. For instance, let's take a domain declared as:
+
+	domain Model {
+	    namespace space model
+	    ...
+	}
+
+When a template gets the namespace for the `Model` domain - and assuming our space is the `SuperAmazingMicroservice` space above - the template will receive a value of `com.example.sam.model`.
+
+## Metadata
+
+The `metadata` block is a way to annotate arbitrary name-value pairs of data that describe the space, or application associated with the space. Although you can annotate any simple name-value pairs, the templates you use to synthesize code may expect you to define values with very specific names. It may seem as though these are template configuration parameters but the intent is to also be used by other spaces that might import this space to know how to interface with it.
+
+## Repositories
+
+A repository defines a place where you want to source files. This can be either a local directory or it can be a Github repository. If it is a Github repository, it can also be a particular folder on the repository and from a specific git tag. When you import files from a repository you only need to reference the repository name, thus abstracting the import away from the details of where the files are coming from.
+
+A repository is declared as follows:
+
+`repository` *name* `{`
+    `type` *type*
+    `organization` *organization*
+    `name` *repositoryName*
+    `path` *path*
+    `tag` *tag*
+`}`
+
+Where *type* is either `local` or `github`. If `local` is specified then only the *path* is required.
+
+If *type* is `github`, then *organization* is the github organization associated with the repo and *repositoryName* is the name of the Github repository. The *path*, for *type* of `local` is the local directory path and for *type* of `github`, it is the path inside the repository to a folder that contains the files you want as part of the repository. The *tag* is a git tag on the repository from which to source the files.
+
+## Model Files
+
+Model files are the files that contain elements such as: `entity`, `enum`, and `typedef`. These are considered to be central to your entire enterprise and should be contained in a single place where all projects reference by way of importing into their space.
+
+The Entity Compiler command line supports specifying entity description language (`.edl` files), however it's best to only use the command line for files that define configurations and spaces. For model type elements, it's best to import them into your application space, even if you are importing them from a local project directory.
+
+As shown above, we import our model files using:
+
+```
+// import model files
+import SAM, Platform from EntityRepo
+```
+
+This will look for files `SAM.edl` and `Platform.edl` from the `EntityRepo` repository. This repository is declared to point to a Github repository but could just as easily be declared as a local directory.
+
+> Another convention is for entities to be grouped into entity modules where each `.edl` file contains a module of entities.
+
+Entity declarations are described in [EDL_Entity.md](EDL_Entity.md).
+
+## Domains
+
+A space needs to define the domains that are important for its application. As with entities, its best to declare domains in their own file and have spaces import them. This allows domains to have some standardization while still allowing each space to *specialize* a domain for its application. 
+
+Domain declarations are described in [EDL_Domain.md](EDL_Domain.md).
+
+## Languages
+
+As a way of standardizing the languages or data formats used by applications (and thus this files generated by templates), there are constructs for declaring and defining languages. As with other elements, its best to define these in a central place and import them into your space.
+
+See [Entity Compiler Tutorial, Module 3, Session 4](https://github.com/entityc/ec-tutorials/EntityCompiler/Module3/Session4) on how to define and use languages.
+
+## Units
+
+Attributes can be declared with respect to units (e.g., `int32 distance in meters`). The entity language allows you to not only declare and define units but also the relationship between them (when that applies). It is up to templates to make use of this information but having units standardized in a central repository and imported into your space will help to keep consistency across your enterprise.
+
+See [Entity Compiler Tutorial, Module 1, Session 3](https://github.com/entityc/ec-tutorials/EntityCompiler/Module1/Session3) on how to define and use units.

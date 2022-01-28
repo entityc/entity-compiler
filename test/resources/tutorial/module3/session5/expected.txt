@@ -1,0 +1,6 @@
+
+String Attributes:
+  Player.name
+  Social.email
+  Social.forumName
+

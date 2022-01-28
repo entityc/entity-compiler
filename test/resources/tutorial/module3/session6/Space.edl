@@ -1,0 +1,42 @@
+space Space
+{
+}
+
+typedef int32 HighColor16 {
+    D "A 16-bit RGB color format that gives extra range for green."
+    (5) red { D "Red" }
+    (6) green { D "Green" }
+    (5) blue { D "Blue" }
+}
+
+enum Rank {
+    Rookie = 1
+    Bronze = 2
+    Silver = 3
+    Gold = 4
+    SuperDuper = 5
+}
+
+secondary entity Social
+{
+    attributes {
+        string email
+        string forumName
+        uuid forumId
+    }
+}
+entity Player {
+    D "A player in the game."
+    primarykey uuid playerId
+
+    attributes {
+        Rank rank
+        string name { D "Name of the player." }
+        HighColor16 color
+        int64 experiencePoints { D "Experience Points" }
+        int32 level { D "Level achieved." }
+        float health { D "Amount of health remaining from 0 to 1." }
+        double strength { D "How strong the player is, from 0 to 100." }
+        Social social
+    }
+}

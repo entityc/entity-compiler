@@ -1,0 +1,29 @@
+$[domain Model]
+$[log]
+=========== MODEL ===========
+$[foreach module in space.modules]
+
+MODULE: ${module|domain|name}
+$[foreach typedef in module.typedefs]
+
+  Typedef: ${typedef|domain|name}
+$[/foreach]
+$[foreach enum in module.enums]
+
+  Enum: ${enum|domain|name}
+$[foreach item in enum.items]
+    ${item.value}) ${item|domain|name}
+$[/foreach]
+$[/foreach]
+$[foreach entity in module.entities]
+
+  Class: ${entity|domain|fullname:("::")}
+$[if entity.hasPrimaryKey]
+      PK:     ${entity.primaryKeyAttribute|domain|name}
+$[/if]
+$[foreach attribute in entity.attributes]
+      Member: ${attribute|domain|name}
+$[/foreach]
+$[/foreach]
+$[/foreach]
+$[/log]

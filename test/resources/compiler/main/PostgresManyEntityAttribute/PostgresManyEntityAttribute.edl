@@ -1,0 +1,41 @@
+space Space {
+}
+
+enum Role {
+    D "Represents a type of access in the system."
+    Restricted    = 0 { D "This user can only read/write cards explicity allowed by a researcher level user." }
+    Viewer        = 1 { D "Is only allowed to view concept cards." }
+    Researcher    = 2 { D "Is allowed to view, modify and create new concept cards." }
+    Administrator = 3 { D "Is allowed to do what the Researcher can do but also change the role of users." }
+}
+entity User {
+
+    D "Represents a user in the system."
+
+    primarykey uuid userId
+
+    attributes {
+        many Role roles { D "The roles assigned to a user." }
+        string username
+    }
+}
+
+domain Database
+{
+    entity User rename platform_user
+
+    naming entity, attribute, relationship {
+        method underscoreLowercase
+    }
+}
+
+configuration Config
+{
+    output Database {
+        path $(TEMP_DIR:"/tmp")
+    }
+    transform Postgres {
+        output primary Database
+        output schema Database
+    }
+}

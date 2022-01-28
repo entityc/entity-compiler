@@ -1,0 +1,96 @@
+# Configuration
+
+This part of the language makes it easier to run the entity compiler without having so many command line arguments. Many of the elements in the configuration are specific to a particular project and generally don't apply across an enterprise. However, if some part of a configuration does apply across an enterprise, it certainly can be placed in a central file that all project import.
+
+You can have multiple configurations. Each configuration has to be named for this reason. When you invoke the entity compiler you should specify which configuration you want to use with the `-c` option. In most cases a project will just have a single configuration but the flexibility is there if you need it.
+
+A configuration is declared as the following (where `Main` is an example name):
+
+	configuration Main {
+	    // configuration
+	}
+
+Inside the configuration block you can define:
+
+- **Repositories**. A place where model files can be imported.
+- **Templates**. Templates you want to use to generate code.
+- **Transforms**. Built-in transforms you want to use to generate code.
+- **Output locations**. Places to store generated code.
+
+The following subsections will go over these, but in an order that makes it easier to understand.
+
+## Output Locations
+
+As part generating files it is necessary to specify where they will be placed. This is the purpose of the `output` block.
+
+	output Entities {
+	    path "src/ec/model"
+	}
+
+Currently only a local filesystem `path` can be used. In the future something more elaborate may be offered. The path can be specified as a full file path or a relative one like shown above. In the case of relative, it is relative from the directory in which the entity compiler was invoked.
+
+Below you will see how these outputs are used.
+
+## Repositories
+
+A repository can be used as place where model files can be fetched. Currently, this can be one of two: local directory or Github. Here is a definition for each:
+
+	repository EntitiesRepo {
+        type github
+        organization "entityc"
+        name "bigrepo"
+        path "entities"
+        tag "v1.0.1"
+    }
+
+    repository LocalDev {
+        type local
+        path "../bigrepo/entities"
+    }
+
+They both have a field called `type` that defines which of the two supported types it is.
+
+### Github
+
+For the GitHub one at the top, you need to specify `organization` as the GitHub organization that owns the repository. This is usually in the first part of a repository URL. Then there is the `name` of the repository, must match exact case for the repository name. The `path` specifies where inside this repository to pull model files from. In this case it is inside a top directory of the repository called `entities`. Lastly the `tag` field is where you specify which git tag to pull the model files from. (you may also specify a branch name??)
+
+To use this method it is necessary to acquire a special GitHub "Personal Access Token" and put it in the right place. To get the token go to GitHub.com and then to your **Settings** page. Then on the left-hand side look for **Developer settings**. Then on the left hand side click **Personal Access Token**. Click on the **Generate new token** button.
+
+It will ask you first to enter a note, you can just put "entity compiler". Then you have to select the scope. Click the **repo** checkbox which will automatically check the ones under it. Scroll to the bottom and press the **Generate token** button. This should display the token on the following screen. This will be the only time you can copy it. If for some reason it is not displayed, you can edit it and hit the **Regenerate token** button and it should display a new one. Copy this token, then create a file called `.github` in your home directory and make it look like this:
+
+	oauth=your_token_here
+
+Where `your_token_here` is the token you copied above.
+
+### Local filesystem
+
+Another type of repository is simply your local file system. This is useful if you have checked out the repository to your local filesystem and you want to reference the model files directly from there. The primary reason for doing it this way is if you are developing a new part of the model and you don't want to constantly create new tags. Here we simply provide the `path` to the local directory that contains the model files.
+
+You can mix and match both types for different parts of your model as you will see below.
+
+## Templates
+
+When you declare a template in this configuration, you are saying you want it to run on the model.
+
+    template PostmanTemplate {
+        output primary Postman
+    }
+
+    template Markdown {
+        output primary Docs
+    }
+
+Here we specify to run two templates, one to generate a Postman configuration file and another to generate Markdown documentation. The output of the template is specified as one of the `output` definitions. This allows you to have multiple templates use the same output and if you have to change the path you can do it in one place.
+
+Although templates can only have one output, a provision here was made to allow multiple to be specified where each could be named. In this case, we must declare all as `primary`. In the future additional outputs may be supported.
+
+## Transforms
+
+There are some built in transforms that can generate code from the model. After the addition of templates there only remains a single transform. Someday it may also be implemented as a template but for now it must be used as a transform. This is the `Postgres` transform that generates not only the initial database SQL but also incremental migration sql files. For instance:
+
+    transform Postgres {
+        output primary DatabaseMigrationResources
+        output schema DatabaseSchema
+    }
+
+Here we have to specify two outputs, one is for the `primary` SQL output and another is for a file private to the transform that it uses to know what has changed from one version of the database to another - it calls the `schema`. It is important for a project to save the `schema` output files to its own git repository so that it is saved.

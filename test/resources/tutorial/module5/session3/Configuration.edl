@@ -1,0 +1,9 @@
+configuration Tutorial
+{
+    templates {
+        template DatabaseTemplate {}
+        template DTOTemplate {}
+        template ModelTemplate {}
+        template APITemplate {}
+    }
+}

@@ -1,0 +1,3 @@
+Model Type: Entity
+Model Type: Domain
+Model Type: Interface

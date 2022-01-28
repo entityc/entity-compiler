@@ -1,0 +1,16 @@
+$[log]
+$[*
+*]
+$[foreach entity in space.entities]
+
+$[let qualifier = entity.isSecondary ? "Secondary " : ""]
+${qualifier}Entity: ${entity.name}
+$[foreach attribute in entity.attributes]
+  Attribute: ${attribute.type} ${attribute.name}
+$[foreach constraint in attribute.constraints]
+    Constraint: ${constraint.name}
+      Expression: ${constraint.expression}
+$[/foreach]
+$[/foreach]
+$[/foreach]
+$[/log]

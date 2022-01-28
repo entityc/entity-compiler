@@ -1,0 +1,23 @@
+space Module1
+{
+}
+
+enum SpellType {
+    D "Indicates the type of spell."
+    Transport = 1 { D "Allows a player to move anywhere." }
+    Zap = 2 { D "Zaps opponent, reducing health." }
+    Shield = 3 { D "Places a shield around the player." }
+}
+
+entity MagicSpell {
+    D "Gives you the ability to do magical things."
+    primarykey uuid magicSpellId
+
+    attributes {
+        SpellType type { D "The type of spell." }
+        string name { D "Name of the magic spell." }
+        int32 castEnergy { D "The amount of energy it requires to cast it." }
+        int64 price { D "How much it costs to buy." }
+        int32 weight { D "How much it weighs. This affects how many spells a player can carry." }
+    }
+}

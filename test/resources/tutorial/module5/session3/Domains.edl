@@ -1,0 +1,68 @@
+domain Database {
+    naming entity, attribute {
+        method underscoreLowercase
+        without units
+    }
+    entity HumanPlayer rename person {
+        attributes {
+            rename playerId to person_id
+            rename experiencePoints to xp
+        }
+    }
+    entity MagicSpell {
+        attributes {
+            int32 options replaces {
+                (16) castEnergy
+                (16) weight
+            }
+        }
+    }
+}
+
+domain DTO {
+    namespace com.example.dto
+    naming entity {
+        prefix "ZD"
+        suffix "Dto"
+    }
+    naming attribute {
+        primarykey id
+    }
+}
+
+domain APICode {
+    namespace com.example.api
+    naming entity {
+        prefix "ZA"
+        suffix "Controller"
+    }
+}
+
+domain APIPath {
+    naming entity, attribute {
+        method dashesLowercase
+    }
+}
+
+domain Model {
+    namespace com.example.model
+    naming module {
+        method capitalize
+    }
+    naming entity {
+        prefix "ZM"
+    }
+    naming attribute {
+        primarykey id
+    }
+    naming enum {
+        prefix "ZE"
+    }
+    naming enumItem {
+        method underscoreUppercase
+    }
+    naming typedef {
+        method standard
+        suffix "Type"
+    }
+}

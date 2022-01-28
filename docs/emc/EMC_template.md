@@ -1,0 +1,369 @@
+# Template Model Classes
+
+Classes used by the template engine to structure and execute the code. The classes are briefly described in the following table, then each will be described in more detail in the sub-sections below the table.
+
+| Class | Description |
+|-----|-----|
+|[`FTAuthor`](#class_FTAuthor)|A template author connects itself to a publisher outlet for the purpose of authoring (sending) code there.|
+|[`FTPublisher`](#class_FTPublisher)|The Publisher class is responsible for inserting code from authors to its outlets. Inside the publisher block it will declare one or more outlets that an author can connect with to author code into.|
+|[`FTTemplate`](#class_FTTemplate)|Represents an actual template containing code to execute.|
+
+<a name="class_FTAuthor"></a>
+## FTAuthor Class
+
+A template author connects itself to a publisher outlet for the purpose of authoring (sending) code there.
+
+The following properties and methods, grouped by category, are available for this class:
+
+### Namespace Category
+
+These methods relate to a namespace.
+
+<hr/>
+
+#### `MFSet` **`fullPublisherNamespaces`**
+
+Returns the set of **full** namespaces associated with this author. A **full** namespace is one which combines parent author namespaces with this author namespaces.
+
+<hr/>
+
+#### `Set` **`namespaces`**
+
+Returns the set of declared namespaces of this author. If this author instruction is embedded in another author instruction then this will not be a full namespace.
+
+<hr/>
+
+#### `MFSet` **`publisherNamespaces`**
+
+Returns the set of publisher namespaces used by this author.
+
+<hr/>
+
+#### `MTNamespace` **`topPublisherNamespace`**
+
+Returns the namespace of the top author in an author hierarchy starting from this author.
+
+
+### Template Category
+
+These methods relate to a template.
+
+<hr/>
+
+#### `FTTemplate` **`template`**
+
+Returns the template in which this author was declared.
+
+
+### Publisher Category
+
+These methods relate to a publisher.
+
+<hr/>
+
+#### `FTPublishPhase` **`phase`**
+
+Returns the declared publishing phase in which this author should execute.
+
+<hr/>
+
+#### `FTPublishScope` **`scope`**
+
+Returns the declared scope in which this author will execute.
+
+
+### Author Category
+
+These methods relate to an author.
+
+<hr/>
+
+#### `List` **`childAuthors`**
+
+Returns the list (if any) of child authors.
+
+<hr/>
+
+#### `boolean` **`hasChildAuthors`**
+
+Indicates whether this author has child authors.
+
+<hr/>
+
+#### `boolean` **`hasParent`**
+
+Indicates whether this author has a parent author.
+
+<hr/>
+
+#### `FTAuthor` **`parentAuthor`**
+
+Returns the parent author instruction to this one.
+
+<hr/>
+
+#### `FTAuthor` **`topAuthor`**
+
+Returns the top author of an author hierarchy starting from this author.
+
+<hr/>
+
+#### `String` **`uniqueId`**
+
+Returns a unique ID for this author.
+
+
+### Outlet Category
+
+These methods relate to an outlet.
+
+<hr/>
+
+#### `List` **`childOutletAuthors`**
+
+Returns the list of child authors that connect to an outlet.
+
+<hr/>
+
+#### `boolean` **`hasChildOutletAuthors`**
+
+Indicates whether this author has child authors that connect to an outlet.
+
+<hr/>
+
+#### `boolean` **`hasChildOutletsWithIntermediateParents`**
+
+Indicates whether this author has children authors that connect to an outlet and there are intermediate parent authors (that is authors that don't connect to an outlet).
+
+<hr/>
+
+#### `boolean` **`isOutletAuthor`**
+
+Indicates whether this author connects to an outlet.
+
+<hr/>
+
+#### `FTOutlet` **`outlet`**
+
+If this author defines an outlet, this returns that outlet. Otherwise, it returns `null`.
+
+<hr/>
+
+#### `String` **`outletName`**
+
+Returns the outlet for this author, if it has one. Otherwise it will return `null`.
+
+
+
+<a name="class_FTPublisher"></a>
+## FTPublisher Class
+
+The Publisher class is responsible for inserting code from authors to its outlets. Inside the publisher block it will declare one or more outlets that an author can connect with to author code into.
+
+The following properties and methods, grouped by category, are available for this class:
+
+### Namespace Category
+
+These methods relate to a namespace.
+
+<hr/>
+
+#### `MTNamespace` **`namespace`**
+
+Returns the namespace for this publisher.
+
+
+### Outlet Category
+
+These methods relate to an outlet.
+
+<hr/>
+
+#### `boolean` **`hasOutlets`**
+
+Indicates if this publisher has any outlets.
+
+<hr/>
+
+#### `List` **`outlets`**
+
+Returns all outlets of this publisher in order of declaration.
+
+<hr/>
+
+#### `List outletsByName(String outletName)`
+
+Returns an outlet of this publisher by name.
+
+| Parameter | Description |
+|-----|-----|
+|`String outletName` | The name of the outlet to return. |
+
+
+
+<a name="class_FTTemplate"></a>
+## FTTemplate Class
+
+Represents an actual template containing code to execute.
+
+The following properties and methods, grouped by category, are available for this class:
+
+### Domain Category
+
+These methods relate to a domain.
+
+<hr/>
+
+#### `String` **`defaultDomainName`**
+
+Returns the default domain name declared by this template.
+
+<hr/>
+
+#### `boolean` **`hasReferencedDomains`**
+
+Indicates whether this template makes reference to any domains.
+
+<hr/>
+
+#### `List` **`referencedDomainNames`**
+
+Returns the names of all the domains referenced by this template (such as those by the domain filter).
+
+
+### Function Category
+
+These methods relate to functions.
+
+<hr/>
+
+#### `FTFunction functionWithName(String functionName)`
+
+Returns the function by the specified name. This function must be declared in this template.
+
+| Parameter | Description |
+|-----|-----|
+|`String functionName` | The name of the function to return. |
+
+<hr/>
+
+#### `Collection` **`functions`**
+
+Returns all the functions declared in this template.
+
+<hr/>
+
+#### `boolean hasFunctionWithName(String functionName)`
+
+Indicates whether this template has a function by the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String functionName` | The name of the function to check. |
+
+<hr/>
+
+#### `boolean` **`hasFunctions`**
+
+Indicates whether this template has at least one function definition.
+
+<hr/>
+
+#### `boolean` **`hasOnlyFunctions`**
+
+Indicates whether this template has only function definitions.
+
+
+### Language Category
+
+These methods relate to language definitions.
+
+<hr/>
+
+#### `String` **`language`**
+
+Returns the name of the language defined by this template.
+
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+<hr/>
+
+#### `boolean` **`hasReferencedTags`**
+
+Indicates whether this template makes reference to any tags.
+
+<hr/>
+
+#### `List` **`referencedTags`**
+
+Returns a list of tag names that are referenced by this template.
+
+
+### Template Category
+
+These methods relate to a template.
+
+<hr/>
+
+#### `boolean` **`hasImportedTemplates`**
+
+Indicates whether this template has imported other templates.
+
+<hr/>
+
+#### `Set` **`importedTemplates`**
+
+Returns the templates that this template has imported.
+
+<hr/>
+
+#### `boolean` **`isImported`**
+
+Indicates whether this template object has been imported. If so it is likely in a list returned by `importedTemplates`.
+
+<hr/>
+
+#### `String` **`name`**
+
+Returns the name of this template.
+
+
+### Publisher Category
+
+These methods relate to a publisher.
+
+<hr/>
+
+#### `boolean` **`hasPublishers`**
+
+Indicates whether this template contains any publishers.
+
+<hr/>
+
+#### `Collection` **`publishers`**
+
+Returns the publishers declared in this template.
+
+
+### Author Category
+
+These methods relate to an author.
+
+<hr/>
+
+#### `List` **`authors`**
+
+Returns the authors declared in this template.
+
+<hr/>
+
+#### `boolean` **`hasAuthors`**
+
+Indicates whether this template contains any authors.
+
+
+
+

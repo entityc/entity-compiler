@@ -1,0 +1,13 @@
+units {
+    coins {
+        D "Currency in the game."
+        abbr "coins"
+    }
+    meters {
+        abbr "m"
+    }
+    millimeters extends meters {
+        abbr "mm"
+        multiplier 0.001
+    }
+}

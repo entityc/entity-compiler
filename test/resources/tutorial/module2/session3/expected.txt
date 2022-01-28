@@ -1,0 +1,21 @@
+
+Typedef: HighColor16
+    BitField: red [4:0] (5)
+    BitField: green [10:5] (6)
+    BitField: blue [15:11] (5)
+
+Entity: Player
+  Attribute: string name
+  Attribute: HighColor16 primaryColor
+    BitField: red [4:0] (5)
+    BitField: green [10:5] (6)
+    BitField: blue [15:11] (5)
+  Attribute: HighColor16 secondaryColor
+    BitField: red [4:0] (5)
+    BitField: green [10:5] (6)
+    BitField: blue [15:11] (5)
+  Attribute: int64 experiencePoints
+  Attribute: int32 level
+  Attribute: int32 health
+  Attribute: int64 coins
+

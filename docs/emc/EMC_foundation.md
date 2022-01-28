@@ -1,0 +1,152 @@
+# Foundation Model Classes
+
+The model classes of this type are intended to provide support for foundation type functions. Currently only array/set classes are supported. The classes are briefly described in the following table, then each will be described in more detail in the sub-sections below the table.
+
+| Class | Description |
+|-----|-----|
+|[`MFArray`](#class_MFArray)|This class represents a ordered array of objects. To create an empty array you can use: `$[let myList = @[]@]` then can use these methods on that variable (`myList` in this example) to access the array functionality that is exposed here.|
+|[`MFSet`](#class_MFSet)|This class represents a unique set of objects. You cannot create an object of this class in template code, however, some classes have methods that will return such an object. Since this class does not offer methods to manipulate the object, it should be considered immutable. You can iterate through the items in a set using the `foreach` instruction. For example: `$[foreach item in mySet] ... $[/foreach]` would allow you to process each item(object) in the set.|
+
+<a name="class_MFArray"></a>
+## MFArray Class
+
+This class represents a ordered array of objects. To create an empty array you can use: `$[let myList = @[]@]` then can use these methods on that variable (`myList` in this example) to access the array functionality that is exposed here.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `MFArray add(Object o)`
+
+Allows you to add an object to this array. The `do` template instruction can be used to do this (e.g., `$[do array.add(obj)]`. This method returns the array itself so you can chain other array methods after this one.
+
+| Parameter | Description |
+|-----|-----|
+|`Object o` | The object to add to the array. |
+
+<hr/>
+
+#### `MFArray addAll(MFArray otherArray)`
+
+Allows you to add all elements of another array to this array. The `do` template instruction can be used to do  this (e.g., `$[do array.addAll(otherArray)]`. This method returns the array itself so you can chain other array methods after this one.
+
+| Parameter | Description |
+|-----|-----|
+|`MFArray otherArray` | The other array to add to this array. |
+
+<hr/>
+
+#### `MFArray` **`clear`**
+
+This method removes all items in the array.
+
+<hr/>
+
+#### `boolean contains(Object object)`
+
+Indicates if the array contains the specified object.
+
+| Parameter | Description |
+|-----|-----|
+|`Object object` | The object of which to determine its presence in the array. |
+
+<hr/>
+
+#### `MFArray` **`copy`**
+
+Allows you to make a copy of this array. Since it returns the new array you can chain other array methods after this one.
+
+<hr/>
+
+#### `int` **`count`**
+
+Returns the number of items in the array.
+
+<hr/>
+
+#### `Object` **`first`**
+
+Returns the first item in the array.
+
+<hr/>
+
+#### `Object get(Long index)`
+
+Returns the specified item by its index into the array.
+
+| Parameter | Description |
+|-----|-----|
+|`Long index` | The index into the array that points to the item to be returned. |
+
+<hr/>
+
+#### `int indexOf(Object o)`
+
+Returns the index into the array associated with the specified object. If the object is not found, a -1 is returned.
+
+| Parameter | Description |
+|-----|-----|
+|`Object o` | The object of which to locate its index. |
+
+<hr/>
+
+#### `boolean` **`isEmpty`**
+
+Indicates if the array is empty (no items).
+
+<hr/>
+
+#### `Object` **`last`**
+
+Returns the last item in the array.
+
+<hr/>
+
+#### `MFArray remove(Object o)`
+
+Allows you to remove a specified object from the array. This method returns the array itself so you can chain other array methods after this one.
+
+| Parameter | Description |
+|-----|-----|
+|`Object o` | The object to remove from this array. |
+
+<hr/>
+
+#### `ArrayList` **`values`**
+
+Returns all the values of the array. When iterating this array with a `foreach` you do **not** need to use this method.
+
+
+
+<a name="class_MFSet"></a>
+## MFSet Class
+
+This class represents a unique set of objects. You cannot create an object of this class in template code, however, some classes have methods that will return such an object. Since this class does not offer methods to manipulate the object, it should be considered immutable. You can iterate through the items in a set using the `foreach` instruction. For example: `$[foreach item in mySet] ... $[/foreach]` would allow you to process each item(object) in the set.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `boolean contains(Object object)`
+
+Indicates if the set contains the specified object.
+
+| Parameter | Description |
+|-----|-----|
+|`Object object` | The object of which to determine its presence in the set. |
+
+<hr/>
+
+#### `int` **`count`**
+
+Returns the number of items in the set.
+
+<hr/>
+
+#### `boolean` **`isEmpty`**
+
+Indicates if the set is empty (no items).
+
+
+
+

@@ -1,0 +1,25 @@
+formatting {
+    format Default {
+        "Element.ExpressionOperator.spaceBefore": true,
+        "Element.ExpressionOperator.spaceAfter": true,
+        "Element.ExpressionOperatorEquals.spaceBefore": true,
+        "Element.ExpressionOperatorEquals.spaceAfter": true,
+        "Element.ExpressionOperatorUnary.spaceAfter": false,
+        "Element.FilterName.spaceAfter": false,
+        "Instruction.outlet.suppressIndent": true,
+        "Instruction.receive.suppressIndent": true,
+        "Instruction.send.suppressIndent": true,
+        "Element.Description.alignTo.InstructionName": true,
+        "Element.FunctionOpenParen.alignTo.InstructionName": true,
+        "Element.FunctionArgName.alignTo.FunctionArgName": true,
+        "Element.FunctionCloseParen.alignTo.FunctionOpenParen": true,
+        "Element.Description.alignTo.FunctionArgName": true,
+        "Element.InstructionBlockStartSuffix.alignTo.InstructionBlockStartPrefix.if.Description": true,
+        "Element.InstructionSuffix.alignTo.InstructionPrefix.if.Description": true,
+        //"Element.FunctionCallOpenParen.alignTo.InstructionName": true,
+        //"Element.FunctionCallArgName.alignTo.FunctionCallArgName": true,
+        //"Element.FunctionCallCloseParen.alignTo.FunctionCallOpenParen": true,
+        "Element.FunctionCallArgDelim.spaceAfter": true,
+        "Element.FunctionCallDelim.spaceAfter": true,
+    }
+}

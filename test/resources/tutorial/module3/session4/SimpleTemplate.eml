@@ -1,0 +1,16 @@
+$[log]
+$[let stringAttributeList = @[]@]
+$[foreach entity in space.entities]
+$[foreach attribute in entity.attributes]
+$[switch attribute.type]
+$[case string]
+$[do stringAttributeList.add(attribute)]
+$[default]
+$[/switch]
+$[/foreach]
+$[/foreach]
+String Attributes:
+$[foreach attribute in stringAttributeList.values]
+  ${attribute.entity.name}.${attribute.name}
+$[/foreach]
+$[/log]

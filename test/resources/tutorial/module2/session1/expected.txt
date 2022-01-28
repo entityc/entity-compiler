@@ -1,0 +1,28 @@
+
+Entity: Achievement
+  Attribute: string title
+  Attribute: string description
+  Attribute: int32 bonusPoints
+  Attribute: HashedCloudAsset model
+  Attribute: HashedCloudAsset texture
+
+Secondary Entity: HashedCloudAsset
+  Attribute: string url
+  Attribute: string bucketName
+  Attribute: string path
+  Attribute: byte md5
+  Attribute: int64 size
+
+Entity: MagicSpell
+  Attribute: string name
+  Attribute: int32 castEnergy
+  Attribute: int64 price
+  Attribute: int32 weight
+  Attribute: Upgrade[] upgrades
+
+Secondary Entity: Upgrade
+  Attribute: string name
+  Attribute: string description
+  Attribute: int32 weightReduction
+  Attribute: int32 castEnergyReduction
+

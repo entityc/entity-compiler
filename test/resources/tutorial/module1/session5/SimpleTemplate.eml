@@ -1,0 +1,23 @@
+$[log]
+$[foreach enum in space.enums]
+
+Enum: ${enum.name}
+$[foreach item in enum.items]
+  Item: ${item.name} = ${item.value}
+$[/foreach]
+$[/foreach]
+$[foreach entity in space.entities]
+
+Entity: ${entity.name}
+$[foreach attribute in entity.attributes]
+$[let attributeType = attribute.type]
+$[if attributeType.isEnumType]
+  $[let attributeType = attributeType.name]
+$[/if]
+  Attribute: ${attributeType} ${attribute.name}
+$[/foreach]
+$[foreach relationship in entity.relationships]
+  Relationship: ${relationship.name} ${relationship.to.plurality} ${relationship.to.entity.name}$[if relationship.isParent] (parent)$[/if-]
+$[/foreach]
+$[/foreach]
+$[/log]

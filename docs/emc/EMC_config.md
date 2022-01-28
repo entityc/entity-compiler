@@ -1,0 +1,445 @@
+# Configuration Model Classes
+
+This represents a grouping of classes that deal with how an application or synthesis of an application is configured. The classes are briefly described in the following table, then each will be described in more detail in the sub-sections below the table.
+
+| Class | Description |
+|-----|-----|
+|[`MTConfiguration`](#class_MTConfiguration)|This class represents a compiler configuration specific for the building of your application.|
+|[`MTRepositoryImport`](#class_MTRepositoryImport)|Contains configuration for importing files from a repository.|
+|[`MTSpace`](#class_MTSpace)|The space class represents the top of your entity model and also defines information about where you can import entities along with other elements such as units, domains, templates, etc. that are important for application synthesis. Most templates start with the space object to obtains the list of modules or entities in your model.|
+|[`MTTemplate`](#class_MTTemplate)|Represents a template configuration.|
+
+<a name="class_MTConfiguration"></a>
+## MTConfiguration Class
+
+This class represents a compiler configuration specific for the building of your application.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `String` **`name`**
+
+Returns the name of this configuration.
+
+<hr/>
+
+#### `MTDirectory outputByName(String name)`
+
+With the name of an output, this returns the directory object representing the output that a template can be configured to use.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the output as it is defined inside the `config {}` block of your model. |
+
+<hr/>
+
+#### `MTSpace` **`space`**
+
+Returns the top space of your application.
+
+<hr/>
+
+#### `List` **`templates`**
+
+Returns all the templates that have been declared in the `config {}` block of your model.
+
+
+
+<a name="class_MTRepositoryImport"></a>
+## MTRepositoryImport Class
+
+Contains configuration for importing files from a repository.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `String` **`filename`**
+
+Returns the filename of this import.
+
+<hr/>
+
+#### `String` **`identifier`**
+
+Returns an identifer which is basically the *repository name*`.`*filename*.
+
+<hr/>
+
+#### `boolean` **`isIncludeOnly`**
+
+Indicates whether this import should only use the file as like a header file or where everything in the imported source file is essentially declared as extern. This would be used in the case of entities where you don't intend to implement them in code directly but need to know how they are defined so code knows how to interface with them in some way.
+
+<hr/>
+
+#### `String` **`repositoryName`**
+
+Returns the declared name of the repository object that this import operation will use as its source repository.
+
+
+
+<a name="class_MTSpace"></a>
+## MTSpace Class
+
+The space class represents the top of your entity model and also defines information about where you can import entities along with other elements such as units, domains, templates, etc. that are important for application synthesis. Most templates start with the space object to obtains the list of modules or entities in your model.
+
+The following properties and methods, grouped by category, are available for this class:
+
+### Domain Category
+
+These methods relate to a domain.
+
+<hr/>
+
+#### `List` **`domains`**
+
+Returns all domains declared in this space.
+
+<hr/>
+
+#### `MTNamespace` **`namespace`**
+
+Returns the namespace defined for this space. This can serve as the base code namespace for code generated in different domains. To do this a domain would define its namespace relative to this namespace using the appropriate syntax.
+
+
+### Module Category
+
+These methods relate to a module.
+
+<hr/>
+
+#### `MTModule moduleWithName(String name)`
+
+Returns a module by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the module to return. |
+
+<hr/>
+
+#### `List` **`modules`**
+
+Returns all modules that have been imported into this space.
+
+
+### Entity Category
+
+These methods relate to an entity.
+
+<hr/>
+
+#### `MTDomain domain(String name)`
+
+Returns a domain from its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the domain to return. |
+
+<hr/>
+
+#### `MTEntity entity(String name)`
+
+Returns an entity from its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the entity to return. |
+
+<hr/>
+
+#### `int` **`entityCount`**
+
+Returns a the total number of entities in this space including implicit entities.
+
+<hr/>
+
+#### `MTEntityTemplate entityTemplateWithName(String name)`
+
+Returns an entity template by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the entity to return. |
+
+<hr/>
+
+#### `boolean hasDomain(String name)`
+
+Indicates if there is a domain by the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the domain in question. |
+
+
+### Enum Category
+
+These methods relate to enums.
+
+<hr/>
+
+#### `int` **`enumCount`**
+
+Returns a the number of enums in this space.
+
+<hr/>
+
+#### `MTEnum enumWithName(String name)`
+
+Returns an enum by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the enum to return. |
+
+<hr/>
+
+#### `List` **`enums`**
+
+Returns all enums declared in this space.
+
+
+### Typedef Category
+
+These methods relate to typedefs.
+
+<hr/>
+
+#### `MTInterfaceOperation operationByName(MTInterface mtInterface, String extendedOperationName)`
+
+Given an interface object, this will return an operation by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`MTInterface mtInterface` | The interface object that contains the operation. |
+|`String extendedOperationName` | The name of the operation to return. |
+
+<hr/>
+
+#### `int` **`typedefCount`**
+
+Returns the number of typedefs declared in this space.
+
+<hr/>
+
+#### `MTTypedef typedefWithName(String name)`
+
+Returns a typedef by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the typedef to return. |
+
+<hr/>
+
+#### `List` **`typedefs`**
+
+Returns all the typedefs declared in this space, sorted by name.
+
+
+### Language Category
+
+These methods relate to language definitions.
+
+<hr/>
+
+#### `MTLanguage languageWithName(String name)`
+
+Returns a language object by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the language to return. |
+
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+<hr/>
+
+#### `List domainsTagged(String tag)`
+
+Returns all domains that are tagged with a specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<hr/>
+
+#### `List entitiesTagged(String tag)`
+
+Returns all entities found with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<hr/>
+
+#### `MTEntity entityTagged(String tag)`
+
+Returns the first entity found with the specified tag. This should only be used when it is expected that only one is tagged with the tag by nature of the entity. Use `entitiesTagged()` if you are expecting multiple entities that are found.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<hr/>
+
+#### `MTEnum enumTagged(String tag)`
+
+Returns all enums that are tagged with a specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<hr/>
+
+#### `boolean hasDomainTagged(String tag)`
+
+Indicates if there is at least one domain tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<hr/>
+
+#### `boolean hasEntityTagged(String tag)`
+
+Indicates if there is at least one entity tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<hr/>
+
+#### `boolean hasEnumTagged(String tag)`
+
+Indicates if there is at least one enum tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+
+### Configuration Category
+
+These methods relate to a part of application configuration.
+
+<hr/>
+
+#### `boolean hasMetadataValue(String name)`
+
+Indicates whether this space has a metadata name/value for the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the metadata value to return. |
+
+<hr/>
+
+#### `List` **`importEntityNames`**
+
+Returns the names of the entities that have been imported into this space.
+
+<hr/>
+
+#### `List` **`importEnumNames`**
+
+Returns the names of the enums that have been imported into this space.
+
+<hr/>
+
+#### `Object metadataValue(String name)`
+
+Spaces can define a dictionary of name/value pairs that provide some meta data about the space and basically the application. This method allows you to get a value by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the meta data. |
+
+<hr/>
+
+#### `MTRepository repository(String name)`
+
+Returns the repository object by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the repository. |
+
+<hr/>
+
+#### `MTRepository repositoryByName(String name)`
+
+Returns a repository object by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the repository to return. |
+
+
+### Interface Category
+
+These methods relate to an interface.
+
+<hr/>
+
+#### `MTInterface interface(String name)`
+
+Returns an interface by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the interface to return. |
+
+<hr/>
+
+#### `List` **`interfaces`**
+
+Returns all the interfaces declared in this space.
+
+
+
+<a name="class_MTTemplate"></a>
+## MTTemplate Class
+
+Represents a template configuration.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `String` **`directoryName`**
+
+Returns the directory name if available. Otherwise returns `null`
+
+<hr/>
+
+#### `String` **`filename`**
+
+Returns the filename of the template which is preceded by a directory name if available.
+
+<hr/>
+
+#### `MTDirectory` **`primaryOutputDirectory`**
+
+Returns the output directory considered to be the primary output for the template.
+
+<hr/>
+
+#### `MTRepositoryImport` **`repositoryImport`**
+
+Returns an object that defines how the template will be imported.
+
+
+
+

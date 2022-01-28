@@ -1,0 +1,73 @@
+space Space
+{
+}
+
+secondary entity HashedCloudAsset {
+    D "Represents a file asset located in the cloud, such as in S3. This also keeps track of the file's MD5 hash"
+    D "signature so clients can detect if it has changed without downloading it."
+    attributes {
+        string url {
+            D "The URL to the asset."
+        }
+        string bucketName {
+            D "The name of the S3 bucket holding the asset."
+        }
+        string path {
+            D "The path inside the bucket to the asset file."
+        }
+        byte[16] md5 {
+            D "The MD5 digest/hash of the asset file contents. This can be used by the client side to"
+            D "detect if there was a change without having to download the asset file."
+        }
+        int64 size {
+            D "The number of bytes contained in the file."
+        }
+    }
+}
+
+// Example of a singular instantiation of a secondary entity
+entity Achievement {
+    D "Something you earn when you achieve something in the game."
+
+    primarykey uuid achievementId
+
+    attributes {
+        string title
+        string description
+        int32 bonusPoints
+
+        HashedCloudAsset model {
+            D "The 3D model for this achievement."
+            contentType "application/x-blender"
+        }
+        HashedCloudAsset texture {
+            D "The texture to apply to the 3D model."
+            contentType "image/tga"
+        }
+    }
+}
+
+secondary entity Upgrade
+{
+    D "A magic spell upgrade."
+
+    attributes {
+        string name
+        string description
+        int32 weightReduction
+        int32 castEnergyReduction
+    }
+}
+
+entity MagicSpell {
+    D "Gives you the ability to do magical things."
+    primarykey uuid magicSpellId
+
+    attributes {
+        string name { D "Name of the magic spell." }
+        int32 castEnergy { D "The amount of energy it requires to cast it." }
+        int64 price { D "How much it costs to buy." }
+        int32 weight { D "How much it weighs. This affects how many spells a player can carry." }
+        many Upgrade upgrades
+    }
+}

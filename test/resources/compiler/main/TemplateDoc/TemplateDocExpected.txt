@@ -1,0 +1,12 @@
+Template: TemplateDocTemplate
+  Description: This is a test case template to test reading out descriptions like this one.
+
+  Function: func
+  Description: A function implemented for testing purposes. This is a second line of the description.
+
+    IN: inArg1   The first argument. That has two descriptions.
+    IN: inArgToo   The second argument.
+
+    OUT: outArg1   The first output argument.
+    OUT: outArgTwo   Thought I was going to put Too didn't you :)
+

@@ -1,0 +1,16 @@
+$[*
+    This template is just to extract basic entity elements.
+*]
+$[file "" "BasicEntity" "txt"]
+$[foreach entity in space.entities]
+<E|N:${entity.name}|D:${entity.description}>
+<PK|N:${entity.primaryKeyAttribute.name}|T:${entity.primaryKeyAttribute.type}|D:${entity.primaryKeyAttribute.description}/>
+$[foreach attribute in entity.attributes]
+<A|N:${attribute.name}|T:${attribute.type}|D:${attribute.description}/>
+$[/foreach]
+$[foreach relationship in entity.relationships]
+<R|N:${relationship.name}|P:${relationship.to.plurality}|D:${relationship.description}/>
+$[/foreach]
+</E>
+$[/foreach]
+$[/file]

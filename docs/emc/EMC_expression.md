@@ -1,0 +1,231 @@
+# Expression Model Classes
+
+Model classes used to describe expressions are of this type. The classes are briefly described in the following table, then each will be described in more detail in the sub-sections below the table.
+
+| Class | Description |
+|-----|-----|
+|[`MTConstant`](#class_MTConstant)|This represents a constant in a model expression.|
+|[`MTExpression`](#class_MTExpression)|An expression is a tree of operations, constants, methods and operands that evaluate to something at runtime. An example of an expression is like a constraint placed on an attribute.|
+|[`MTMethodCall`](#class_MTMethodCall)|A method call in a model expression must map to a language specific method. For instance, if we define the following function in the Java language: `functions { length(string str) "${str}.length()" }` then we can use `length(string str)` method in our expressions. Passing the object of this class through the `language` filter will result in remapping it to use the `length()` method on the `str` string object.|
+|[`MTOperand`](#class_MTOperand)|This represents some operand of an expression such as a parameter of an entity or an enum item.|
+|[`MTOperation`](#class_MTOperation)|Represents an operation inside an expression. Each type of operation (add, subtract, not, etc.) can have its own number of inputs, where each input is an expression. The output of the operation is effectively an object of this class. You can assign the object of this class as the operand of another operation, thus creating a multi-operation expression.|
+
+<a name="class_MTConstant"></a>
+## MTConstant Class
+
+This represents a constant in a model expression.
+
+The following properties and methods, grouped by category, are available for this class:
+
+### Type Category
+
+These methods relate to data types.
+
+<hr/>
+
+#### `Boolean` **`booleanValue`**
+
+Returns the boolean value of this constant.
+
+<hr/>
+
+#### `Double` **`doubleValue`**
+
+Returns the double floating-point value of this constant.
+
+<hr/>
+
+#### `Long` **`longValue`**
+
+Returns the long value of this constant.
+
+<hr/>
+
+#### `String` **`stringValue`**
+
+Returns the string value of this constant.
+
+<hr/>
+
+#### `String` **`toString`**
+
+Returns the constant represented as a string.
+
+<hr/>
+
+#### `Type` **`type`**
+
+Returns the data type of this constant.
+
+
+### Enum Category
+
+These methods relate to enums.
+
+<hr/>
+
+#### `MTEnumItem` **`enumItem`**
+
+If the constant value is an enum item, this will return the enum item. You can use the `isEnumItem` property to determine if this is an enum item.
+
+<hr/>
+
+#### `boolean` **`isEnumItem`**
+
+Indicates whether this constant is of the enum item type. If so, you will need to use the `enumItem` property to obtain the enum item object.
+
+
+
+<a name="class_MTExpression"></a>
+## MTExpression Class
+
+An expression is a tree of operations, constants, methods and operands that evaluate to something at runtime. An example of an expression is like a constraint placed on an attribute.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `boolean` **`isConstant`**
+
+Indicates whether this expression is a constant.
+
+<hr/>
+
+#### `boolean` **`isMethodCall`**
+
+Indicates whether this expression is a method call.
+
+<hr/>
+
+#### `boolean` **`isOperand`**
+
+Indicates whether this expression is an operand (variable).
+
+<hr/>
+
+#### `boolean` **`isOperation`**
+
+Indicates whether this expression is an operation.
+
+
+
+<a name="class_MTMethodCall"></a>
+## MTMethodCall Class
+
+A method call in a model expression must map to a language specific method. For instance, if we define the following function in the Java language: `functions { length(string str) "${str}.length()" }` then we can use `length(string str)` method in our expressions. Passing the object of this class through the `language` filter will result in remapping it to use the `length()` method on the `str` string object.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `MTExpression argument(int i)`
+
+Returns the expression of a specified argument of the method call.
+
+| Parameter | Description |
+|-----|-----|
+|`int i` | The index of argument (where 0 is the first). |
+
+<hr/>
+
+#### `int` **`argumentCount`**
+
+Returns the number of arguments of the method call.
+
+<hr/>
+
+#### `List` **`arguments`**
+
+Returns all the expressions assigned to the arguments of the method.
+
+<hr/>
+
+#### `String` **`name`**
+
+Returns the name of the method call.
+
+<hr/>
+
+#### `String` **`toString`**
+
+Returns the string representation of the method call (good for debug).
+
+
+
+<a name="class_MTOperand"></a>
+## MTOperand Class
+
+This represents some operand of an expression such as a parameter of an entity or an enum item.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `MTAttribute` **`attribute`**
+
+If this operand is an attribute of an entity this will return the attribute object.
+
+<hr/>
+
+#### `MTEnumItem` **`enumItem`**
+
+If this operand is an enum item this will return the enum item object.
+
+<hr/>
+
+#### `String` **`toString`**
+
+Returns a string representing the operand (for debug purposes).
+
+<hr/>
+
+#### `Type` **`type`**
+
+Indicates the type of operand this is.
+
+
+
+<a name="class_MTOperation"></a>
+## MTOperation Class
+
+Represents an operation inside an expression. Each type of operation (add, subtract, not, etc.) can have its own number of inputs, where each input is an expression. The output of the operation is effectively an object of this class. You can assign the object of this class as the operand of another operation, thus creating a multi-operation expression.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `Operator` **`op`**
+
+Returns the operator of the operation. This is the actual add, subtract, multiply, etc.
+
+<hr/>
+
+#### `MTExpression operand(int i)`
+
+Returns the operand expression for a specified input of the operation. An operation can have up to 3 inputs (you can use the `operandCount` property to know how many this one has).
+
+| Parameter | Description |
+|-----|-----|
+|`int i` | The index of the specific operand (input) of the operation you want to be returned. |
+
+<hr/>
+
+#### `int` **`operandCount`**
+
+Returns the number of operands (inputs) for this operation.
+
+<hr/>
+
+#### `String` **`operatorSymbol`**
+
+Returns a string representation of the operator of this operation (e.g., `+`, `-`, `*`, etc.).
+
+<hr/>
+
+#### `String` **`toString`**
+
+Returns a string representation for this operation (for debug purposes).
+
+
+
+

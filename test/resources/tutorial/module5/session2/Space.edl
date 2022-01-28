@@ -1,0 +1,70 @@
+space Space
+{
+}
+
+module graphics {
+    typedef int32 HighColor16 {
+        D "A 16-bit RGB color format that gives extra range for green."
+        (5) red { D "Red" }
+        (6) green { D "Green" }
+        (5) blue { D "Blue" }
+    }
+}
+
+module accessories {
+    enum SpellType {
+        D "Indicates the type of spell."
+        Transport = 1 { D "Allows a player to move anywhere." }
+        Zap = 2 { D "Zaps opponent, reducing health." }
+        Shield = 3 { D "Places a shield around the player." }
+    }
+
+    entity MagicSpell {
+        D "Gives you the ability to do magical things."
+        primarykey uuid magicSpellId
+
+        attributes {
+            SpellType type { D "The type of spell." }
+            string name { D "Name of the magic spell." }
+            int32 castEnergy { D "The amount of energy it requires to cast it." }
+            int64 price { D "How much it costs to buy." }
+            int32 weight { D "How much it weighs. This affects how many spells a player can carry." }
+        }
+    }
+}
+
+module user {
+    enum PlayerRank {
+        Rookie = 1
+        SuperDuperRank = 5
+        Bronze = 2
+        Silver = 3
+        Gold = 4
+    }
+
+
+    secondary entity Social
+    {
+        attributes {
+            string email
+            string forumName
+            uuid forumId
+        }
+    }
+
+    entity Player {
+        D "A player in the game."
+        primarykey uuid playerId
+
+        attributes {
+            PlayerRank rank
+            string name { D "Name of the player." }
+            HighColor16 primaryColor
+            int64 experiencePoints { D "Experience Points" }
+            int32 level { D "Level achieved." }
+            float health { D "Amount of health remaining from 0 to 1." }
+            double strength { D "How strong the player is, from 0 to 100." }
+            Social social
+        }
+    }
+}

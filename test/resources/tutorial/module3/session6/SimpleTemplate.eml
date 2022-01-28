@@ -1,0 +1,18 @@
+$[log]
+$[function FindAllAttributesOfType(space, type) -> (attributes)]
+$[let attributes  = @[]@]
+$[foreach entity in space.entities]
+$[foreach attribute in entity.attributes]
+$[if attribute.type.asString == type]
+$[do attributes.add(attribute)]
+$[/if]
+$[/foreach]
+$[/foreach]
+$[/function]
+
+$[call FindAllAttributesOfType(type:type) -> (attributes:stringAttributeList)]
+${type|capitalize} Attributes:
+$[foreach attribute in stringAttributeList.values]
+  ${attribute.entity.name}.${attribute.name}
+$[/foreach]
+$[/log]

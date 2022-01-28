@@ -1,0 +1,39 @@
+$[D "This is a test case template to test reading out descriptions like this one."]
+$[function func
+  D "A function implemented for testing purposes."
+  D "This is a second line of the description."
+  (inArg1 D "The first argument." D "That has two descriptions.",
+   inArgToo D "The second argument."
+  ) ->
+  (outArg1 D "The first output argument.",
+   outArgTwo D "Thought I was going to put Too didn't you :)"
+  )]
+$[/function]
+
+$[file "" "TemplateDoc" "txt"]
+$[foreach tm in configuration.templates]
+  $[let parsedTemplate = tm.parse()]
+Template: ${parsedTemplate.name}
+  $[if parsedTemplate.hasDescription]
+  Description: ${parsedTemplate.description}
+  $[/if]
+
+  $[foreach fun in parsedTemplate.functions]
+  Function: ${fun.name}
+  Description: ${fun.description}
+
+  $[if fun.hasInputs]
+    $[foreach arg in fun.inputArguments]
+    IN: ${arg.name}   ${arg.description}
+    $[/foreach]
+  $[/if]
+
+  $[if fun.hasOutputs]
+    $[foreach arg in fun.outputArguments]
+    OUT: ${arg.name}   ${arg.description}
+    $[/foreach]
+  $[/if]
+
+$[/foreach]
+$[/foreach]
+$[/file]

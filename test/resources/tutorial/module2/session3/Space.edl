@@ -1,0 +1,28 @@
+space Space
+{
+}
+
+typedef int32 HighColor16 {
+    D "A 16-bit RGB color format that gives extra range for green."
+    (5) red { D "Red" }
+    (6) green { D "Green" }
+    (5) blue { D "Blue" }
+}
+
+entity Player {
+    D "A player in the game."
+    primarykey uuid playerId
+
+    attributes {
+        string name { D "Name of the player." }
+        HighColor16 primaryColor
+        HighColor16 secondaryColor
+        int64 experiencePoints { D "Experience Points" }
+        int32 level { D "Level achieved." }
+        int32 health { D "Amount of health remaining." }
+        int64 coins { D "Number of coins the player has." }
+    }
+
+    relationships {
+    }
+}

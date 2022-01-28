@@ -1,0 +1,174 @@
+# Transforms
+
+A transform is a piece of Java code that takes in all the entities of your model and a select set of domains to generate something, usually code but its up to the transform. Currently the transforms are built into the compiler and look for domains by a specific name.
+
+Since the advent of template support, all but one have been implemented by templates. The one that is still only available as a transform is:
+
+| Transform | Domains | Description |
+|---|:---:|---|
+| Postgres  | Database  | Creates Postgres SQL to create database elements such as tables, columns, indexes, etc. to represent the entities defined. It also supports database migration by generating versioned SQL files. |
+
+## Postgres
+
+This transform creates versioned Postgres SQL files to support the database and migrations of the database as versioned changes are made to the entity model.
+
+This section describes how entities, attributes and relationships are mapped to database elements such as tables, columns, foreign keys and indexes.
+
+### Schema Versioning
+
+The database schema that you initially release with your application is most likely to change as you add new features to your application.
+It is very unlikely that you will be willing to totally wipe your database to install a new schema so in order to install new schemas you will
+need to apply changes to the schema. This means that for tables where columns change, you would need to alter those tables. All such changes
+to your database schema we will call a version. Applying a version is what we call a migration. A Java library called Flyway can be used to apply
+these database versions to your database, making sure to only apply those that have not yet been applied.
+
+This Postgres transform will use some private project files to keep track of the versions it creates. Initially, any changes to your model will be written
+to version 1 of the SQL output it generates. Once you deploy your schema to a database, you will want to tell the transform to start generating a new version
+where this new version will know about all the previous versions of the schema and make sure to construct the SQL accordingly - such as altering tables if
+changes are made (instead of creating them).  It can handle most alterations that can occur.
+
+Once you have deployed the latest version of the database, its best to add the `-asv` option the next time you invoke the compiler. This will set a flag
+so that the next time the database schema changes it will increment to the next version of the schema.
+
+The location where this transform stores schema related files is set in your application [configuration](Language_Configuration.md).
+
+### Entity Mapping
+
+A primary entity maps to a database table. A secondary entity has its attributes merged into its primary entity and does **not** cause a table to be created for it.
+
+	entity Example {
+	...
+	}
+
+If this entity is defined for the first time, it would map to the following SQL:
+
+	CREATE TABLE IF NOT EXISTS example (
+	...
+	);
+
+However, if the entity was previously defined in an existing schema version and something changed in the entity, it would map to
+this:
+
+    ALTER TABLE example ...
+
+### Primary Key Mapping
+
+A primary key is essentially a special type of attribute.
+
+	primarykey int64 exampleId
+
+would map as follows (and be inside the above CREATE TABLE):
+
+	 example_id BIGSERIAL PRIMARY KEY NOT NULL
+
+### Attribute Mapping
+
+#### Scalar Attributes
+
+Attributes that are scalar (that is, **not** qualified with `many` and **not** the `asset` type) are mapped to columns of a table.
+
+	string name
+
+would map as:
+
+	name TEXT NOT NULL
+
+Note the use of NOT NULL. Alternately:
+
+	optional string name
+
+would map as:
+
+	name TEXT
+
+Attribute types map to Postgres types as follows:
+
+| Attribute Type | Postgres Type |
+|---|---|
+|`uuid`|`UUID`|
+|`string`|`TEXT`|
+|`int32`|`INT`|
+|`int64`|`BIGINT`|
+|`float`|`FLOAT`|
+|`boolean`|`BOOLEAN`|
+|`date`|`TIMESTAMP WITH TIME ZONE`|
+|`creation date`|`TIMESTAMP WITH TIME ZONE DEFAULT NOW()`|
+|`modification date`|`TIMESTAMP WITH TIME ZONE` (also see below)|
+
+##### Modification Date
+
+Specifically for `modification date`, a trigger is also created to make its value be set automatically. So if the modification date was declared as:
+
+	modification date modifiedOn
+
+Then it generates the following trigger:
+
+	CREATE TRIGGER example_updatemodifiedon
+	BEFORE INSERT OR UPDATE ON example
+	FOR EACH ROW EXECUTE PROCEDURE update_modified_on_column();
+
+The SQL function `update_modified_on_column()` is included in the first version of the generated SQL as:
+
+```
+CREATE OR REPLACE FUNCTION update_modified_on_column()
+    RETURNS TRIGGER AS $$
+BEGIN
+  NEW.modified_on = now();
+  RETURN NEW;
+END;
+$$ language 'plpgsql';
+```
+
+
+#### Array Attributes
+
+Attributes that are qualified with `many` are considered array attributes and are mapped to a new table to contain the array items.
+
+	many string categories
+
+This would result in the following table to be created:
+
+```
+CREATE TABLE example_categories (
+    value TEXT NOT NULL,
+    example_id BIGINT NOT NULL,
+    FOREIGN KEY (example_id) REFERENCES example(example_id) ON DELETE CASCADE
+);
+```
+
+This can be done for not just string attributes for the other scalar types, where the `value` column of the created table would be of a SQL type appropriate for the attribute type.
+
+#### Secondary Entity Attributes
+
+When a primary entity is mapped to a table, the attributes of any secondary entities instantiated by the primary entity are flattened into the table as well. This includes
+other secondary entities instantiated into the secondary entity.
+
+In doing so the column name for secondary entity attributes includes the instantiated secondary entity names hierarchically. For instance if we have the following secondary entity usage:
+
+    entity User {
+        primarykey uuid userId
+        
+        attributes {
+            string username
+            string encodedPassword
+            UserProfile profile
+        } 
+    }
+    secondary entity UserProfile {
+        attributes {
+            string firstName
+            string lastName
+            CloudAsset picture
+        }
+    }
+
+    secondary entity CloudAsset {
+        attributes {
+            string url
+            string bucketName
+            string path
+            int64 size
+        }
+    }
+
+With this entity model, the `url` of the `CloudAsset` secondary attribute would have a database column name of `profile_picture_url`. It picks up the `profile` due to the usage of the `UserProfile profile` in the `User` entity. Then the `picture` part is because the `UserProfile` secondary entity instantiates `CloudAsset` as `picture'. Because the naming convention is to use underscore (`_`) between words, it results in `profile_picture_url`.

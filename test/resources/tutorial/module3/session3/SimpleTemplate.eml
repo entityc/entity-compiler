@@ -1,0 +1,51 @@
+$[log]
+$[receive distinct imports]
+$[foreach typedef in space.typedefs]
+
+Typedef: ${typedef.name}
+$[/foreach]
+$[foreach enum in space.enums]
+
+Enum: ${enum.name}
+$[/foreach]
+$[foreach entity in space.entities]
+
+$[let qualifier = entity.isSecondary ? "Secondary " : ""]
+${qualifier}Entity: ${entity.name}
+$[foreach attribute in entity.attributes]
+$[capture typeLongName]
+$[switch attribute.type]
+$[case uuid]
+$[send imports]
+Import: com.example.SpecialUUIDClass
+$[/send]
+Unique Identifier - 128 bits
+$[case int32]
+32-bit Integer
+$[case int64]
+64-bit Integer
+$[case float]
+32-bit Floating Point
+$[case double]
+64-bit Floating Point
+$[case string]
+$[send imports]
+Import: com.example.SpecialStringClass
+$[/send]
+String of characters
+$[case enum]
+Enum named ${attribute.type.name}
+$[case typedef]
+Typedef named ${attribute.type.name}
+$[case entity]
+Entity named ${attribute.type.name}
+$[default]
+Unknown
+$[/switch]
+$[/capture]
+  Attribute
+    Name: ${attribute.name}
+    Type: ${typeLongName}
+$[/foreach]
+$[/foreach]
+$[/log]

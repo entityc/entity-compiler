@@ -1,0 +1,243 @@
+# Entity
+
+As the name implies, the entity is the basis of the Entity Compiler. An entity is composed of attributes and relationships to other entities.
+
+The language used to describe an entity is designed to describe an entity in the purest form - independent of any application of the entity or any domain into which the entity will be rendered.
+
+An entity is defined simply as:
+
+	entity name {
+
+	}
+
+where `name` is the name of the entity.
+
+There are two types of entities: **primary** and **secondary**.
+
+A **primary entity** is one who's objects and be uniquely identified from all other objects of the same entity (they define a "primarykey" as described below). A primary entity can be optionally declared as:
+
+	primary entity name {
+	
+	}
+
+A **secondary entity** is one that must be included as a sub entity of another entity and objects of this entity assume the same identity as their enclosed primary entity. These are useful to help break up large entities into smaller entities based on some kind of category.
+
+A secondary entity can be optionally declared as:
+
+	secondary entity name {
+	
+	}
+
+> **NOTE:** The declaration of `primary` or `secondary` is not required, the compiler will infer based on whether a primary key is declared however as a form of documentation to help the person reading the entity declarations it is recommended to specify - or at least to specify for the secondary entities.
+
+How to instantiate secondary entities inside other entities is described below under **Secondary Entities**.
+
+## Primary Key
+
+Primary entities that live on their own must have something so as to uniquely identify their objects. This is known as a "primary key". The simplest type is simply one that is of the type `int64`.
+
+	primarykey int64 id
+
+Where `id` is the name of the primary key.
+
+## Attributes
+
+Within the `entity` block, attributes are declared inside an `attributes` block as follows:
+
+	attributes {
+		// attributes defined here
+	}
+
+An attribute can be of a native data type, an enum or can be another entity in type. Attributes are declared as follows:
+
+  ***qualifier*** ***type*** ***name*** `in` ***unit name***
+
+Where ***name*** is the name of the attribute, ***type*** is the data type and ***qualifier*** is something that augments the type in some way or describes something important about the attribute.
+
+The `in` ***unit name*** is optional. When a ***unit name*** is specified, it serves to add a suffix to the name when rendered by a transformer into code. Instead of just naming the attribute this way, this allows it to be optional for some domains and also provides useful information about the attribute.
+
+For instance:
+
+	optional float distance in kilometers
+
+The default naming for this parameter in all domains would be `distanceInKilometers`. Any domain naming methods, prefixes or suffixes would be applied after the unit is added. There is a way to suppress the unit from the name on a domain basis.
+
+### Attribute Types
+
+| Type | Description |
+| --- | --- |
+| `uuid` | Represents a 128-bit UUID. |
+| `int64` | Represents a 64-bit integer type. |
+| `int32` | Represents a 32-bit integer type. |
+| `float` | Represents a floating point type. |
+| `boolean` | Represents a boolean type. |
+| `date` | Represents a date. |
+| `string` | Represents a string of characters. |
+| `byte`| When qualified by `many` it represents a byte array.|
+
+### Attribute Qualifiers
+
+| Qualifier | Description |
+| --- | --- |
+| `unique` | Defines that the attribute value must be unique across all objects of an entity. |
+| `optional` | Defines that the attribute value is optional and can be null. |
+| `creation` | This is used in conjunction with the `date` type to indicate this is a date that represents when an object of this entity is created. |
+| `modification` | This is used in conjunction with the `date` type to indicate this is a date that represents when an object of this entity is modified. |
+|`many`| Defines that this attribute should be an array of the specified type.|
+|`virtual`|Indicates that the attribute is to be computed by code and is not involved in any persistence storage. A template will synthesize its code.|
+
+### Units
+
+Units are all "user defined" meaning you have to declare them (or import a file that declares them).
+
+## Relationships
+
+This is where we describe how an entity is related to other entities. Inside the `entity` block relationships are declared as follows:
+
+	relationships {
+		// relationships defined here
+	}
+
+A relationship is declared as:
+
+  ***qualifier*** ***plurality*** ***entity*** ***name***
+
+Where ***name*** is the name of the relationship, ***entity*** is the name of the entity to which this entity has a relationship, ***plurality*** describes the relationship as either singular (`one`) or multiple (`many`) and ***qualifier*** is something that augments the specification of the relationship.
+
+> Note: Relationship names must be unique not just amoung themselves but also amoung attribute names.
+
+### Relationship Qualifiers
+
+Currently there are the following qualifiers for relationships:
+
+| Qualifier | Description |
+|---|---|
+| `parent` | Indicates that the entity declared in this relationship should be considered a parent to this entity. A parent entity is one that is used to define the scope/identification of a child entity. |
+| `optional` | Indicates that this relationship is optional and not necessarily employed for all objects of the entity. In this case, for instance, if the referenced object is deleted, this reference would also be removed but not the object doing the reference. However, if a relationship is **not optional**, then deleting the referenced object would likely result in the deleting of the objecting doing the reference. |
+
+> If you ever want to change the **entity** name or the name of its **attributes** or **relationships**, caution should be taken as domains that reference them would also need to be changed not to mention any external references to them.
+
+There can be situations where there can be multiple relationships between the same two entities and it requires clarification to make sure the reverse relationship is paired up properly. In that event, after the ***entity*** you can explicitly specify the reverse relationship name as ***entity***`(`***reverse_name***`)` ***name***.
+
+## Secondary Entities
+
+A secondary entity is much like an entity but it cannot stand on its own, it must be "instantiated" inside another entity in order to be used. It can be instantiated inside multiple primary entities or secondary entities.
+
+A secondary entity is simply declared using the `secondary` keyword as follows:
+
+	secondary entity SomeSecondaryEntity {
+	    // note, no primary key
+	    attributes {
+	        string somefield
+	    }
+	}
+
+An entity (either primary or secondary) can instantiate secondary entities inside itself. How this is ultimately reflected in generated code is up to the transformation process that is configured. At entity declaration we are simply establishing a kind of partitioning of entities into smaller size entities - preferably by some type of categorization. This can be viewed still as a flat primary entity (with attributes and relationships grouped simply for organizational purposes), or it can imply some kind of hierarchy of objects for that entity --- again it is up to what transforms the entities.
+
+A secondary entity can define relationships with primary entities, however it is really just a relationship between its containing primary entity and the other primary entity.
+
+Secondary entities are declared as follows:
+
+	entity ContainingEntity {
+	    ...
+	    secondary entities {
+	        SomeSecondaryEntity subEntity
+	    }
+	    ...
+	}
+
+## Views
+
+A view is an alternate representation of an entity. An entity can have multiple views.
+
+### Attribute Subset
+
+Most typically a view is used when you want to limit the number of attributes to a smaller subset. For instance, if you had the following entity:
+
+	entity Profile {
+	    attributes {
+	        string firstName
+	        string lastName
+	        int level
+	        int wearingJersey
+	        int wearingShorts
+	        int wearingSocks
+	        int glasses
+	    }
+	}
+
+Here we have everything about a person in their profile. However, in some use cases in an application we may not care for all fields, maybe just a subset of those fields, for instance:
+
+	entity Profile {
+	    attributes {
+	        ... the attributes above ...
+	    }
+	    view Basic {
+	        include attributes {firstName, lastName, level}
+	    }
+	}
+
+In the `Basic` view, we restrict the attributes to just those three. Anytime we express that view to code it will represent just those attributes.
+
+Alternately, instead of including a set of attributes, we can exclude a set. So the same Basic view can be accomplished as follows:
+
+	view Basic {
+	    exclude attributes {wearingJersey, wearingShorts,
+	     wearingSocks, glasses}
+	}
+
+The result is the same, however there is a difference. In the include method, if new entity attributes are added, it won't affect the application of the view since we are telling it explicitly including only those three. However in the exclude case, if new attributes are added to the entity the view automatically includes them.
+
+If neither `include` nor `exclude` is specified it assumes to include all attributes.
+
+We can have as many views as we think is necessary.
+
+> NOTE: Views are defined as part of the entity so that all domains can use them and if something is added or removed from a view, all domains automatically adjust to the change.
+
+### View-only Attributes
+
+Sometimes it's useful to have a special attribute that is fully calculated from other attributes. This is known as a "view-only" attribute since it is defined in the scope of a single view. A view attribute would likely never be stored in persistent storage since it can be calculated from others. For example:
+
+	view Basic {
+	    attributes {
+	        boolean superPlayer = level > 25
+	    }
+	}
+
+The advantage in defining this in a view is that it is available to all domains that wish to use this view. This is powerful since we have let it be known once, in one place, what a superPlayer is (using the above example) and it can be synthesized into multiple renderings of the view.
+
+> NOTE: View attributes defined this way are in addition to those resolved via the `include` and `exclude` specifications.
+
+You can also use this as a way to represent an attribute in different units:
+
+	float distance in meters = distance
+
+Assuming, say, the entity attribute `distance` is in millimeters, this would create a new `distanceInMeters` attribute that is calculated from the `distanceInMillimeters` root attribute.
+
+## Modules
+
+In a large enterprise application the number of entities can become rather large. To help organize entities the concept of modules was created. A module is simply a grouping of entities. An entity can only be in a single module.
+
+A module is defined in the entity language as:
+
+`module` *module_name* `{`...`}`
+
+For example:
+
+```
+module FeatureX {
+    entity EntityA {
+        ...
+    }
+    entity EntityB {
+        ...
+    }
+    entity EntityC {
+        ...
+    }
+}
+```
+
+Modules typically represent some kind of functional grouping such as a feature or it can be entities that share a common use case or facility and are usually defined in their own `.edl` file.
+
+Modules can be queried inside templates and are often used as a way to iterate through entities. Actually for entities that are defined within a module, the preferred method of iterating through them is through their module.

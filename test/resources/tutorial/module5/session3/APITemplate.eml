@@ -1,0 +1,11 @@
+$[domain APICode]
+$[log]
+=========== API ===========
+$[foreach entity in space.entities]
+$[if entity.isSecondary]$[continue]$[/if]
+
+API Class: ${entity|domain|name}
+Get ${entity.name|title} List: GET /api/${entity|domain:APIPath|name}
+Returns objects of class ${entity|domain:DTO|name}
+$[/foreach]
+$[/log]

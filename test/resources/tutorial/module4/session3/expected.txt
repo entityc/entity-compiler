@@ -1,0 +1,12 @@
+
+Entity: Player
+  Attribute: String name
+    Constraint: correctLength
+      Expression: name.length() >= 3 && name.length() <= 20
+  Attribute: long experiencePoints
+  Attribute: int level
+    Constraint: levelValue
+      Expression: level <= 12
+  Attribute: int health
+  Attribute: long coins
+

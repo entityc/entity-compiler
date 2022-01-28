@@ -1,0 +1,49 @@
+Entity: Player
+  Primary Key: uuid playerId
+  Attribute:
+      name: name
+      type: string
+      UNIQUE
+
+  Attribute:
+      name: createdOn
+      type: date
+      CREATION
+
+  Attribute:
+      name: modifiedOn
+      type: date
+      MODIFICATION
+
+  Attribute:
+      name: experiencePoints
+      type: int64
+
+  Attribute:
+      name: level
+      type: int32
+
+  Attribute:
+      name: health
+      type: int32
+
+  Attribute:
+      name: coins
+      type: int64
+
+  Attribute:
+      name: height
+      type: float
+      unit: millimeters (mm)
+
+  Attribute:
+      name: bio
+      type: string
+      OPTIONAL
+
+  Attribute:
+      name: skills
+      type: string
+      ARRAY
+
+

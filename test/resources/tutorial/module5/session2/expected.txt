@@ -1,0 +1,43 @@
+
+MODULE: ACCESSORIES
+
+  Enum: SpellType
+    1) Transport
+    2) Zap
+    3) Shield
+
+  Entity: MagicSpell
+      Attribute: type
+      Attribute: name
+      Attribute: castEnergy
+      Attribute: price
+      Attribute: weight
+
+MODULE: GRAPHICS
+
+  Typedef: HighColor16
+
+MODULE: USER
+
+  Enum: PlayerRank
+    1) Rookie
+    5) SuperDuperRank
+    2) Bronze
+    3) Silver
+    4) Gold
+
+  Entity: Player
+      Attribute: rank
+      Attribute: name
+      Attribute: primaryColor
+      Attribute: experiencePoints
+      Attribute: level
+      Attribute: health
+      Attribute: strength
+      Attribute: social
+
+  Entity: Social
+      Attribute: email
+      Attribute: forumName
+      Attribute: forumId
+

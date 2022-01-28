@@ -1,0 +1,25 @@
+space Module1
+{
+}
+
+entity Player {
+    D "A player in the game."
+
+    primarykey uuid playerId
+
+    attributes {
+        unique string name { D "Name of the player." }
+        creation date createdOn { D "The date this player was created." }
+        modification date modifiedOn { D "The date this player was last modified." }
+        int64 experiencePoints { D "Experience Points" }
+        int32 level { D "Level achieved." }
+        int32 health { D "Amount of health remaining." }
+        int64 coins { D "Number of coins the player has." }
+        float height in millimeters
+        optional string bio { D "Optional information about the player." }
+        many string skills
+    }
+
+    relationships {
+    }
+}

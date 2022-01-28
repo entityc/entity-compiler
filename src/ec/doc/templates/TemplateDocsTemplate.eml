@@ -1,0 +1,91 @@
+$[D "This template will extract info from the compiler and create a markdown document that can be"]
+$[D "used by template developers."]
+$[let manager = __documentationManager]
+$[install "markdown/EMC.md" "emc"]
+$[install "markdown/EDL.md" "edl"]
+$[install "markdown/EDL_Configuration.md" "edl"]
+$[install "markdown/EDL_Domain.md" "edl"]
+$[install "markdown/EDL_Entity.md" "edl"]
+$[install "markdown/EDL_Interface.md" "edl"]
+$[install "markdown/EDL_Space.md" "edl"]
+$[install "markdown/ETL.md" "etl"]
+$[install "markdown/ETL_Instructions.md" "etl"]
+$[install copy "markdown/Transforms.md" ""]
+$[install copy "markdown/GettingStarted.md" ""]
+
+$[foreach type in manager.modelClassTypes]
+    $[if manager.modelClassCount(type) == 0]$[continue]$[/if]
+    $[let modelClasses = manager.modelClasses(type)]
+    $[file "emc" "EMC_" + type.packageName "md"]
+# ${type.title} Model Classes
+
+${type.description} The classes are briefly described in the following table, then each will be described in more detail in the sub-sections below the table.
+
+| Class | Description |
+|-----|-----|
+        $[foreach className in modelClasses]
+            $[let classMeta = manager.modelClassMeta(className)]
+|[`${classMeta.name}`](#class_${classMeta.name})|${classMeta.description}|
+        $[/foreach]
+
+        $[foreach className in modelClasses]
+            $[let classMeta = manager.modelClassMeta(className)]
+            $[if classMeta.methodCount == 0]$[continue]$[/if]
+<a name="class_${classMeta.name}"></a>
+## ${classMeta.name} Class
+
+${classMeta.description}
+
+            $[if classMeta.categoryCount == 0]$[continue]$[/if]
+            $[let moreThanOneCategory = classMeta.categoryCount > 1]
+            $[if moreThanOneCategory]
+The following properties and methods, grouped by category, are available for this class:
+
+            $[else]
+The following properties and methods are available for this class:
+
+            $[/if]
+            $[let methodCategories = manager.methodCategories]
+            $[foreach category in methodCategories]
+                $[let methodsInCategory = classMeta.methodMetasByCategory(category)]
+                $[if methodsInCategory.count > 0]
+                    $[if moreThanOneCategory]
+### ${category.title} Category
+
+${category.description}
+
+                    $[/if]
+                    $[foreach methodMeta in methodsInCategory]
+<hr/>
+
+                        $[if methodMeta.isProperty]
+#### `${methodMeta.returnType}` **`${methodMeta.name}`**
+
+${methodMeta.description}
+
+                        $[else]
+                            $[let parameterList = methodMeta.signature(", ",true)]
+#### `${methodMeta.returnType} ${methodMeta.name}(${parameterList})`
+
+${methodMeta.description}
+
+| Parameter | Description |
+|-----|-----|
+                            $[foreach param in methodMeta.parameters]
+                                $[let description = param.description]
+                                $[if !param.hasDescription]
+                                    $[let description = "*no description*"]
+                                $[/if]
+|`${param.typeName} ${param.name}` | ${description} |
+                            $[/foreach]
+
+                        $[/if]
+                    $[/foreach]
+
+                $[/if]
+            $[/foreach]
+
+        $[/foreach]
+
+    $[/file]
+$[/foreach]

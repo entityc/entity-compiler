@@ -1,0 +1,62 @@
+$[log]
+$[let str="playerAchievement"]
+Original:     ${str}
+
+Case)
+
+Capitalize:   ${str|capitalize}
+Uncapitalize: ${str|uncapitalize}
+Uppercase:    ${str|uppercase}
+Lowercase:    ${str|lowercase}
+
+Words)
+
+Words:        ${str|words}
+Title:        ${str|title}
+Dashes:       ${str|dashes}
+
+Combination)
+
+Words Uppercase:  ${str|words|uppercase}
+Words Lowercase:  ${str|words|lowercase}
+Dashes Lowercase: ${str|dashes|lowercase}
+
+Model)
+$[foreach enum in space.enums]
+
+Enum: ${enum.name|words|uppercase}
+$[foreach item in enum.items]
+    ${item.value}) ${item.name|title}
+$[/foreach]
+$[/foreach]
+$[foreach entity in space.entities]
+
+Entity: ${entity.name|words|uppercase}
+$[foreach attribute in entity.attributes]
+    Attribute: ${attribute.name|title}
+$[/foreach]
+$[/foreach]
+
+Wrap)
+
+$[capture paragraph]
+In this exercise we will work with entities
+$[foreach entity in space.entities]$[if entity#last && !entity#first] and $[elseif !entity#first], $[/if]${entity.name}$[/foreach]
+ so that we can see how wrapping works to create a comment
+block
+to be used in code generation.
+$[/capture]
+Raw Paragraph:
+${paragraph}
+
+Line Comments (default width of 80):
+// Paragraph: ${paragraph|join|wrap}
+
+Line Comments (width of 100):
+// Paragraph: ${paragraph|join|wrap lineWidth:100}
+
+Block Comment:
+/*
+ * Paragraph: ${paragraph|join|wrap:(" *") lineWidth:60}
+ */
+$[/log]

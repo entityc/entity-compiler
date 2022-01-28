@@ -1,0 +1,27 @@
+$[D "This template demonstrates the use of functions."]
+$[log]
+$[function FindAllStringAttributes
+    D "Finds all attributes of type string in the given space."
+    (space D "The space to search within."
+    ) ->
+    (attributes D "An array of the found attributes."
+    )
+]
+$[let attributes  = @[]@]
+$[foreach entity in space.entities]
+$[foreach attribute in entity.attributes]
+$[switch attribute.type]
+$[case string]
+$[do attributes.add(attribute)]
+$[default]
+$[/switch]
+$[/foreach]
+$[/foreach]
+$[/function]
+
+$[call FindAllStringAttributes() -> (attributes:stringAttributeList)]
+String Attributes:
+$[foreach attribute in stringAttributeList.values]
+  ${attribute.entity.name}.${attribute.name}
+$[/foreach]
+$[/log]

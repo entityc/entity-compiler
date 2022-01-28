@@ -1,0 +1,180 @@
+# Domain
+
+A domain represents an environment in which an entity can be represented. For example a database is a domain that provides storage and retrieval of the instances (objects) of entities. Another domain could be a REST API implemented on the server to provide access to the entity objects stored in the database. And yet another domain could be a client side REST interface.
+
+Domains serve the following functions:
+
+* Namespace declaration
+* Renaming
+* Bit field mapping
+
+Declaring a domain is simply done as:
+
+	domain name {
+
+	}
+
+Where `name` is the name of the domain.  Presently the transforms are looking for very specifically named domains so you have to be aware of this, see the **Domains** column in the table in the Transforms section below.
+
+## Namespace
+
+The ability to assign a namespace to a domain allows any code generated for a domain to use its namespace as appropriate for the code language. For instance, for Java the domain namespace would be used to declare the code's package. The transforms can decide to use this as a base namespace and add explicit sub-namespaces to this namespace.
+
+	namespace org.entityc.app
+
+## Renaming
+
+Each domain may have its own naming convention, so the following language constructs help with this.
+
+### Naming Method
+
+A domain can define a naming method for entities, attributes and support as they are used in that domain. The `support` naming is intended for support type files that may be necessary in a domain.
+
+	naming entity {
+	    method methodname
+	}
+	naming attribute {
+	    method methodname
+	}
+	naming support {
+	    method methodname
+	}
+
+where methodname is one of:
+
+| Method Name | Description |
+|---|---|
+| `standard` | A name is not converted and simply adopts the standard camel case naming. |
+| `lowercase` | A name is converted simply by naming it all lowercase. For instance, `TrainingPlan` would become `trainingplan` |
+| `uppercase` | A name is converted simply by naming it all uppercase. For instance, `TrainingPlan` would become `TRAININGPLAN` |
+| `underscoreLowercase` | A name is converted from camel case to underscores and all lowercase. For instance, `TrainingPlan` is renamed as `training_plan`. |
+| `underscoreUppercase` | A name is converted from camel case to underscores and all uppercase. For instance, `TrainingPlan` is renamed as `TRAINING_PLAN`. |
+| `dashesLowercase` | A name is converted from camel case to dashes and all lowercase. For instance, `TrainingPlan` is renamed as `training-plan`. |
+| `dashesUppercase` | A name is converted from camel case to dashes and all uppercase. For instance, `TrainingPlan` is renamed as `TRAINING-PLAN`. |
+
+### Prefix and Suffix
+
+Some domains may have a naming convention that is the entity name either prefixed by something or suffixed by something (or both). For example:
+
+	prefix Z
+	suffix Dto
+
+This also may be desired in situations where classes would be named the same and would cause an inconvenience even if their namespaces were different.
+
+### Unit Usage in Name
+
+By default, if an attribute is defined to have a unit, that unit will be used in its name across all domains. However if you do not want a particular domain to use units you can do the following:
+
+	without units
+
+This will make sure units are not included in the naming of attributes in a particular domain. Likewise you could just say:
+
+	with units
+
+To ensure units are used (even though that is the default).
+
+### Primary Key
+
+To rename the primary key for all entities in the domain, we can simply add:
+
+	primarykey somecrazyid
+
+All primary keys in this domain will simply be named `somecrazyid`.
+
+### Explicit Naming
+
+> **NOTE:** This explicitly renaming happens **before** any domain naming method for attributes.
+
+A domain can also explicitly rename any particular entity or attribute for just that domain.
+
+To rename an entity within a domain:
+
+	domain SomeDomain {
+	    entity SomeEntity rename to SomeOtherEntityName {
+	    }
+	}
+
+For attributes, this can be done either with respect to a single entity or for all entities.
+
+#### Single Entity
+
+This can be very useful in cases where a database already exists but the table or column name may not be a good name so instead of trying to change it in the database, having the better name reflected every else is better, started with the entity.
+
+To rename an attribute within a domain:
+
+	domain SomeDomain {
+	    entity SomeEntity {
+	        attributes {
+	            rename someAttribute to someOtherAttributeName
+	        }
+	    }
+	}
+
+A special type of renaming can also be applied:
+
+	domain SomeDomain {
+	    entity SomeEntity {
+	        attributes {
+	            rename someAttribute append entity
+	            rename someOtherAttribute prepend domain
+	        }
+	    }
+	}
+
+This will allow you to append or prepend either the entity or domain name to the attribute name. This is more powerful when used irrespective of the entity context.
+
+#### All Entities
+
+A more powerful rename method is to rename all attributes across all entities. This can be useful in situations where a particular domain has keywords and would cause issues if an attribute was not renamed in that domain. For instance, in Object-C the member variable named `description` is special (its like Java's `toString()` method) and should be avoided.
+
+To rename all attributes of a particular name can be done in a couple of ways. One way is simply explicitly renaming it:
+
+	domain ObjCDomain {
+	    attributes {
+	        rename description to desc
+	    }
+	}
+
+Another method would be using the append or prepend method with the entity or domain name:
+
+	domain ObjCDomain {
+	    attributes {
+	        rename description prepend entity
+	    }
+	}
+
+So in the above example, the `description` attribute for an entity named `Activity` would be renamed to `activityDescription`.
+
+> **NOTE:** As mentioned previously, explicit attribute renaming happens **before** any domain naming method for attributes. So if the domain naming method was `underscoreLowercase`, the above example would result in a name: `activity_description`.
+
+## Bit Field Mapping
+
+There are times when it is preferred to compress multiple attributes (especially booleans) into a single integer field. This done on a domain by domain basis.
+
+When this is done, essentially multiple attributes are **replaced** by another newly defined domain specific attribute. That is, the replaced attributes are not rendered directly to code, only the replacing attribute is rendered. And any time the attribute from another domain is mapped to this domain, a bit field transformation is applied.
+
+For example, let's say we have three attributes that we want to compress into a single integer attribute. The entity attribute is defined as:
+
+	entity SomeEntity {
+	    attributes {
+	        boolean enableFeatureA
+	        boolean enableFeatureB
+	        int32   mode // value is from 0 to 15
+	    }
+	}
+
+To compress them into a single field for some domain, you would do the following:
+
+	domain SomeDomain {
+	    entity SomeEntity {
+	        attributes {
+	            int32 options replaces {
+	                (1) enableFeatureA
+	                (1) enableFeatureB
+	                (4) mode
+	            }
+	        }
+	    }
+	}
+
+The number in the parentheses is the number of bits for that field. The order the fields are defined is important. The bits of the int32 are allocated starting with bit 0. So `enableFeatureA` is bit 0, `enableFeatureB` is bit 1 and `mode` is bits 2 through 5.

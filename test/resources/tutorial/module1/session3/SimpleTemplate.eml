@@ -1,0 +1,31 @@
+$[log]
+$[foreach entity in space.entities]
+Entity: ${entity.name}
+  Primary Key: ${entity.primaryKeyAttribute.type} ${entity.primaryKeyAttribute.name}
+$[foreach attribute in entity.attributes]
+  Attribute:
+      name: ${attribute.name}
+      type: ${attribute.type}
+$[if attribute.hasUnit]
+      unit: ${attribute.unit.name} (${attribute.unit.abbreviation})
+$[/if]
+$[* Qualifiers *]
+$[if attribute.isUnique]
+      UNIQUE
+$[/if]
+$[if attribute.isOptional]
+      OPTIONAL
+$[/if]
+$[if attribute.isCreation]
+      CREATION
+$[/if]
+$[if attribute.isModification]
+      MODIFICATION
+$[/if]
+$[if attribute.isArray]
+      ARRAY
+$[/if]
+
+$[/foreach]
+$[/foreach]
+$[/log]

@@ -1,0 +1,6 @@
+configuration Tutorial
+{
+    templates {
+        template SimpleTemplate {}
+    }
+}

@@ -1,0 +1,9 @@
+space Module1
+{
+}
+
+entity Player {
+    D "A player in the game."
+
+    primarykey uuid playerId
+}

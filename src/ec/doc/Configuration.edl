@@ -1,0 +1,19 @@
+configuration TemplateDocs
+{
+    output Docs {
+        D "The directory containing compiler documents."
+        path "docs"
+    }
+
+    repository DocsRepo {
+        type local
+        path "src/ec/doc"
+    }
+
+    templates {
+        import from DocsRepo
+        template TemplateDocsTemplate in "templates" {
+            output primary Docs
+        }
+    }
+}

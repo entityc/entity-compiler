@@ -1,0 +1,22 @@
+$[log]
+$[foreach enum in space.enums|sort]
+
+Enum: ${enum.name}
+$[foreach item in enum.items|sort]
+    ${item.value}) ${item.name}
+$[/foreach]
+$[/foreach]
+$[let stringAttributes = @[]@]
+$[foreach entity in space.entities|sort]
+
+Entity: ${entity.name}
+$[foreach attribute in entity.attributes|sort]
+$[switch attribute.type]$[case string]$[do stringAttributes.add(attribute)]$[default]$[/switch]
+    Attribute: ${attribute.name}
+$[/foreach]
+$[/foreach]
+
+$[foreach attribute in stringAttributes.values|sort]
+String Attribute: ${attribute.name}
+$[/foreach]
+$[/log]

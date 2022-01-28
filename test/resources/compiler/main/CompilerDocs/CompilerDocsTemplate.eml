@@ -1,0 +1,88 @@
+$[*
+    This template will extract some compiler documentation.
+*]
+$[let modelClassManager = __documentationManager]
+$[do modelClassManager.build()]
+$[file "" "CompilerDocs" "txt"]
+    $[foreach type in modelClassManager.modelClassTypes]
+        $[if modelClassManager.modelClassCount(type) == 0]$[continue]$[/if]
+        $[let modelClasses = modelClassManager.modelClasses(type)]
+# ${type.title} Model
+
+${type.description} The classes are briefly described in the following table, then each will be described in more detail below the table.
+
+| Class | Description |
+|-----|-----|
+        $[foreach className in modelClasses]
+            $[if modelClassManager.modelClassCount(type) == 0]$[continue]$[/if]
+            $[let classMeta = modelClassManager.modelClassMeta(className)]
+|[`${classMeta.name}`](#class_${classMeta.name})|${classMeta.description}|
+        $[/foreach]
+
+        $[foreach className in modelClasses]
+            $[if modelClassManager.modelClassCount(type) == 0]$[continue]$[/if]
+            $[let classMeta = modelClassManager.modelClassMeta(className)]
+<a name="class_${classMeta.name}">
+## ${classMeta.name} Class
+</a>
+
+${classMeta.description}
+
+This class has the following methods broken up into categories:
+
+            $[let methodCategories = modelClassManager.methodCategories]
+            $[foreach category in methodCategories]
+                $[let methodsInCategory = classMeta.methodMetasByCategory(category)]
+                $[if methodsInCategory.count > 0]
+### ${category.title} Category
+
+${category.description}
+
+| Method/Property |
+|---|
+                    $[let hasMethodWithArgsCount = false]
+                    $[foreach methodMeta in methodsInCategory]
+                        $[if methodMeta.isProperty]
+| `${methodMeta.returnType}` **`${methodMeta.name}`** |
+| ${methodMeta.description} |
+                        $[else]
+                            $[let hasMethodWithArgsCount = true]
+                            $[let parameterList = methodMeta.signature(", ",true)]
+| `${methodMeta.returnType}` [**`${methodMeta.name}(${parameterList})`**](#class_${classMeta.name}_${methodMeta.name}) |
+| ${methodMeta.description} |
+                        $[/if]
+                        $[if !methodMeta#last]
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+                        $[/if]
+                    $[/foreach]
+
+                    $[if hasMethodWithArgsCount]
+                        $[foreach methodMeta in methodsInCategory]
+                            $[if !methodMeta.isProperty]
+                                $[let parameterList = methodMeta.signature(", ",true)]
+<a name="class_${classMeta.name}_${methodMeta.name}">
+#### Method `${methodMeta.returnType} ${methodMeta.name}(${parameterList})`
+</a>
+
+${methodMeta.description}
+
+| Parameter | Description |
+|-----|-----|
+                                $[foreach param in methodMeta.parameters]
+                                    $[let description = param.description]
+                                    $[if !param.hasDescription]
+                                        $[let description = "*no description*"]
+                                    $[/if]
+|`${param.typeName} ${param.name}` | ${description} |
+                                $[/foreach]
+                            $[/if]
+
+                        $[/foreach]
+                    $[/if]
+                $[/if]
+            $[/foreach]
+
+        $[/foreach]
+
+    $[/foreach]
+$[/file]

@@ -1,0 +1,5 @@
+$[log]
+$[foreach entity in space.entities]
+Entity: ${entity.name}
+$[/foreach]
+$[/log]

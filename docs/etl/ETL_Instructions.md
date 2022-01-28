@@ -1,0 +1,659 @@
+# Template Instruction Reference
+
+The following document should be used for reference only. When getting started with the language it is recommended to take the Entity Compiler Tutorial, then use this document once you understand the concepts and just need specific information about particular instructions.
+
+There are two types of instructions, ones that represent a single statement and ones that also define a block of template code associated with it. This is similar to many other programming languages such as C and Java that use `{` and `}` to surround a block of code for statements such as `for` or `if`. In the template language, these instructions are referred to as **block** instructions. A **block** instruction has the form: `$[`*instruction* *args*`]` ... *block of code* ... `$[/`*instruction*`]`. It's important to keep the instruction block end balanced with its start.
+
+> **NOTE:** Instruction usage will use *italics* to indicate an instruction argument and square brackets - 
+> e.g. [ *optional* ] - to indicate an optional part of the instruction. 
+
+This document covers all the instructions of the template language, grouped by category.
+
+| Category | Description |
+|----------|-------------|
+| [Assignment](#category_assignment)  | Instructions that result in a variable being assigned a value. |
+| [Context](#category_context)  | Instructions that define the context in which a template runs (such as language and domain). |
+| [Control Flow](#category_control_flow)  | Instructions that alter the flow of execution such as loop and conditional instructions. |
+| [File I/O](#category_file_io)  | Instructions that perform some type of file operation. |
+| [Function](#category_function)  | Instructions related to defining and calling functions. |
+| [Miscellaneous](#category_misc)  | These are instructions that didn't fit into any particular category. |
+| [Movement](#category_movement)  | These are instructions that help you to move code/text up in the template output. |
+| [Publishing](#category_publishing)  | Instructions related to the publishing feature that allows you to establish publishers with outlets then else author code to those outlets. |
+
+<a name="category_assignment"></a>
+## Assignment
+
+Instructions that result in a variable being assigned a value.
+
+| Instruction | Summary |
+|-------------|---------|
+| [`capture`](#instruction_capture) | Captures text into a variable instead of going to the output. |
+| [`let`](#instruction_let) | This is a straight forward way to assign values to a variable. |
+
+<hr/>
+
+<a name="instruction_capture"></a>
+### `capture`
+
+This instruction will execute a piece of the template but instead of it going out to a file it capture it into a string variable. Its analogous to a `sprintf` in C. You could use a `let` instruction to do the same thing but its much more readable and natural to use this `capture` instruction.
+
+#### Usage
+
+> `$[capture `*variable*`]` ...***template-block***... `$[/capture]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *variable* | `String` | The name of the variable you wish to be assigned with the captured string value. |
+
+#### *template-block*
+
+This template code inside a `capture` block is just like any other template code, the only difference is that its output is directed into the specified string variable.
+
+<hr/>
+
+<a name="instruction_let"></a>
+### `let`
+
+Assigns the resulting value after evaluating the provided *expression* to the provided *variable*.
+
+#### Usage
+
+> `$[let `*variable*` = `*expression*`]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *variable* | `String` | The variable to receive the assigned value. |
+| *expression* | `FTExpression` | The expression that will be evaluated. |
+
+<a name="category_context"></a>
+## Context
+
+Instructions that define the context in which a template runs (such as language and domain).
+
+| Instruction | Summary |
+|-------------|---------|
+| [`domain`](#instruction_domain) | Specifies the default domain name for this template. |
+| [`language`](#instruction_language) | Defines the programming language associated with the template text and resulting output. |
+
+<hr/>
+
+<a name="instruction_domain"></a>
+### `domain`
+
+Specifies the default domain name for this template. When this is specified, filtering with this domain can be done without specifying this domain.
+
+#### Usage
+
+> `$[domain *name*`]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *name* | `String` | The name of the domain. |
+
+<hr/>
+
+<a name="instruction_language"></a>
+### `language`
+
+Defines the programming language associated with the template text and resulting output.
+
+#### Usage
+
+> `$[language *name*`]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *name* | `String` | The name of the language. |
+
+<a name="category_control_flow"></a>
+## Control Flow
+
+Instructions that alter the flow of execution such as loop and conditional instructions.
+
+| Instruction | Summary |
+|-------------|---------|
+| [`break`](#instruction_break) | Allows you to break out of a foreach loop or a switch/case block. |
+| [`case`](#instruction_case) | The case part of a switch/case block. |
+| [`continue`](#instruction_continue) | Allows you to force the next iteration of a foreach loop. |
+| [`default`](#instruction_default) | The default case of a switch/case structure. |
+| [`else`](#instruction_else) | Executes template code when all prior `if` and `elseif` instructions fail. |
+| [`elseif`](#instruction_elseif) | Executes template code conditionally when prior `if` or `elseif` instructions fail. |
+| [`foreach`](#instruction_foreach) | With this instruction you can iterate through collections of objects. |
+| [`if`](#instruction_if) | Allows you to conditionally execute template code. |
+| [`switch`](#instruction_switch) | The start of a switch/case structure for conditionally executing template code. |
+
+<hr/>
+
+<a name="instruction_break"></a>
+### `break`
+
+When inside a `foreach` or a `case`/`default` instruction block, this instruction will allow you to branch out of that block to the code just below that block.
+
+#### Usage
+
+> `$[break]`
+
+<hr/>
+
+<a name="instruction_case"></a>
+### `case`
+
+The `case` instruction is part of a `switch` instruction that provides a branch target and code to execute when the switch expression value matches the case value.
+
+#### Usage
+
+> `$[case `*identifier*[`, `*identifier*]`]` ...***template-block***... `$[/case]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *identifier* | `String` | An identifier that represents ... |
+
+#### *template-block*
+
+
+
+#### See Also
+
+[`switch`](#instruction_switch),[`default`](#instruction_default)
+<hr/>
+
+<a name="instruction_continue"></a>
+### `continue`
+
+Causes it to immediately go to the next iteration the `foreach` instruction it is contained within.
+
+#### Usage
+
+> `$[continue]`
+
+<hr/>
+
+<a name="instruction_default"></a>
+### `default`
+
+When all `case` instructions do not match the switch expression value, it will branch to this instruction (if it is defined) and execute its code.
+
+#### Usage
+
+> `$[default]` ...***template-block***... `$[/default]`
+
+#### *template-block*
+
+Code to execute when none of the `case` instructions match the switch expression value.
+
+#### See Also
+
+[`switch`](#instruction_switch),[`case`](#instruction_case)
+<hr/>
+
+<a name="instruction_else"></a>
+### `else`
+
+This instruction is the last one in the `if`...`elseif`...`else` structure. If all of the conditional expressions in the structure above it evaluate to `false`, then its template code executes.
+
+#### Usage
+
+> `$[else]`...***template-block***...`$[/if]`
+
+#### *template-block*
+
+Template code that executes if all other conditions in the structure fail.
+
+#### See Also
+
+[`if`](#instruction_if),[`elseif`](#instruction_elseif)
+<hr/>
+
+<a name="instruction_elseif"></a>
+### `elseif`
+
+This instruction must be preceded by an `if` instruction. If the expression of that prior `if` instruction evaluated to `false`, then this instruction will evaluate its expression. If it resolves to `true` it will execute its template code. If it is false and is followed by another `elseif`, execution will move to that other `elseif` instruction. If false and is instead followed by an `else` statement, the code contained in the `else` instruction is executed.
+
+#### Usage
+
+> `$[elseif `*expression*`]`... ***template-block*** ...`$[/if]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *expression* | `FTExpression` | The expression that is evaluated to determine whether to execute the template  code of this instruction. |
+
+#### *template-block*
+
+Between this instruction and either the next `elseif`, `else` or the `if` instruction terminator is template code that will be execution if the condition is met for this instruction.
+
+#### See Also
+
+[`if`](#instruction_if),[`else`](#instruction_else)
+<hr/>
+
+<a name="instruction_foreach"></a>
+### `foreach`
+
+There are a couple of variations of this instruction, each described by its own usage below.
+
+#### Usage
+
+
+
+##### Simple Collection Iteration
+
+> `$[foreach `*loopVariable*` in `*collectionExpression*`]` ...***template-block***... `$[/foreach]`
+
+This is the most common usage where the `foreach` instruction iterates over a provided collection, and for each iteration, assigns the item in the collection to the provided loop variable.
+
+##### Conditional Collection Iteration
+
+> `$[foreach `*loopVariable*` in `*collectionExpression*` if `*conditionalExpression*`]` ...***template-block***... `$[/foreach]`
+
+This usage iterates over the provided collection but also allows you to conditionally include (or exclude) items based on a provided expression.
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *loopVariable* | `String` | The loop variable. Each iteration of the collection represented by the collection expression will be assigned to a variable by this name. |
+| *collectionExpression* | `FTExpression` | This is the expression that represents a collection through which to iterate. |
+| *conditionalExpression* | `FTExpression` | This expression allows you to conditionally include item by item in the collection. For each item in the collection, it will evaluate this expression. If it is `true` then that item is included in the collection, otherwise it is excluded. For this to work, this expression typically includes the loop variable but can in fact be any expression. |
+
+#### *template-block*
+
+The block of template code this instruction surrounds is executed for each iteration of the `foreach` loop based on the resulting collection after optional conditional filtering. The `#first`, `#last`, and `#count` loop variable suffixes apply to the post-filtered collection. This is the advantage of using the conditional usage of this instruction over simply having an `if` inside the loop.
+
+<hr/>
+
+<a name="instruction_if"></a>
+### `if`
+
+This instruction evaluates the provided instruction and if it resolves to `true` it will execute its template code. If it is `false` and is followed by an `elseif`, execution will move to that instruction. If `false` and is instead followed by an `else` statement, the code contained in the `else` instruction is executed.
+
+#### Usage
+
+> `$[if `*expression*`]` ...***template-block***... `$[/if]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *expression* | `FTExpression` | The expression that is evaluated to determine whether to execute the template code of this instruction. |
+
+#### *template-block*
+
+This instruction represents the top of a possible `if`...`elseif`...`else` structure, where the `elseif` and `else` are optional. Between this instruction and either the next `elseif`, `else` or this instructions terminator is template code.
+
+#### See Also
+
+[`elseif`](#instruction_elseif),[`else`](#instruction_else)
+<hr/>
+
+<a name="instruction_switch"></a>
+### `switch`
+
+This `switch` instruction works much like it does in most languages. The provided expression is evaluated and based on its value it will try to find a `case` statement contained in it that matches in value. When it finds a case statement it changes the control flow of the template to the code located there (branches). If no `case` is found that matches it will branch to a `default` instruction if that is specified. Otherwise it exits to just below the `switch` statement. One aspect that is different from C or Java is that it does not fall through a case statement, once the code for a `case` statement is executed, it exits the `switch`. This eliminates the need for `break` statements, although you can still use them if needed.
+
+#### Usage
+
+> `$[switch `*expression*`]` ...***template-block***... `$[/switch]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *expression* | `FTExpression` | The instruction evaluates this expression and branches to the matching case. |
+
+#### *template-block*
+
+Inside this `switch` block are zero or more `case` instructions and up to one `default` instruction. See their descriptions for information about them specifically.
+
+#### See Also
+
+[`case`](#instruction_case),[`default`](#instruction_default)
+<a name="category_file_io"></a>
+## File I/O
+
+Instructions that perform some type of file operation.
+
+| Instruction | Summary |
+|-------------|---------|
+| [`file`](#instruction_file) | Allows you to direct the template output to a file. |
+| [`import`](#instruction_import) | Imports a file into the template engine and executes it. |
+| [`install`](#instruction_install) | Provides an easy way to install files into your local project. |
+| [`load`](#instruction_load) | Loads specifically supported files that can add certain data to the model. |
+| [`log`](#instruction_log) | Sends template output to system output for logging purposes. |
+
+<hr/>
+
+<a name="instruction_file"></a>
+### `file`
+
+Defines a block of the template who's output will be directed to a specified file. The base directory is the working directory where the compiler was invoked.Note that each of the arguments are expressions, which means they can come from an expression or simply from a string constant. Following the current working directory, the *pathExpression* is used to further provide a path to the ultimate directory where the file *pathExpression*`/`*filenameExpression*`.`*extensionExpression* will be written. You **cannot** nest a `file` instruction inside another `file` instruction.
+
+#### Usage
+
+> `$[file `[`ifdoesnotexist`]` `*pathExpression*` `*filenameExpression*` `*extensionExpression*`]` ...***template-block***... `$[/file]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `ifdoesnotexist` | option | If specified, the file will only be written if it does not already exist. This would be used for files you want to initially setup for the user but after this initial setup, the user is expected to maintain the file. |
+| *pathExpression* | `FTExpression` | The path of the directory containing the destination file. This path is relative to the directory where the compiler was launched. |
+| *filenameExpression* | `FTExpression` | This is the filename for the output file. |
+| *extensionExpression* | `FTExpression` | This is the file extension for the output file. |
+
+#### *template-block*
+
+The template block inside the bounds of this instruction will be executed and its output sent to the file specified (aside from the behavior of the `ifdoesnotexist` option if specified). Any other output redirecting block instruction contained in here will pause the writing to the file until that block has finished. At the end of this block, the file will be closed.
+
+<hr/>
+
+<a name="instruction_import"></a>
+### `import`
+
+You can import template files that simply contain function declarations so that you can call those functions, or you can import templates you want to execute right after the import.
+
+#### Usage
+
+> `$[import "`*templatePath*`"` [ `from `*repositoryName* ]`]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *templatePath* | `String` | The path to the template file relative to the current repository importer. |
+| *repositoryName* | `String` | This is an optional repository name when you want to import from a different repository than the current repository. |
+
+<hr/>
+
+<a name="instruction_install"></a>
+### `install`
+
+When setting up a project using files from a library, this instruction makes it easy to install files from that library into the project directory structure. The files being installed have their native file extension (not the one we use for templates) so they are easily viewable and edited (using the code highlighter appropriate for them). You can also include template code in them and the template code will execute during the install process. Of course, the presence of the template code may interfere with the code highlighter and as well, the template code will not be appropriately highlighted but when the amount of template code is relatively small it can be very advantageous to use this install method over just making it a template and running the template.
+
+#### Usage
+
+> `$[install `[`copy`]` `*sourceExpression*` `*destExpression*`]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `copy` | option | If specified, the file will be copied verbatim without trying to execute any template code. |
+| *sourceExpression* | `FTExpression` | Defines the path and filename with extension of the source file. The path is relative to the directory in which the template was configured. |
+| *destExpression* | `FTExpression` | Defines the destination path and directory name to copy the file into. The path is relative to the directory in which the template was configured. |
+
+<hr/>
+
+<a name="instruction_load"></a>
+### `load`
+
+This instruction is used to load specific types of data from a file that will alter specific data in the model. As with `file`, the same three arguments *path* *filename* *extension* are used specify the file. The *type* argument specifies the type of file to be loaded. Currently only `proto` is supported. This loader expects the file to be a Protobuf protocol file and parses it to extract field numbers and assign to appropriate attributes.
+
+#### Usage
+
+> `$[load `*type* *pathExpression* *filenameExpression* *extensionExpression*`]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *type* | `Type` | One of a supported type of file to read. Only `proto` is supported at this time. |
+| *pathExpression* | `FTExpression` | The path of the directory containing the source file. This path is relative to the directory where the compiler was launched. |
+| *filenameExpression* | `FTExpression` | This is the filename of the input file. |
+| *extensionExpression* | `FTExpression` | This is the file extension of the input file. |
+
+<hr/>
+
+<a name="instruction_log"></a>
+### `log`
+
+This instruction is designed to help you debug a template by allowing you to send output to the system output. It has multiple levels of log output, including one that will allow you to terminate the compiler after it sends it output to system out.
+
+#### Usage
+
+> `$[log `*level*`]` ...***template-block***... `$[/log]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *level* | `String` | The level can be used to classify the level of severity of the log output. The options are `info`, `debug`, `warning`, `error` and `fatal`. For the first three the only difference in the output is the prefix of each line which is the level name in all caps followed by `> `. For `error`, output is directed to system error. For `fatal`, output is also sent to system error but after the output, the compiler terminates, stopping any further execution of the template. |
+
+#### *template-block*
+
+The template block is executed and its output sent to the system output. If it contains a `capture` block or any other such block instruction that redirects output, as soon as that block has finished, it will resume with sending output to the system out until it reaches the log's template block.
+
+<a name="category_function"></a>
+## Function
+
+Instructions related to defining and calling functions.
+
+| Instruction | Summary |
+|-------------|---------|
+| [`call`](#instruction_call) | Calls a function by name with inputs and outputs. |
+| [`function`](#instruction_function) | Allows you to define a function with both inputs and outputs. |
+| [`return`](#instruction_return) | Returns from a function. |
+
+<hr/>
+
+<a name="instruction_call"></a>
+### `call`
+
+This instruction is used to call a function by its name and has the ability to map inputs by name assign them to variables to provide values to the inputs. As well, you can map outputs to variable names where upon calling the function will result in those variables being assigned values from the function.
+
+#### Usage
+
+> `$[call `*functionName*`(`[*inputName*`:`*variable*[`,`*inputName*`:`*variable*]]`)`[` -> (`[*outputName*`:`*variable*[`,`*outputName*`:`*variable*]]`)]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *functionName* | `String` | The name of the function to call. |
+
+#### See Also
+
+[`function`](#instruction_function)
+<hr/>
+
+<a name="instruction_function"></a>
+### `function`
+
+The function instruction allows you to define a block of template code that you can call by name, passing values in and receiving values out. A function is called with a `call` instruction. Functions can be declared at any scope and calls to those functions must be made within the same scope. If you have two functions declared with the same name inside the same scope, the most recently defined function to the point of the `call` is used.
+
+#### Usage
+
+> `$[function `*name*`(`[*input*[`,` *input*]]`)`[`-> (`*output*[`,`*output*]`)]` ...***template-block***... `$[/function]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *name* | `String` | The name of the function. |
+| *output* | `FTFunctionArgument` | An output argument of the function. |
+| *input* | `FTFunctionArgument` | An input argument of the function. |
+
+#### *template-block*
+
+The template code inside the function is executed upon calling the function. The limitation with the `file` instruction still holds, you cannot execute a `file` instruction inside another `file` instruction, even if it is included in a function. If you do include a `file` instruction in a function just make sure no other `file` instruction is active at the time you call the function.
+
+#### See Also
+
+[`call`](#instruction_call),[`return`](#instruction_return)
+<hr/>
+
+<a name="instruction_return"></a>
+### `return`
+
+This instruction simply returns from the current function it is within.
+
+#### Usage
+
+> `$[return]`
+
+#### See Also
+
+[`function`](#instruction_function)
+<a name="category_misc"></a>
+## Miscellaneous
+
+These are instructions that didn't fit into any particular category.
+
+| Instruction | Summary |
+|-------------|---------|
+| [`do`](#instruction_do) | With this instruction you can call functions on an object to do something. |
+
+<hr/>
+
+<a name="instruction_do"></a>
+### `do`
+
+This instruction simply evaluates an expression. It is useful when the expression contains a method that actually performs some operation that you want performed.
+
+#### Usage
+
+> `$[do `*expression*`]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *expression* | `FTExpression` | The expression you want to evaluate. |
+
+<a name="category_movement"></a>
+## Movement
+
+These are instructions that help you to move code/text up in the template output.
+
+| Instruction | Summary |
+|-------------|---------|
+| [`receive`](#instruction_receive) | Defines a receive point where text can be sent. |
+| [`send`](#instruction_send) | Allows you to send text to a declared receive point. |
+
+<hr/>
+
+<a name="instruction_receive"></a>
+### `receive`
+
+Creates a receive point with a give name to where a `send` instruction can send it text. A good example for this is to place a `receive` instruction where you want to accept import statements. Then farther down in the template execution just run a `send` instruction to send the import statement up to this receive point.
+
+#### Usage
+
+> `$[receive `[`distinct`]` `*name*`]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `distinct` | option | An option that, if specified, will make sure that all lines of text that are sent to this receive point are distinct, that is, there are no duplicates. This is useful for a receive point for import statements since you don't want to duplicate them but you also don't want to complicate the send logic to avoid them. |
+| *name* | `String` | The name of the receive point. The `send` instruction will reference this name when sending code/text here. |
+
+<hr/>
+
+<a name="instruction_send"></a>
+### `send`
+
+Sends its block of text to the specified receiver. This receiver must have been declared prior to this instruction executes.
+
+#### Usage
+
+> `$[send `*receiveName*`]` ...***template-block***... `$[/send]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *receiveName* | `String` | The name of the receiver (declared with a `receive` instruction) where the block of this instruction should be sent. |
+
+#### *template-block*
+
+The text to send to the receiver.
+
+<a name="category_publishing"></a>
+## Publishing
+
+Instructions related to the publishing feature that allows you to establish publishers with outlets then else author code to those outlets.
+
+| Instruction | Summary |
+|-------------|---------|
+| [`author`](#instruction_author) | Allows you to send text/code to the outlet of a publisher. |
+| [`outlet`](#instruction_outlet) | Defines a place where authors can send code/text. |
+| [`publisher`](#instruction_publisher) | Defines a block that can contain publishing outlets where authors can send code/text. |
+
+<hr/>
+
+<a name="instruction_author"></a>
+### `author`
+
+The author instruction defines a block of template that you want to be inserted at a publisher's outlet. How this template code is executed by the publisher can be specified in this instruction with the phase and scope options.
+
+#### Usage
+
+> `$[author to `*namespaces*` `[`outlet `*outletName*` `[*phase*]` `[*scope*]]`]` ...***template-block***... `$[/author]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *namespaces* | `Set` | One or more publisher namespaces (separated by a comma ',') to which the authoring should be performed. Any authoring options will be applied to all specified publisher namespaces. |
+| *outletName* | `String` | The name of the outlet to which you want to author this block of template. |
+| *phase* | `FTPublishPhase` | Sets the publishing phase when you want the authoring to occur. The default is the `Connect` phase. |
+| *scope* | `FTPublishScope` | Sets the publishing scope this code should execute within. The default is the `Author` scope. |
+
+#### *template-block*
+
+The block of template code this instruction surrounds will be executed by the publisher when it reaches the referenced outlet during its execution but only during its configured publisher execution *phase*. Essentially the publisher makes an execution pass for each of its phases, thus allowing an action decide when it executes. The configured *scope* of this action will determine the runtime environment that is used for execution.
+
+<hr/>
+
+<a name="instruction_outlet"></a>
+### `outlet`
+
+Specifies an outlet inside a publisher. This will be a place where authors can send code (or text). When author template code is executed for this outlet, template variables called `__outlet` and `__author` will be made available so the authoring code. This gives the ability to create comments in code that can help a developer know how that code got there.
+
+#### Usage
+
+> `$[outlet `*name*`]` ...***template-block***... `$[/outlet]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *name* | `String` | The name of the outlet. Authors will use this name along with that of its publisher's namespace to identify the outlet. |
+
+#### *template-block*
+
+If no authors are matched up to an outlet then the contents of this outlet block is executed.
+
+<hr/>
+
+<a name="instruction_publisher"></a>
+### `publisher`
+
+This instruction allows you to establish a block of template code as a **publisher**. Inside the publisher block you can declare one or more **outlets** that will serve as insertion points for authors.
+
+#### Usage
+
+> `$[publisher `*namespace*`]` ...***template-block***... `$[/publisher]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *namespace* | `MTNamespace` | A publisher defines a namespace that is intended to be unique among all other publishers that an application developer would encounter. Using a **reverse domain name** at the start of this identifier would be best. |
+
+#### *template-block*
+
+
+
