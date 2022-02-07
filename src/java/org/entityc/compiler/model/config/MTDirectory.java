@@ -31,6 +31,9 @@ public class MTDirectory extends MTNode {
     }
 
     public void setPath(String path) {
+        if (path == null || path.equals("")) {
+            path = ".";
+        }
         this.path = path;
     }
 
@@ -56,7 +59,7 @@ public class MTDirectory extends MTNode {
     }
 
     public boolean hasFilesWithExtension(String extension) {
-        File   thisDirectory = new File(path);
+        File   thisDirectory = new File(path == null || path.equals("") ? "." : path);
         File[] files         = thisDirectory.listFiles(File::isFile);
         for (File file : files) {
             String filename = file.getName();

@@ -43,13 +43,15 @@ public class RepositoryCache {
             case TempDirectory:
                 outputFilepath += filename;
                 break;
-            case UserCache:
-                String completeFilename = repository.getPath() + File.separator + filename;
+            case UserCache: {
+                String pathPart = repository.getPath() != null && !repository.getPath().isEmpty() ? repository.getPath() + File.separator : "";
+                String completeFilename = pathPart + filename;
                 if (repository.getType() == MTRepositoryType.LOCAL) {
                     outputFilepath = completeFilename;
                 } else {
                     outputFilepath += getRepositoryCachePath(repository) + File.separator + completeFilename;
                 }
+            }
                 break;
         }
 

@@ -145,7 +145,7 @@ public abstract class FTNode extends MFObject {
     }
 
     public boolean hasDescription() {
-        return descriptionNodes != null && !descriptionNodes.isEmpty();
+        return descriptionNodes != null && !descriptionNodes.isEmpty() && !this.descriptionInCategory(FTDescription.DefaultCategory).isEmpty();
     }
 
     public String getDescription() {

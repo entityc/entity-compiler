@@ -69,8 +69,7 @@ public class MTRepository extends MTNode {
             Integer lastPathDelimIndex = path.lastIndexOf("/");
             if (lastPathDelimIndex == -1) {
                 setupFilename = "Setup";
-            }
-            else {
+            } else {
                 setupFilename = path.substring(lastPathDelimIndex + 1);
                 path          = path.substring(0, lastPathDelimIndex);
             }
@@ -100,11 +99,9 @@ public class MTRepository extends MTNode {
     public boolean isValid() {
         if (type == MTRepositoryType.GITHUB) {
             return organization != null && organization.length() > 0
-                   && path != null && path.length() > 0
                    && tag != null && tag.length() > 0
                    && repoName != null && repoName.length() > 0;
-        }
-        else if (type == MTRepositoryType.LOCAL) {
+        } else if (type == MTRepositoryType.LOCAL) {
             return path != null && path.length() > 0;
         }
         return false;
@@ -139,8 +136,10 @@ public class MTRepository extends MTNode {
         if (!indexedTemplates) {
             try {
                 GHRepository repo = gitHub.getRepository(
-                    this.getOrganization() + "/" + this.getRepoName());
-                List<GHContent> directoryContents = repo.getDirectoryContent(this.getPath());
+                        this.getOrganization() + "/" + this.getRepoName());
+                List<GHContent> directoryContents = repo.getDirectoryContent(this.getPath() != null ?
+                                                                             this.getPath() :
+                                                                             "");
                 indexTemplateFilesInGithubDirectory(repo, directoryContents);
                 indexedTemplates = true;
             } catch (IOException e) {

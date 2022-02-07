@@ -32,6 +32,7 @@ import org.entityc.compiler.util.ECLog;
 
 import javax.json.JsonObject;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -176,6 +177,10 @@ public class MTSpace extends MTNode implements MTReferenceResolution, MTTemplate
     @Override
     public String getName() {
         return name;
+    }
+
+    public final Collection<MTRepository> getRepositories() {
+        return repositoryMap.values();
     }
 
     public List<MTSpace> getConnectedToSpaces() {

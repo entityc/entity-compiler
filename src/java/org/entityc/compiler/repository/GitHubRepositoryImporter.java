@@ -36,7 +36,8 @@ public class GitHubRepositoryImporter implements RepositoryImporter {
         } catch (IOException e) {
             ECLog.logFatal("Unable to connect to GitHub: " + repository.getOrganization() + "/" + repository.getRepoName() + "\n" + e.getMessage());
         }
-        String gitRepoPath = repository.getPath() + "/" + repositoryImport.getFilename() + "." + extension;
+        String pathPart = repository.getPath() != null && !repository.getPath().isEmpty() ? repository.getPath() + "/" : "";
+        String gitRepoPath = pathPart + repositoryImport.getFilename() + "." + extension;
         GHRepository repo = null;
         try {
             repo        = github.getRepository(repository.getOrganization() + "/" + repository.getRepoName());
