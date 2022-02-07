@@ -50,7 +50,7 @@ public class TutorialTest {
         File   expectedFile = new File(TestResourceDir + File.separator + "expected.txt");
         String actual       = FileUtils.readFileToString(actualFile);
         String expected     = FileUtils.readFileToString(expectedFile);
-        assertEquals(actual, expected);
+        assertEquals(expected, actual);
     }
 
     @Test

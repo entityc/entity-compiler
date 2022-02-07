@@ -852,7 +852,7 @@ public class MTDEntity extends MTNode implements MTReferenceResolution, MTDomain
         description =
             "Returns the first found domain relationship of this domain entity that is tagged with the specified "
             + "tag. Although it is possible to have more than one, this method is used when expecting just one "
-            + "by nature of the tag ")
+            + "by nature of the tag.")
     public MTDERelationship relationshipToEntityTagged(
         @ModelMethodParameter(description = "The tag with which to search.")
             String tag) {

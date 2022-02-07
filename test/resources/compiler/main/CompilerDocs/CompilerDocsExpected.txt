@@ -1,3 +1,3201 @@
-Model Type: Entity
-Model Type: Domain
-Model Type: Interface
+# Configuration Model
+
+This represents a grouping of classes that deal with how an application or synthesis of an application is configured. The classes are briefly described in the following table, then each will be described in more detail below the table.
+
+| Class | Description |
+|-----|-----|
+|[`MTConfiguration`](#class_MTConfiguration)|This class represents a compiler configuration specific for the building of your application.|
+|[`MTRepositoryImport`](#class_MTRepositoryImport)|Contains configuration for importing files from a repository.|
+|[`MTSpace`](#class_MTSpace)|The space class represents the top of your entity model and also defines information about where you can import entities along with other elements such as units, domains, templates, etc. that are important for application synthesis. Most templates start with the space object to obtains the list of modules or entities in your model.|
+|[`MTTemplate`](#class_MTTemplate)|Represents a template configuration.|
+
+<a name="class_MTConfiguration">
+## MTConfiguration Class
+</a>
+
+This class represents a compiler configuration specific for the building of your application.
+
+This class has the following methods broken up into categories:
+
+### Configuration Category
+
+These methods relate to a part of application configuration.
+
+| Method/Property |
+|---|
+| `String` **`name`** |
+| Returns the name of this configuration. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDirectory` [**`outputByName(String name)`**](#class_MTConfiguration_outputByName) |
+| With the name of an output, this returns the directory object representing the output that a template can be configured to use. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTSpace` **`space`** |
+| Returns the top space of your application. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`templates`** |
+| Returns all the templates that have been declared in the `config {}` block of your model. |
+
+
+<a name="class_MTConfiguration_outputByName">
+#### Method `MTDirectory outputByName(String name)`
+</a>
+
+With the name of an output, this returns the directory object representing the output that a template can be configured to use.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the output as it is defined inside the `config {}` block of your model. |
+
+
+
+
+<a name="class_MTRepositoryImport">
+## MTRepositoryImport Class
+</a>
+
+Contains configuration for importing files from a repository.
+
+This class has the following methods broken up into categories:
+
+### Configuration Category
+
+These methods relate to a part of application configuration.
+
+| Method/Property |
+|---|
+| `String` **`filename`** |
+| Returns the filename of this import. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`identifier`** |
+| Returns an identifer which is basically the *repository name*`.`*filename*. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isIncludeOnly`** |
+| Indicates whether this import should only use the file as like a header file or where everything in the imported source file is essentially declared as extern. This would be used in the case of entities where you don't intend to implement them in code directly but need to know how they are defined so code knows how to interface with them in some way. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`repositoryName`** |
+| Returns the declared name of the repository object that this import operation will use as its source repository. |
+
+
+<a name="class_MTSpace">
+## MTSpace Class
+</a>
+
+The space class represents the top of your entity model and also defines information about where you can import entities along with other elements such as units, domains, templates, etc. that are important for application synthesis. Most templates start with the space object to obtains the list of modules or entities in your model.
+
+This class has the following methods broken up into categories:
+
+### Domain Category
+
+These methods relate to a domain.
+
+| Method/Property |
+|---|
+| `List` **`domains`** |
+| Returns all domains declared in this space. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTNamespace` **`namespace`** |
+| Returns the namespace defined for this space. This can serve as the base code namespace for code generated in different domains. To do this a domain would define its namespace relative to this namespace using the appropriate syntax. |
+
+### Module Category
+
+These methods relate to a module.
+
+| Method/Property |
+|---|
+| `MTModule` [**`moduleWithName(String name)`**](#class_MTSpace_moduleWithName) |
+| Returns a module by its name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`modules`** |
+| Returns all modules that have been imported into this space. |
+
+<a name="class_MTSpace_moduleWithName">
+#### Method `MTModule moduleWithName(String name)`
+</a>
+
+Returns a module by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the module to return. |
+
+
+### Entity Category
+
+These methods relate to an entity.
+
+| Method/Property |
+|---|
+| `MTDomain` [**`domain(String name)`**](#class_MTSpace_domain) |
+| Returns a domain from its name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTEntity` [**`entity(String name)`**](#class_MTSpace_entity) |
+| Returns an entity from its name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`entityCount`** |
+| Returns a the total number of entities in this space including implicit entities. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTEntityTemplate` [**`entityTemplateWithName(String name)`**](#class_MTSpace_entityTemplateWithName) |
+| Returns an entity template by its name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasDomain(String name)`**](#class_MTSpace_hasDomain) |
+| Indicates if there is a domain by the specified name. |
+
+<a name="class_MTSpace_domain">
+#### Method `MTDomain domain(String name)`
+</a>
+
+Returns a domain from its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the domain to return. |
+
+<a name="class_MTSpace_entity">
+#### Method `MTEntity entity(String name)`
+</a>
+
+Returns an entity from its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the entity to return. |
+
+
+<a name="class_MTSpace_entityTemplateWithName">
+#### Method `MTEntityTemplate entityTemplateWithName(String name)`
+</a>
+
+Returns an entity template by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the entity to return. |
+
+<a name="class_MTSpace_hasDomain">
+#### Method `boolean hasDomain(String name)`
+</a>
+
+Indicates if there is a domain by the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the domain in question. |
+
+### Enum Category
+
+These methods relate to enums.
+
+| Method/Property |
+|---|
+| `int` **`enumCount`** |
+| Returns a the number of enums in this space. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTEnum` [**`enumWithName(String name)`**](#class_MTSpace_enumWithName) |
+| Returns an enum by its name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`enums`** |
+| Returns all enums declared in this space. |
+
+
+<a name="class_MTSpace_enumWithName">
+#### Method `MTEnum enumWithName(String name)`
+</a>
+
+Returns an enum by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the enum to return. |
+
+
+### Typedef Category
+
+These methods relate to typedefs.
+
+| Method/Property |
+|---|
+| `MTInterfaceOperation` [**`operationByName(MTInterface mtInterface, String extendedOperationName)`**](#class_MTSpace_operationByName) |
+| Given an interface object, this will return an operation by its name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`typedefCount`** |
+| Returns the number of typedefs declared in this space. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTTypedef` [**`typedefWithName(String name)`**](#class_MTSpace_typedefWithName) |
+| Returns a typedef by its name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`typedefs`** |
+| Returns all the typedefs declared in this space, sorted by name. |
+
+<a name="class_MTSpace_operationByName">
+#### Method `MTInterfaceOperation operationByName(MTInterface mtInterface, String extendedOperationName)`
+</a>
+
+Given an interface object, this will return an operation by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`MTInterface mtInterface` | The interface object that contains the operation. |
+|`String extendedOperationName` | The name of the operation to return. |
+
+
+<a name="class_MTSpace_typedefWithName">
+#### Method `MTTypedef typedefWithName(String name)`
+</a>
+
+Returns a typedef by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the typedef to return. |
+
+
+### Language Category
+
+These methods relate to language definitions.
+
+| Method/Property |
+|---|
+| `MTLanguage` [**`languageWithName(String name)`**](#class_MTSpace_languageWithName) |
+| Returns a language object by its name. |
+
+<a name="class_MTSpace_languageWithName">
+#### Method `MTLanguage languageWithName(String name)`
+</a>
+
+Returns a language object by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the language to return. |
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+| Method/Property |
+|---|
+| `List` [**`domainsTagged(String tag)`**](#class_MTSpace_domainsTagged) |
+| Returns all domains that are tagged with a specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` [**`entitiesTagged(String tag)`**](#class_MTSpace_entitiesTagged) |
+| Returns all entities found with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTEntity` [**`entityTagged(String tag)`**](#class_MTSpace_entityTagged) |
+| Returns the first entity found with the specified tag. This should only be used when it is expected that only one is tagged with the tag by nature of the entity. Use `entitiesTagged()` if you are expecting multiple entities that are found. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTEnum` [**`enumTagged(String tag)`**](#class_MTSpace_enumTagged) |
+| Returns all enums that are tagged with a specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasDomainTagged(String tag)`**](#class_MTSpace_hasDomainTagged) |
+| Indicates if there is at least one domain tagged with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasEntityTagged(String tag)`**](#class_MTSpace_hasEntityTagged) |
+| Indicates if there is at least one entity tagged with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasEnumTagged(String tag)`**](#class_MTSpace_hasEnumTagged) |
+| Indicates if there is at least one enum tagged with the specified tag. |
+
+<a name="class_MTSpace_domainsTagged">
+#### Method `List domainsTagged(String tag)`
+</a>
+
+Returns all domains that are tagged with a specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTSpace_entitiesTagged">
+#### Method `List entitiesTagged(String tag)`
+</a>
+
+Returns all entities found with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTSpace_entityTagged">
+#### Method `MTEntity entityTagged(String tag)`
+</a>
+
+Returns the first entity found with the specified tag. This should only be used when it is expected that only one is tagged with the tag by nature of the entity. Use `entitiesTagged()` if you are expecting multiple entities that are found.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTSpace_enumTagged">
+#### Method `MTEnum enumTagged(String tag)`
+</a>
+
+Returns all enums that are tagged with a specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTSpace_hasDomainTagged">
+#### Method `boolean hasDomainTagged(String tag)`
+</a>
+
+Indicates if there is at least one domain tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTSpace_hasEntityTagged">
+#### Method `boolean hasEntityTagged(String tag)`
+</a>
+
+Indicates if there is at least one entity tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTSpace_hasEnumTagged">
+#### Method `boolean hasEnumTagged(String tag)`
+</a>
+
+Indicates if there is at least one enum tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+### Configuration Category
+
+These methods relate to a part of application configuration.
+
+| Method/Property |
+|---|
+| `boolean` [**`hasMetadataValue(String name)`**](#class_MTSpace_hasMetadataValue) |
+| Indicates whether this space has a metadata name/value for the specified name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`importEntityNames`** |
+| Returns the names of the entities that have been imported into this space. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`importEnumNames`** |
+| Returns the names of the enums that have been imported into this space. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Object` [**`metadataValue(String name)`**](#class_MTSpace_metadataValue) |
+| Spaces can define a dictionary of name/value pairs that provide some meta data about the space and basically the application. This method allows you to get a value by its name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRepository` [**`repository(String name)`**](#class_MTSpace_repository) |
+| Returns the repository object by its name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRepository` [**`repositoryByName(String name)`**](#class_MTSpace_repositoryByName) |
+| Returns a repository object by its name. |
+
+<a name="class_MTSpace_hasMetadataValue">
+#### Method `boolean hasMetadataValue(String name)`
+</a>
+
+Indicates whether this space has a metadata name/value for the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the metadata value to return. |
+
+
+
+<a name="class_MTSpace_metadataValue">
+#### Method `Object metadataValue(String name)`
+</a>
+
+Spaces can define a dictionary of name/value pairs that provide some meta data about the space and basically the application. This method allows you to get a value by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the meta data. |
+
+<a name="class_MTSpace_repository">
+#### Method `MTRepository repository(String name)`
+</a>
+
+Returns the repository object by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the repository. |
+
+<a name="class_MTSpace_repositoryByName">
+#### Method `MTRepository repositoryByName(String name)`
+</a>
+
+Returns a repository object by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the repository to return. |
+
+### Interface Category
+
+These methods relate to an interface.
+
+| Method/Property |
+|---|
+| `MTInterface` [**`interface(String name)`**](#class_MTSpace_interface) |
+| Returns an interface by its name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`interfaces`** |
+| Returns all the interfaces declared in this space. |
+
+<a name="class_MTSpace_interface">
+#### Method `MTInterface interface(String name)`
+</a>
+
+Returns an interface by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the interface to return. |
+
+
+
+<a name="class_MTTemplate">
+## MTTemplate Class
+</a>
+
+Represents a template configuration.
+
+This class has the following methods broken up into categories:
+
+### Configuration Category
+
+These methods relate to a part of application configuration.
+
+| Method/Property |
+|---|
+| `String` **`directoryName`** |
+| Returns the directory name if available. Otherwise returns `null` |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`filename`** |
+| Returns the filename of the template which is preceded by a directory name if available. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDirectory` **`primaryOutputDirectory`** |
+| Returns the output directory considered to be the primary output for the template. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRepositoryImport` **`repositoryImport`** |
+| Returns an object that defines how the template will be imported. |
+
+
+
+# Entity Model
+
+Model classes of this type are directly related to the entities in your model. The classes are briefly described in the following table, then each will be described in more detail below the table.
+
+| Class | Description |
+|-----|-----|
+|[`MTAttribute`](#class_MTAttribute)|Represents an attribute of an entity.|
+|[`MTAttributeConstraint`](#class_MTAttributeConstraint)|Represents some type of constraint placed upon an attribute. Constraints can help prevent attributes from receiving values that are not valid for a specific application.|
+|[`MTBitField`](#class_MTBitField)|Represents a bit field of an attribute.|
+|[`MTEntity`](#class_MTEntity)|Represents an entity in your model.|
+|[`MTEntityTemplate`](#class_MTEntityTemplate)|An Entity Template is the declaration of an entity in a parameterized way, such as `MyEntity<T,S>` where `T` and `S` are parameters that are used in the body of the definition to parameterize the entity. This entity template can then be used as a template to create other entities. Currently template entites can only be used in a special usage of a relationship.|
+|[`MTEnum`](#class_MTEnum)|Represents an enum in your model.|
+|[`MTEnumItem`](#class_MTEnumItem)|Represents an enum item.|
+|[`MTModule`](#class_MTModule)|Represents a grouping of entities.|
+|[`MTNativeType`](#class_MTNativeType)|Represents a native data type such as `int32`, `float`, `string`, etc. Basically anything except a secondary entity type.|
+|[`MTPrimaryKey`](#class_MTPrimaryKey)|Represents the primary key of an entity.|
+|[`MTRelationship`](#class_MTRelationship)|Represents a relationship of an entity.|
+|[`MTType`](#class_MTType)|Represents a data type of an attribute. Such types can be as simple as a primitive (native) type (like `int32`) and as complex as a secondary entity.|
+|[`MTTypedef`](#class_MTTypedef)|Represents a type definition useful in dealing with bit fields.|
+|[`MTUnit`](#class_MTUnit)|Represents a unit of measure used in the naming and/or source of info of an attribute. When declaring attributes that is associated with some unit of measure, its best to assign a unit to the attribute. Not only does it help other people working with this attribute, it can be used by templates to automatically add code to convert from one unit to another as data flows from one domain to another. Units are easily defined and imported from a central repository. Units can be based on other units with an associated multiplier.|
+
+<a name="class_MTAttribute">
+## MTAttribute Class
+</a>
+
+Represents an attribute of an entity.
+
+This class has the following methods broken up into categories:
+
+### Primary Key Category
+
+These methods relate to a primary key.
+
+| Method/Property |
+|---|
+| `boolean` **`isPrimaryKey`** |
+| Indicates if this attribute represents the primary key of its entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTType` **`nonPrimaryKeyType`** |
+| An attribute that represents a primary key has a type that indicates it is a primary key. This method returns the type but with the primary key indicator set to false. |
+
+### Attribute Category
+
+These methods relate to attributes.
+
+| Method/Property |
+|---|
+| `List` **`bitFields`** |
+| Returns the bit fields declared as part of this attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Integer` **`byteArraySize`** |
+| For those attributes that are defined as the `byte` data type, this returns the size of an array that is holding values for this attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`constraints`** |
+| Returns an optional list of constraints defined for this attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`contentType`** |
+| For attributes that represent an asset and have been defined with a content type, this will return that defined content type. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTConstant` **`defaultValue`** |
+| Returns an optional default value declaration of the attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTEntity` **`entity`** |
+| Returns the parent entity of this attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`entityName`** |
+| Returns the name of the parent entity of this attribute as it was declared in the model. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasBitFields`** |
+| Indicates whether this attribute was declared with bit fields. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasConstraints`** |
+| Indicates whether this attribute has any defined constraints. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasDefaultValue`** |
+| Indicates whether this attribute was declared with a default value. If so, you can obtain the default value from the `defaultValue` property of this attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasUnit`** |
+| Indicates whether this attribute has been defined with a unit. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isArray`** |
+| Indicates whether this attribute was declared using the `many` keyword. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isCreation`** |
+| Indicates whether this attribute was declared with the `creation` qualifier. This should only occur with a `date` attribute that represents the creation date for objects of this entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isModification`** |
+| Indicates whether this attribute was declared with the `modification` qualifier. This should only occur with a `date` attribute that represents the last modification date for objects of this entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isNullable`** |
+| Indicates whether this attribute has been declared `optional`. When an attribute is declared as `optional` it means that it can be null. For secondary entities, if the instantiation of a secondary entity is declared as `optional` then all its attributes are nullable in that context. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isOptional`** |
+| Indicates whether this attribute has been declared as `optional`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isOrdered`** |
+| Indicates whether this attribute was declared using the `ordered` keyword. This only applies to array type attributes (that is, have been declared with `many` also). Using the `ordered` keyword should cause this attribute to have a field in the database to keep track of the order for each item in the array of objects for this attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isParent`** |
+| Indicates whether this attribute was declared using the `parent` keyword. Attributes declared this way is intended to indicate that objects of this entity will likely be grouped by this attribute. Its up to the templates to look at this flag and synthesize appropriate code to provide the grouped representation. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isParentUnique`** |
+| Indicates whether an attribute has been defined using **both** the `unique` and `parent` keywords. This can be used to establish unique constraints such that objects of this entity must have unique values of this attribute per parent object. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isSecondary`** |
+| Indicates whether this attribute is an attribute of a secondary entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isSecondaryEntityType`** |
+| Indicates whether the the data type of this attribute is a secondary entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isSequential`** |
+| Indicates whether this attribute was declared using the `sequential` keyword. When you use this keyword it means you want this attribute to be auto incremented for each new object of its entity that is created. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isUnique`** |
+| Indicates whether this attribute was declared as `unique`. If so, the database should be configured or code should be synthesized so as to assure that all objects of its entity will have a unique value across all values of this attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isVirtual`** |
+| Indicates whether this attribute has been declared `virtual`. A virtual attribute is one that is not persistent and is backed by code to create its value - code that a developer writes. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`name`** |
+| Returns the name of this attribute as it was declared in the model. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`order`** |
+| Returns the order in which this attribute was declared among the other attributes of this entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTSpace` **`space`** |
+| Returns the space associated with this attribute. This property is provided more out of convenience as you can also obtain this from its entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTType` **`type`** |
+| Returns the data type of this attribute. The type can be a native type (such as an int32, string, etc.) or can be a secondary entity. If you are looking for it to be a secondary entity, it would be better to use the `isSecondaryEntityType` property then `typeEntity` if it is a secondary entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTEntity` **`typeEntity`** |
+| If the data type of this attribute is a secondary entity, then it returns that secondary entity. Otherwise it returns `null`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`typeName`** |
+| Returns a string that represents the textual representation of the data type for this attribute. This is not intended to be used to generate code - its best to use the `getType()` method and send it through the `language` filter which will result in a language specific representation of the type (assuming you have the language definition for your target language). You can also use this for debug purposes. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTUnit` **`unit`** |
+| Returns the declared unit of this attribute as a unit object. |
+
+### Relationship Category
+
+These methods relate to relationships.
+
+| Method/Property |
+|---|
+| `boolean` **`isParentRelationship`** |
+| For attributes that were created from relationships (effective attributes), this indicates whether the relationship it was created from is declared as a `parent` relationship. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRelationship` **`relationship`** |
+| When an attribute is created for the purpose of returning the effective set of attributes, attributes created due to a relationship, then this returns the relationship that this attribute represents. For example, if you have a many-to-one relationship, an effective attribute will be created to contain the unique ID of the other end of this relationship. |
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+| Method/Property |
+|---|
+| `boolean` [**`secondaryEntityIsTagged(String tag)`**](#class_MTAttribute_secondaryEntityIsTagged) |
+| For attributes that are of a secondary entity type, this indicates whether the attribute as been tagged with the specified tag.. |
+
+<a name="class_MTAttribute_secondaryEntityIsTagged">
+#### Method `boolean secondaryEntityIsTagged(String tag)`
+</a>
+
+For attributes that are of a secondary entity type, this indicates whether the attribute as been tagged with the specified tag..
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to check. |
+
+
+<a name="class_MTAttributeConstraint">
+## MTAttributeConstraint Class
+</a>
+
+Represents some type of constraint placed upon an attribute. Constraints can help prevent attributes from receiving values that are not valid for a specific application.
+
+This class has the following methods broken up into categories:
+
+### Attribute Category
+
+These methods relate to attributes.
+
+| Method/Property |
+|---|
+| `MTAttribute` **`attribute`** |
+| Returns the attribute of this attribute constraint. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTExpression` **`expression`** |
+| Returns the expression of this attribute constraint. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`name`** |
+| Returns the name of this attribute constraint. |
+
+
+<a name="class_MTBitField">
+## MTBitField Class
+</a>
+
+Represents a bit field of an attribute.
+
+This class has the following methods broken up into categories:
+
+### Attribute Category
+
+These methods relate to attributes.
+
+| Method/Property |
+|---|
+| `int` **`high`** |
+| The high bit number of the bit field. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isUnused`** |
+| Indicates this bit field is declared as not used. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`low`** |
+| The low bit number of the bit field. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`width`** |
+| The number of bits wide of the bit field. |
+
+
+<a name="class_MTEntity">
+## MTEntity Class
+</a>
+
+Represents an entity in your model.
+
+This class has the following methods broken up into categories:
+
+### Module Category
+
+These methods relate to a module.
+
+| Method/Property |
+|---|
+| `MTModule` **`module`** |
+| Returns the module associated with this entity. |
+
+### Entity Category
+
+These methods relate to an entity.
+
+| Method/Property |
+|---|
+| `boolean` **`isDeclaredAsPrimary`** |
+| Indicates whether this entity was **declared** `primary`. If the entity was **not** declared with the `primary` keyword then this will return false even if it is implied as primary. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isDeclaredAsSecondary`** |
+| Indicates whether this entity was **declared** `secondary`. If the entity was **not** declared with the `secondary` keyword then this will return false even if it is implied as secondary. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isExtern`** |
+| Indicates whether an entity was declared with the `extern` keyword. This would happen if reference is made to an entity but the entity is not implemented in this application space. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isImplicit`** |
+| Indicates whether this entity was created by the compiler because it represents an implicit entity, such as in a many-to-many relationship. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isPrimary`** |
+| Indicates whether this entity was declared `primary` or if it was inferred as primary. If an entity has a primary key it is inferred to be a primary entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isSecondary`** |
+| Indicates whether this entity is a secondary entity, either because it is declared as one or implied. If the entity does not have a primary key, then it is implied to be a secondary entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isTransient`** |
+| Indicates whether this entity was declared `transient`. Transient entities are those which have objects at runtime but are not persisted in any way. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`name`** |
+| Returns the name of this entity as it was declared in the model. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`primaryParentAncestory`** |
+| Returns the list of entities representing the a chain of primary parents to this entity. At the top of the list is the top parent and at the bottom is this entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTSpace` **`space`** |
+| Returns the space in which this entity was declared. |
+
+### Entity Template Category
+
+These methods relate to entity templates.
+
+| Method/Property |
+|---|
+| `MTEntity` [**`entityOfTemplateArg(String templateArgName)`**](#class_MTEntity_entityOfTemplateArg) |
+| Returns the entity associated with a specified entity template argument. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isMadeFromTemplate`** |
+| Indicates whether this entity was made as a result of expanding an entity template. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`templateName`** |
+| If this entity was created from the declaration of an entity template, then this will return the name of that entity template. |
+
+<a name="class_MTEntity_entityOfTemplateArg">
+#### Method `MTEntity entityOfTemplateArg(String templateArgName)`
+</a>
+
+Returns the entity associated with a specified entity template argument.
+
+| Parameter | Description |
+|-----|-----|
+|`String templateArgName` | The convention is usually an upper case letter but depends on how the entity template was defined. For instance, if it is defined as: `Factory<C>` then you would pass the string "C" to get the entity associated with that argument that was used when instantiating this entity template. |
+
+
+
+### Primary Key Category
+
+These methods relate to a primary key.
+
+| Method/Property |
+|---|
+| `boolean` **`hasPrimaryKey`** |
+| Indicates whether this entity is declared to have a primary key attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTType` **`pkType`** |
+| Returns the data type of the primary key of this entity. If the entity does not have a primary key then `null` is returned. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTPrimaryKey` **`primaryKey`** |
+| Returns the primary key associated with this entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTAttribute` **`primaryKeyAttribute`** |
+| Returns the attribute of the primary key for this entity. If the entity does not have a primary key then `null` is returned. |
+
+### Attribute Category
+
+These methods relate to attributes.
+
+| Method/Property |
+|---|
+| `MTAttribute` [**`attributeByFullName(String fullName)`**](#class_MTEntity_attributeByFullName) |
+| Returns an attribute by its full name, where the full name is with regards to secondary entities being used as attributes. For instance, If an entity instantiates a secondary entity named say `Profile` as `profile`, and that secondary entity instantiates another secondary entity named `Picture` as `picture` which has an attribute say `size`, then the full name of the `size` attribute would be `profile.picture.size`. So this method is called on the top primary entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`attributeCount`** |
+| Returns the number of attributes declared in this entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTAttribute` [**`attributeNamed(String name)`**](#class_MTEntity_attributeNamed) |
+| Returns an attribute of this entity with the specified name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`attributes`** |
+| Returns the list of attributes of this entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`effectiveAttributes`** |
+| Returns a list of attributes that are either directly declared or are inferred to be present from its relationships. An attribute is inferred if its associated relationship is **to** a single entity (one-to-one or many-to-one) and will be the same type as the primary key of that other entity. Essentially it is intended to contain the unique ID of the other entity object much like a foreign key column in an SQL database. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` [**`fieldNumber(MTAttribute attribute)`**](#class_MTEntity_fieldNumber) |
+| Returns the field number of the specified attribute. Field numbers are assigned to attributes in the order in which they are read from the model source file. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` [**`fieldNumberByName(String fieldName)`**](#class_MTEntity_fieldNumberByName) |
+| Returns the field number of the specified field name. Field numbers are assigned to attributes in the order in which they are read from the model source file. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`flatAttributeList`** |
+| This attribute list includes not just those attributes directly declared in its entity but also those attributes declared in instantiated secondary entities. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`flatAttributeNameList`** |
+| This list contains all the attribute names of not just the directly declared attributes in its entity but also those of instantiated secondary entities. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasAttributeNamed(String name)`**](#class_MTEntity_hasAttributeNamed) |
+| Indicates whether this entity has an attribute with the specified name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasAttributeOfDataType(DataType dataType)`**](#class_MTEntity_hasAttributeOfDataType) |
+| Indicates whether any of the attributes of this entity are of the specified data type. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasAttributes`** |
+| Indicates whether this entity has any attributes. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasBitFields`** |
+| Indicates whether this entity defines any bit fields. |
+
+<a name="class_MTEntity_attributeByFullName">
+#### Method `MTAttribute attributeByFullName(String fullName)`
+</a>
+
+Returns an attribute by its full name, where the full name is with regards to secondary entities being used as attributes. For instance, If an entity instantiates a secondary entity named say `Profile` as `profile`, and that secondary entity instantiates another secondary entity named `Picture` as `picture` which has an attribute say `size`, then the full name of the `size` attribute would be `profile.picture.size`. So this method is called on the top primary entity.
+
+| Parameter | Description |
+|-----|-----|
+|`String fullName` | The full name of the attribute based on its secondary entity hierarchy. |
+
+
+<a name="class_MTEntity_attributeNamed">
+#### Method `MTAttribute attributeNamed(String name)`
+</a>
+
+Returns an attribute of this entity with the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the attribute to return. |
+
+
+
+<a name="class_MTEntity_fieldNumber">
+#### Method `int fieldNumber(MTAttribute attribute)`
+</a>
+
+Returns the field number of the specified attribute. Field numbers are assigned to attributes in the order in which they are read from the model source file.
+
+| Parameter | Description |
+|-----|-----|
+|`MTAttribute attribute` | The attribute associated with the field number that you want returned. |
+
+<a name="class_MTEntity_fieldNumberByName">
+#### Method `int fieldNumberByName(String fieldName)`
+</a>
+
+Returns the field number of the specified field name. Field numbers are assigned to attributes in the order in which they are read from the model source file.
+
+| Parameter | Description |
+|-----|-----|
+|`String fieldName` | The field name (attribute or relationship) associated with the field number that you want returned. |
+
+
+
+<a name="class_MTEntity_hasAttributeNamed">
+#### Method `boolean hasAttributeNamed(String name)`
+</a>
+
+Indicates whether this entity has an attribute with the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the attribute. |
+
+<a name="class_MTEntity_hasAttributeOfDataType">
+#### Method `boolean hasAttributeOfDataType(DataType dataType)`
+</a>
+
+Indicates whether any of the attributes of this entity are of the specified data type.
+
+| Parameter | Description |
+|-----|-----|
+|`DataType dataType` | The data type of which to search for attributes. |
+
+
+
+### Relationship Category
+
+These methods relate to relationships.
+
+| Method/Property |
+|---|
+| `boolean` **`allParentRelationshipsOptional`** |
+| Indicates whether all relationships of this entity that are declared as `parent` are also declared as `optional`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` [**`fieldNumberByDomainRelationship(MTDERelationship relationship)`**](#class_MTEntity_fieldNumberByDomainRelationship) |
+| Returns the field number of the specified *domain* relationship. This is the same order as the non-domain specific relationship. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` [**`fieldNumberByRelationship(MTRelationship relationship)`**](#class_MTEntity_fieldNumberByRelationship) |
+| Returns the field number of the specified relationship. Field numbers are assigned to relationships in the order in which they are read from the model source file. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` [**`findPossibleRelationshipsWithEntity(MTEntity entity)`**](#class_MTEntity_findPossibleRelationshipsWithEntity) |
+| Given an entity, this method finds possible relationships to this entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRelationship` [**`findRelationshipWithToEntity(MTEntity entity)`**](#class_MTEntity_findRelationshipWithToEntity) |
+| Given an entity object, this method will try to find and return a relationship on this entity that is to the provided entity. If none is found, `null` will be returned. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasImplicitRelationships`** |
+| Indicates whether this entity has any implicit relationships. Implicit means undeclared relationships that are inferred as a result of declared relationships in other entities. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasParentRelationship`** |
+| Indicates whether it has a least one relationship declared as parent. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasPrimaryParentRelationship`** |
+| Indicates whether this entity has a primary parent relationship. A primary parent relationship is one which is declared `parent` and **not** declared `optional`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasRelationships`** |
+| Indicates whether this entity defines any relationships. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`implicitRelationships`** |
+| Returns the list of implicit relationships, where an implicit relationship is one that is to an implicit entity. An implicit entity is created by the compiler when it transforms a many-to-many relationship into this implicit entity along with implicit one-to-many and many-to-one relationships. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`parentRelationships`** |
+| Returns the list of parent relationships of this entity. A parent relationship is one that is declared with the `parent` keyword to indicate that their identity is fully or partially scoped by this parent entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTEntity` **`primaryParentEntity`** |
+| Using the relationship that is both a `parent` relationship and **not optional**, it returns the "to" entity of the relationship. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRelationship` **`primaryParentRelationship`** |
+| Returns the relationship that is both a `parent` relationship and **not** `optional` |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRelationship` [**`primaryParentRelationship(String entityName)`**](#class_MTEntity_primaryParentRelationship) |
+| Returns the one relationship of this entity that is both declared as `parent` and **not** declared as `optional` and is **to** the named entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRelationship` [**`relationshipByName(String relationshipName)`**](#class_MTEntity_relationshipByName) |
+| Returns a relationship of this entity by name. If a relationship is not found with this name `null` will be returned. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`relationshipCount`** |
+| Returns the number of declared relationships. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`relationships`** |
+| Returns the list of relationships of this entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` [**`relationshipsWithToEntity(MTEntity toEntity)`**](#class_MTEntity_relationshipsWithToEntity) |
+| Returns a list of relationships from this entity to a specified entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRelationship` **`singleParentRelationship`** |
+| Returns a relationship of this entity that is declared as `parent` and **not** declared as `optional`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`uniquenesses`** |
+| Returns the list of declared uniqueness constraints between relationships. |
+
+
+<a name="class_MTEntity_fieldNumberByDomainRelationship">
+#### Method `int fieldNumberByDomainRelationship(MTDERelationship relationship)`
+</a>
+
+Returns the field number of the specified *domain* relationship. This is the same order as the non-domain specific relationship.
+
+| Parameter | Description |
+|-----|-----|
+|`MTDERelationship relationship` | The domain relationship associated with the field number that you want returned. |
+
+<a name="class_MTEntity_fieldNumberByRelationship">
+#### Method `int fieldNumberByRelationship(MTRelationship relationship)`
+</a>
+
+Returns the field number of the specified relationship. Field numbers are assigned to relationships in the order in which they are read from the model source file.
+
+| Parameter | Description |
+|-----|-----|
+|`MTRelationship relationship` | The relationship associated with the field number that you want returned. |
+
+<a name="class_MTEntity_findPossibleRelationshipsWithEntity">
+#### Method `List findPossibleRelationshipsWithEntity(MTEntity entity)`
+</a>
+
+Given an entity, this method finds possible relationships to this entity.
+
+| Parameter | Description |
+|-----|-----|
+|`MTEntity entity` | The entity from which to find relationships. |
+
+<a name="class_MTEntity_findRelationshipWithToEntity">
+#### Method `MTRelationship findRelationshipWithToEntity(MTEntity entity)`
+</a>
+
+Given an entity object, this method will try to find and return a relationship on this entity that is to the provided entity. If none is found, `null` will be returned.
+
+| Parameter | Description |
+|-----|-----|
+|`MTEntity entity` | The entity of which to search. |
+
+
+
+
+
+
+
+
+
+<a name="class_MTEntity_primaryParentRelationship">
+#### Method `MTRelationship primaryParentRelationship(String entityName)`
+</a>
+
+Returns the one relationship of this entity that is both declared as `parent` and **not** declared as `optional` and is **to** the named entity.
+
+| Parameter | Description |
+|-----|-----|
+|`String entityName` | The name of the entity that the relationship is **to**. |
+
+<a name="class_MTEntity_relationshipByName">
+#### Method `MTRelationship relationshipByName(String relationshipName)`
+</a>
+
+Returns a relationship of this entity by name. If a relationship is not found with this name `null` will be returned.
+
+| Parameter | Description |
+|-----|-----|
+|`String relationshipName` | The name of the relationship to return. |
+
+
+
+<a name="class_MTEntity_relationshipsWithToEntity">
+#### Method `List relationshipsWithToEntity(MTEntity toEntity)`
+</a>
+
+Returns a list of relationships from this entity to a specified entity.
+
+| Parameter | Description |
+|-----|-----|
+|`MTEntity toEntity` | The entity that the relationships are **to**. |
+
+
+
+### View Category
+
+These methods relate to views.
+
+| Method/Property |
+|---|
+| `boolean` **`isView`** |
+| Indicates whether this entity is really a View. |
+
+### Enum Category
+
+These methods relate to enums.
+
+| Method/Property |
+|---|
+| `MTEnum` [**`enum(String name)`**](#class_MTEntity_enum) |
+| Returns an enum declared in this entity by a specified name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`enums`** |
+| Returns a list of enums that have been declared in this entity. |
+
+<a name="class_MTEntity_enum">
+#### Method `MTEnum enum(String name)`
+</a>
+
+Returns an enum declared in this entity by a specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the enum to return. |
+
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+| Method/Property |
+|---|
+| `MTAttribute` [**`attributeOfTypeTagged(String tag)`**](#class_MTEntity_attributeOfTypeTagged) |
+| Returns an attribute of this entity that has a type (which can be another entity) that is tagged with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTAttribute` [**`attributeTagged(String tag)`**](#class_MTEntity_attributeTagged) |
+| Returns an attribute of this entity that is tagged with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasAttributeOfTypeTagged(String tag)`**](#class_MTEntity_hasAttributeOfTypeTagged) |
+| Indicates whether this entity has a type (which can be another entity) that is tagged with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasAttributeTagged(String tag)`**](#class_MTEntity_hasAttributeTagged) |
+| Indicates whether this entity has at least one attribute with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasRelationshipTagged(String tag)`**](#class_MTEntity_hasRelationshipTagged) |
+| Indicates whether this entity has at least one relationship with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasRelationshipToEntityTagged(String tag)`**](#class_MTEntity_hasRelationshipToEntityTagged) |
+| Indicates whether the entity **to** which a relationship references is tagged with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRelationship` [**`relationshipTagged(String tag)`**](#class_MTEntity_relationshipTagged) |
+| Returns a relationship of this entity that is tagged with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRelationship` [**`relationshipToEntityTagged(String tag)`**](#class_MTEntity_relationshipToEntityTagged) |
+| Returns the entity **to** which a relationship references that is tagged with the specified tag. |
+
+<a name="class_MTEntity_attributeOfTypeTagged">
+#### Method `MTAttribute attributeOfTypeTagged(String tag)`
+</a>
+
+Returns an attribute of this entity that has a type (which can be another entity) that is tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTEntity_attributeTagged">
+#### Method `MTAttribute attributeTagged(String tag)`
+</a>
+
+Returns an attribute of this entity that is tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTEntity_hasAttributeOfTypeTagged">
+#### Method `boolean hasAttributeOfTypeTagged(String tag)`
+</a>
+
+Indicates whether this entity has a type (which can be another entity) that is tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTEntity_hasAttributeTagged">
+#### Method `boolean hasAttributeTagged(String tag)`
+</a>
+
+Indicates whether this entity has at least one attribute with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTEntity_hasRelationshipTagged">
+#### Method `boolean hasRelationshipTagged(String tag)`
+</a>
+
+Indicates whether this entity has at least one relationship with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTEntity_hasRelationshipToEntityTagged">
+#### Method `boolean hasRelationshipToEntityTagged(String tag)`
+</a>
+
+Indicates whether the entity **to** which a relationship references is tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTEntity_relationshipTagged">
+#### Method `MTRelationship relationshipTagged(String tag)`
+</a>
+
+Returns a relationship of this entity that is tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTEntity_relationshipToEntityTagged">
+#### Method `MTRelationship relationshipToEntityTagged(String tag)`
+</a>
+
+Returns the entity **to** which a relationship references that is tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+
+<a name="class_MTEntityTemplate">
+## MTEntityTemplate Class
+</a>
+
+An Entity Template is the declaration of an entity in a parameterized way, such as `MyEntity<T,S>` where `T` and `S` are parameters that are used in the body of the definition to parameterize the entity. This entity template can then be used as a template to create other entities. Currently template entites can only be used in a special usage of a relationship.
+
+This class has the following methods broken up into categories:
+
+### Entity Category
+
+These methods relate to an entity.
+
+| Method/Property |
+|---|
+| `List` **`templateArgs`** |
+| Returns the list of template arguments. |
+
+
+<a name="class_MTEnum">
+## MTEnum Class
+</a>
+
+Represents an enum in your model.
+
+This class has the following methods broken up into categories:
+
+### Enum Category
+
+These methods relate to enums.
+
+| Method/Property |
+|---|
+| `boolean` **`hasParentEntity`** |
+| Indicates if this enum was defined inside an entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasParentModule`** |
+| Indicates if this enum was defined inside a module. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isExtern`** |
+| Indicates whether this was declared as `extern`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`items`** |
+| Gets the enum items. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTModule` **`module`** |
+| Gets the module in which this enum was defined. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`name`** |
+| Gets the name of this enum. |
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+| Method/Property |
+|---|
+| `boolean` [**`hasItemTagged(String tag)`**](#class_MTEnum_hasItemTagged) |
+| Indicates if any of the enum's items have been tagged with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` [**`itemsTagged(String tag)`**](#class_MTEnum_itemsTagged) |
+| Returns any of the enum items tagged with the specified tag. |
+
+<a name="class_MTEnum_hasItemTagged">
+#### Method `boolean hasItemTagged(String tag)`
+</a>
+
+Indicates if any of the enum's items have been tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTEnum_itemsTagged">
+#### Method `Collection itemsTagged(String tag)`
+</a>
+
+Returns any of the enum items tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+
+<a name="class_MTEnumItem">
+## MTEnumItem Class
+</a>
+
+Represents an enum item.
+
+This class has the following methods broken up into categories:
+
+### Enum Category
+
+These methods relate to enums.
+
+| Method/Property |
+|---|
+| `MTEnum` **`enum`** |
+| Gets the enum of this item. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`name`** |
+| Gets the name of this item. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`value`** |
+| Gets the numeric value of this item. |
+
+
+<a name="class_MTModule">
+## MTModule Class
+</a>
+
+Represents a grouping of entities.
+
+This class has the following methods broken up into categories:
+
+### Module Category
+
+These methods relate to a module.
+
+| Method/Property |
+|---|
+| `String` **`name`** |
+| Returns the name of this module. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`referencedModules`** |
+| Returns all the other modules that entities of this module make reference to. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` [**`referencedModules(Boolean includeToOneRelationships)`**](#class_MTModule_referencedModules) |
+| Returns all the other modules that entities of this module make reference to. |
+
+
+
+<a name="class_MTModule_referencedModules">
+#### Method `List referencedModules(Boolean includeToOneRelationships)`
+</a>
+
+Returns all the other modules that entities of this module make reference to.
+
+| Parameter | Description |
+|-----|-----|
+|`Boolean includeToOneRelationships` | Whether to include one-to-one or many-to-one relationships when determining references. |
+
+### Entity Category
+
+These methods relate to an entity.
+
+| Method/Property |
+|---|
+| `List` **`entities`** |
+| Returns all the entities of this module. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTEntity` [**`entity(String name)`**](#class_MTModule_entity) |
+| Returns an entity of this module by its name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`entityCount`** |
+| Returns the number of entities declared in this module. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`enums`** |
+| Returns all the enums of this module. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasPrimaryEntities`** |
+| Indicates if this module contains any primary entities. If it contains at least one it would return `true`, otherwise it would mean that it only contains secondary entities and would return `false`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`isExternEntity(String entityName)`**](#class_MTModule_isExternEntity) |
+| Indicates whether the specified entity is externally declared (such as in a different space). |
+
+
+<a name="class_MTModule_entity">
+#### Method `MTEntity entity(String name)`
+</a>
+
+Returns an entity of this module by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the entity to return. |
+
+
+
+
+<a name="class_MTModule_isExternEntity">
+#### Method `boolean isExternEntity(String entityName)`
+</a>
+
+Indicates whether the specified entity is externally declared (such as in a different space).
+
+| Parameter | Description |
+|-----|-----|
+|`String entityName` | The name of the entity to check. |
+
+### Enum Category
+
+These methods relate to enums.
+
+| Method/Property |
+|---|
+| `MTEnum` [**`enum(String name)`**](#class_MTModule_enum) |
+| Returns an enum of this module by its name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`enumCount`** |
+| Returns the number of enums in this module. |
+
+<a name="class_MTModule_enum">
+#### Method `MTEnum enum(String name)`
+</a>
+
+Returns an enum of this module by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the enum to return. |
+
+
+### Typedef Category
+
+These methods relate to typedefs.
+
+| Method/Property |
+|---|
+| `MTTypedef` [**`typedef(String name)`**](#class_MTModule_typedef) |
+| Returns a typedef of this module by its name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`typedefCount`** |
+| Returns the number of typedefs in this module. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`typedefs`** |
+| Returns all the typedefs of this module. |
+
+<a name="class_MTModule_typedef">
+#### Method `MTTypedef typedef(String name)`
+</a>
+
+Returns a typedef of this module by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the typedef to return. |
+
+
+
+### Configuration Category
+
+These methods relate to a part of application configuration.
+
+| Method/Property |
+|---|
+| `MTSpace` **`space`** |
+| Returns the space in which this module was declared. |
+
+
+<a name="class_MTNativeType">
+## MTNativeType Class
+</a>
+
+Represents a native data type such as `int32`, `float`, `string`, etc. Basically anything except a secondary entity type.
+
+This class has the following methods broken up into categories:
+
+### Primary Key Category
+
+These methods relate to a primary key.
+
+| Method/Property |
+|---|
+| `boolean` **`isPrimaryKey`** |
+| Indicates whether this native type object is being used in a primary key attribute. |
+
+### Type Category
+
+These methods relate to data types.
+
+| Method/Property |
+|---|
+| `int` **`arraySize`** |
+| Returns the array size of this type if it is of type `byte[]``. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `DataType` **`dataType`** |
+| Returns the data type enum of this native type. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`isDataType(DataType dataType)`**](#class_MTNativeType_isDataType) |
+| Indicates whether this is of the specified data type. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isUUIDType`** |
+| Indicates whether this native type is a `uuid`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isVariableSizeArray`** |
+| Indicates whether this is of a `byte[]` type but with a variable (not declared) array size. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`toString`** |
+| Returns the string representation of this native type. |
+
+
+
+<a name="class_MTNativeType_isDataType">
+#### Method `boolean isDataType(DataType dataType)`
+</a>
+
+Indicates whether this is of the specified data type.
+
+| Parameter | Description |
+|-----|-----|
+|`DataType dataType` | The data type with which to compare. |
+
+
+
+
+
+<a name="class_MTPrimaryKey">
+## MTPrimaryKey Class
+</a>
+
+Represents the primary key of an entity.
+
+This class has the following methods broken up into categories:
+
+### Primary Key Category
+
+These methods relate to a primary key.
+
+| Method/Property |
+|---|
+| `MTType` **`type`** |
+| Gets the data type of the primary key. |
+
+
+<a name="class_MTRelationship">
+## MTRelationship Class
+</a>
+
+Represents a relationship of an entity.
+
+This class has the following methods broken up into categories:
+
+### Attribute Category
+
+These methods relate to attributes.
+
+| Method/Property |
+|---|
+| `MTAttribute` **`effectiveAttribute`** |
+| Returns the effective attribute associated with this relationship. The effective attribute can help you persist the relationship in a database. |
+
+### Relationship Category
+
+These methods relate to relationships.
+
+| Method/Property |
+|---|
+| `MTRelationshipHalf` **`from`** |
+| Returns the "from" part of the relationship which references the entity in which this relationship is defined. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isImplicit`** |
+| Indicates whether the relationship was created because although it was not declared it can be implied based on relationships declared to this entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isManyToMany`** |
+| Indicates whether this relationship is a many-to-many; where in a many-to-many relationship multiple objects of this entity can have multiple relationships with objects of another entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isOneToMany`** |
+| Indicates whether this relationship is a one-to-many; where in a one-to-many relationship an object of this entity can have multiple relationships with objects of another entity but not the other way around. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isOptional`** |
+| Indicates whether this relationship was defined with the `optional` keyword, indicating that relationships to the other entity is not required. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isParent`** |
+| Indicates whether this relationship was defined with the `parent` keyword. Relationships defined this way are ones that imply that this entity considers its identity as being the combination of its parent entity and itself. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isPrimaryParent`** |
+| Indicates whether this relationship was defined with the `parent` keyword and **not** with the `optional` keyword. Within the set of relationships of an entity, only one relationship should be defined this way. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`name`** |
+| Gets the name of the relationship. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`reverseName`** |
+| Returns the name of the reverse relationship. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRelationship` **`reverseRelationship`** |
+| Returns the relationship from the perspective "to" entity to this entity, that is, the reverse relationship. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`templateArgName`** |
+| When a relationship is defined as part of an entity template, it has a template argument that will be used when an entity is created from it. This will return the name of that argument. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRelationshipHalf` **`to`** |
+| Returns the "to" part of the relationship. This part tells you about the entity to which this relationship is bound. |
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+| Method/Property |
+|---|
+| `boolean` [**`hasToEntityTagged(String tag)`**](#class_MTRelationship_hasToEntityTagged) |
+| Indicates whether the "to" entity of this relationship has been tagged with the specified tag. |
+
+<a name="class_MTRelationship_hasToEntityTagged">
+#### Method `boolean hasToEntityTagged(String tag)`
+</a>
+
+Indicates whether the "to" entity of this relationship has been tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+
+<a name="class_MTType">
+## MTType Class
+</a>
+
+Represents a data type of an attribute. Such types can be as simple as a primitive (native) type (like `int32`) and as complex as a secondary entity.
+
+This class has the following methods broken up into categories:
+
+### Type Category
+
+These methods relate to data types.
+
+| Method/Property |
+|---|
+| `String` **`asString`** |
+| Returns the string representation of the type. This would be used for debug purposes. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTEnum` **`enumType`** |
+| If this type is an enum type then it returns the enum type object. Otherwise it returns `null`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isByteArrayType`** |
+| Indicates whether this type is both an array type and also `byte` data type. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isDateType`** |
+| Indicates whether this type is the `date` data type. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isEntityType`** |
+| Indicates whether this type is an entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isEnumType`** |
+| Indicates whether this type is of `enum` type. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isIntegerType`** |
+| Indicates whether this type is one of the integer data types. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`isNativeDataType(DataType dataType)`**](#class_MTType_isNativeDataType) |
+| Indicates whether this type is of the specified data types. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isNativeType`** |
+| Indicates whether this type is one of the native types (`int32`, `string`, etc.) |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isTypedef`** |
+| Indicates whether this type is a `typedef` type. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isUUIDType`** |
+| Indicates whether this type is a UUID. |
+
+
+
+
+
+
+
+
+<a name="class_MTType_isNativeDataType">
+#### Method `boolean isNativeDataType(DataType dataType)`
+</a>
+
+Indicates whether this type is of the specified data types.
+
+| Parameter | Description |
+|-----|-----|
+|`DataType dataType` | The native data type from which to compare. |
+
+
+
+
+
+<a name="class_MTTypedef">
+## MTTypedef Class
+</a>
+
+Represents a type definition useful in dealing with bit fields.
+
+This class has the following methods broken up into categories:
+
+### Typedef Category
+
+These methods relate to typedefs.
+
+| Method/Property |
+|---|
+| `List` **`bitFields`** |
+| Returns the bit fields declared in this typedef. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`bitWidth`** |
+| Returns the bit width of this typedef. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTModule` **`module`** |
+| Returns the module in which this typedef was declared. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`name`** |
+| Returns the name of this typedef. |
+
+
+<a name="class_MTUnit">
+## MTUnit Class
+</a>
+
+Represents a unit of measure used in the naming and/or source of info of an attribute. When declaring attributes that is associated with some unit of measure, its best to assign a unit to the attribute. Not only does it help other people working with this attribute, it can be used by templates to automatically add code to convert from one unit to another as data flows from one domain to another. Units are easily defined and imported from a central repository. Units can be based on other units with an associated multiplier.
+
+This class has the following methods broken up into categories:
+
+### Attribute Category
+
+These methods relate to attributes.
+
+| Method/Property |
+|---|
+| `String` **`abbreviation`** |
+| Returns an abbreviation of this unit.  |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTUnit` **`baseUnit`** |
+| When a unit is based from another unit, this returns that base unit.  |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasBaseUnit`** |
+| Indicates whether this unit extends from a base unit.  |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `double` **`multiplier`** |
+| When a unit is based from another unit, it should have a multiplier. A multiplier is defined as the number of items in this unit per the number of items in base unit. For example, if this unit is millimeters and the base unit is meters, then the multiplier would be 1000. This method returns the units multiplier.  |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`name`** |
+| Returns the name of the unit.  |
+
+
+
+# Domain Model
+
+Model classes that are domain specific are of this type. The classes are briefly described in the following table, then each will be described in more detail below the table.
+
+| Class | Description |
+|-----|-----|
+|[`MTDEAttribute`](#class_MTDEAttribute)|Represents an attribute in your model in the context of a domain.|
+|[`MTDEAttributeConstraintExpression`](#class_MTDEAttributeConstraintExpression)|Represents a constraint on an attribute in the form of an expression.|
+|[`MTDERelationship`](#class_MTDERelationship)|Represents a relationship in your model in the context of a domain.|
+|[`MTDEntity`](#class_MTDEntity)|Represents an entity in your model in the context of a domain.|
+|[`MTDEnum`](#class_MTDEnum)|Represents an enum in the context of a domain.|
+|[`MTDEnumItem`](#class_MTDEnumItem)|Represents an enum item in the context of a domain.|
+|[`MTDomain`](#class_MTDomain)|Represents a domain.|
+
+<a name="class_MTDEAttribute">
+## MTDEAttribute Class
+</a>
+
+Represents an attribute in your model in the context of a domain.
+
+This class has the following methods broken up into categories:
+
+### Domain Category
+
+These methods relate to a domain.
+
+| Method/Property |
+|---|
+| `MTDomain` **`domain`** |
+| Returns the domain associated with this domain attribute. |
+
+### Entity Category
+
+These methods relate to an entity.
+
+| Method/Property |
+|---|
+| `MTDEntity` **`domainEntity`** |
+| Returns the domain entity to which this belongs. |
+
+### Attribute Category
+
+These methods relate to attributes.
+
+| Method/Property |
+|---|
+| `MTAttribute` **`attribute`** |
+| Returns the model (non-domain specific) attribute of this domain attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`attributeName`** |
+| Returns the name of the model's attribute name (not the domain one). |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDEAttributeConstraint` [**`constraintByName(String name)`**](#class_MTDEAttribute_constraintByName) |
+| Returns the a domain constraint by name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`constraints`** |
+| Returns the list of constraints that have been declared on this domain entity. The constraints are domain constraints. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTConstant` **`defaultValue`** |
+| Returns the default value if one was assigned on the model attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`description`** |
+| Returns the declared domain attribute description. If that is not available then it will return the model attribute description. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`explicitAttributeName`** |
+| For those domain attributes that were renamed explicitly, this returns that name. Otherwise `null` is returned. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` [**`fullname(String delim)`**](#class_MTDEAttribute_fullname) |
+| This returns the full name of this domain attribute which includes not only its domain based name but is also preceded with the domain's entity's full name. The delimiter can be provided which is used between all parts of the full name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasReplacedBitFields`** |
+| Indicates whether this domain attribute has defined bit fields to that replace the model bit fields. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasUnit`** |
+| Indicates whether this attribute was declared with a unit of measure. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isVirtual`** |
+| Indicates whether this attribute was declared as virtual. A virtual attribute is one in which you do not persist and is driven by code synthesized from a template. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`name`** |
+| Returns the domain attribute name which is the result of applying any defined naming conventions or explicit renaming. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`replacedBitFields`** |
+| Returns the domain-specific bit fields (replacing the model defined ones) |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`sinceSchemaVersion`** |
+| As new attributes are added it can be helpful to have a record of when an attribute was introduced. The "since schema version" provides the schema version that this attribute was added. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTType` **`type`** |
+| Returns the type of this attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDEntity` **`typeEntity`** |
+| If the type of this attribute is of an entity type, then that domain entity is returned. Otherwise `null` is returned. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDEnum` **`typeEnum`** |
+| If this domain attribute is of enum type, then the domain enum is returned as such. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTUnit` **`unit`** |
+| If this attribute was declared with a unit of measure it returns that unit. Otherwise it will return `null`. |
+
+
+
+<a name="class_MTDEAttribute_constraintByName">
+#### Method `MTDEAttributeConstraint constraintByName(String name)`
+</a>
+
+Returns the a domain constraint by name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the constraint as declared in the model. |
+
+
+
+
+
+<a name="class_MTDEAttribute_fullname">
+#### Method `String fullname(String delim)`
+</a>
+
+This returns the full name of this domain attribute which includes not only its domain based name but is also preceded with the domain's entity's full name. The delimiter can be provided which is used between all parts of the full name.
+
+| Parameter | Description |
+|-----|-----|
+|`String delim` | A delimiter to place between the segments of the domain namespace as well as between that namespace and the domain entity name and between the domain entity name and the domain attribute name. |
+
+
+
+
+
+
+
+
+
+
+
+### View Category
+
+These methods relate to views.
+
+| Method/Property |
+|---|
+| `String` **`viewName`** |
+| Returns the name of the view that this domain attribute to which this is associated. |
+
+### Configuration Category
+
+These methods relate to a part of application configuration.
+
+| Method/Property |
+|---|
+| `MTSpace` **`space`** |
+| Returns the space in which this attribute was declared. |
+
+
+<a name="class_MTDEAttributeConstraintExpression">
+## MTDEAttributeConstraintExpression Class
+</a>
+
+Represents a constraint on an attribute in the form of an expression.
+
+This class has the following methods broken up into categories:
+
+
+<a name="class_MTDERelationship">
+## MTDERelationship Class
+</a>
+
+Represents a relationship in your model in the context of a domain.
+
+This class has the following methods broken up into categories:
+
+### Domain Category
+
+These methods relate to a domain.
+
+| Method/Property |
+|---|
+| `MTDomain` **`domain`** |
+| Returns the domain associated with this domain relationship. |
+
+### Entity Category
+
+These methods relate to an entity.
+
+| Method/Property |
+|---|
+| `MTDEntity` **`domainEntity`** |
+| Returns the parent domain entity of this domain relationship. |
+
+### Relationship Category
+
+These methods relate to relationships.
+
+| Method/Property |
+|---|
+| `String` **`description`** |
+| Returns the description of this domain relationship, if it exists. Otherwise it will return `null`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`explicitName`** |
+| If this relationship was explicitly renamed within its domain, it will return that name. Otherwise it will return `null`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` [**`fullname(String delim)`**](#class_MTDERelationship_fullname) |
+| This returns the full name of this domain relationship which includes not only its domain based name but is also preceded with the domain's entity's full name. The delimiter can be provided which is used between all parts of the full name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasDescription`** |
+| Indicates whether this domain relationship has a description. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isManyToMany`** |
+| Indicates if this relationship is a many-to-many. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isOneToMany`** |
+| Indicates if this relationship is a one-to-many. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isOptional`** |
+| Returns whether this relationship was declared as optional. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isParent`** |
+| Returns whether this relationship was declared as a parent. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isPrimaryParent`** |
+| Returns whether this relationship was declared as a parent and **not** declared optional. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`name`** |
+| Returns the domain relationship name which is the result of applying any defined naming conventions or explicit renaming. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRelationship` **`relationship`** |
+| Returns the model relationship. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`relationshipName`** |
+| Returns the name of the model relationship as it was declared. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDERelationshipHalf` **`to`** |
+| Returns the "to" half of this domain relationship. |
+
+
+
+<a name="class_MTDERelationship_fullname">
+#### Method `String fullname(String delim)`
+</a>
+
+This returns the full name of this domain relationship which includes not only its domain based name but is also preceded with the domain's entity's full name. The delimiter can be provided which is used between all parts of the full name.
+
+| Parameter | Description |
+|-----|-----|
+|`String delim` | A delimiter to place between the segments of the domain namespace as well as between that namespace and the domain entity name and between the domain entity name and the domain relationship name. |
+
+
+
+
+
+
+
+
+
+
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+| Method/Property |
+|---|
+| `boolean` [**`hasToEntityTagged(String tag)`**](#class_MTDERelationship_hasToEntityTagged) |
+| Returns whether this relationship's "to" entity is tagged with the specified tag. |
+
+<a name="class_MTDERelationship_hasToEntityTagged">
+#### Method `boolean hasToEntityTagged(String tag)`
+</a>
+
+Returns whether this relationship's "to" entity is tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to check. |
+
+
+<a name="class_MTDEntity">
+## MTDEntity Class
+</a>
+
+Represents an entity in your model in the context of a domain.
+
+This class has the following methods broken up into categories:
+
+### Domain Category
+
+These methods relate to a domain.
+
+| Method/Property |
+|---|
+| `MTDomain` **`domain`** |
+| Returns the domain associated with this domain entity. |
+
+### Module Category
+
+These methods relate to a module.
+
+| Method/Property |
+|---|
+| `MTModule` **`module`** |
+| Returns the module associated with this domain entity. |
+
+### Entity Category
+
+These methods relate to an entity.
+
+| Method/Property |
+|---|
+| `Collection` **`attributes`** |
+| Returns the full list of domain attributes of this domain entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`description`** |
+| Returns the description of this domain entity. If the domain entity does not have its own description, then the description of the entity is returned. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTEntity` **`entity`** |
+| This returns the non-domain specific entity on which this domain entity is based. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`entityName`** |
+| This returns the name of the non-domain specific entity on which this domain entity is based. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`explicitName`** |
+| This returns the explicitly defined name for this domain entity. If no such name was defined it returns `null`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` **`flatSecondaryEntityList`** |
+| Returns a list of all the secondary domain entities hierarchically that make up this domain entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` [**`fullname(String delim)`**](#class_MTDEntity_fullname) |
+| This returns the full name of this domain entity which includes not only its domain based name but is also preceded with the domain's namespace and the delimiter used in the namespace and between the namespace and the domain entity name can be provided. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`name`** |
+| This returns the name of this domain entity. If the domain has any naming conventions or this entity was explicitly renamed, then this name will be different than the entity from which it is based. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`sinceSchemaVersion`** |
+| As new entities are added it can be helpful to have a record of when an entity was introduced. The "since schema version" provides the schema version that this entity was added. |
+
+
+
+
+
+
+
+<a name="class_MTDEntity_fullname">
+#### Method `String fullname(String delim)`
+</a>
+
+This returns the full name of this domain entity which includes not only its domain based name but is also preceded with the domain's namespace and the delimiter used in the namespace and between the namespace and the domain entity name can be provided.
+
+| Parameter | Description |
+|-----|-----|
+|`String delim` | The delimiter string to use between segments of the namespace and between the namespace and the domain entity name. |
+
+
+
+### Primary Key Category
+
+These methods relate to a primary key.
+
+| Method/Property |
+|---|
+| `MTDEAttribute` [**`domainPrimaryKeyAttribute(boolean createIfNeeded)`**](#class_MTDEntity_domainPrimaryKeyAttribute) |
+| Returns the domain specific version of the entity's primary key attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasPrimaryKey`** |
+| Indicates whether this domain entity has a primary key. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTType` **`pkType`** |
+| Returns the data type of the primary key attribute of this domain entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDEAttribute` **`primaryKeyAttribute`** |
+| Returns the primary key attribute of this domain entity. |
+
+<a name="class_MTDEntity_domainPrimaryKeyAttribute">
+#### Method `MTDEAttribute domainPrimaryKeyAttribute(boolean createIfNeeded)`
+</a>
+
+Returns the domain specific version of the entity's primary key attribute.
+
+| Parameter | Description |
+|-----|-----|
+|`boolean createIfNeeded` | If the domain based primary key attribute has not yet been created, specifying `true` will make sure it is created before returning it. Otherwise `null` will be returned if it was not yet created. |
+
+
+
+
+### Attribute Category
+
+These methods relate to attributes.
+
+| Method/Property |
+|---|
+| `MTDEAttribute` [**`attributeNamed(String name)`**](#class_MTDEntity_attributeNamed) |
+| Returns the domain attribute by its name if it exists, otherwise it returns `null`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` **`declaredAttributes`** |
+| Returns a list of all the declared domain attributes of this domain entity that are declared in this domain hierarchically (secondary entity hierarchy). |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`declaredDomainAttributes`** |
+| Returns the list of domain attributes that are explicitly defined in the domain. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDEAttribute` [**`domainAttributeByName(String attributeName, boolean createIfNeeded)`**](#class_MTDEntity_domainAttributeByName) |
+| Returns the domain specific version of the specified attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` **`domainAttributes`** |
+| Returns all the domain attributes from this domain entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` [**`flatDeclaredAttributeList(MFArray ofTypes)`**](#class_MTDEntity_flatDeclaredAttributeList) |
+| Returns a list of domain attributes of this domain entity that are of one of the specified data types and that are declared in this domain hierarchically (secondary entity hierarchy). |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` **`flatDeclaredAttributeList`** |
+| Returns a list of all the domain attributes of this domain entity that are declared in this domain hierarchically (secondary entity hierarchy). |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasAttributeNamed(String name)`**](#class_MTDEntity_hasAttributeNamed) |
+| Indicates whether this domain entity has an attribute by the specified name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasDeclaredDomainAttributes`** |
+| Indicates if any attributes were declared in this domain entity declaration. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`orderedDomainAttributes`** |
+| Returns an ordered list of domain attributes, where the order is defined by the order in which they are defined. It also includes attributes that were not defined, where they are placed at the end of the list. |
+
+<a name="class_MTDEntity_attributeNamed">
+#### Method `MTDEAttribute attributeNamed(String name)`
+</a>
+
+Returns the domain attribute by its name if it exists, otherwise it returns `null`.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the domain attribute to return. |
+
+
+
+<a name="class_MTDEntity_domainAttributeByName">
+#### Method `MTDEAttribute domainAttributeByName(String attributeName, boolean createIfNeeded)`
+</a>
+
+Returns the domain specific version of the specified attribute.
+
+| Parameter | Description |
+|-----|-----|
+|`String attributeName` | The name of the attribute to return. |
+|`boolean createIfNeeded` | If the domain based attribute has not yet been created, specifying `true` will make sure it is created before returning it. Otherwise `null` will be returned if it was not yet created. |
+
+
+<a name="class_MTDEntity_flatDeclaredAttributeList">
+#### Method `Collection flatDeclaredAttributeList(MFArray ofTypes)`
+</a>
+
+Returns a list of domain attributes of this domain entity that are of one of the specified data types and that are declared in this domain hierarchically (secondary entity hierarchy).
+
+| Parameter | Description |
+|-----|-----|
+|`MFArray ofTypes` | *no description* |
+
+
+<a name="class_MTDEntity_hasAttributeNamed">
+#### Method `boolean hasAttributeNamed(String name)`
+</a>
+
+Indicates whether this domain entity has an attribute by the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the domain attribute of which to check the presence. |
+
+
+
+### Relationship Category
+
+These methods relate to relationships.
+
+| Method/Property |
+|---|
+| `List` **`declaredDomainRelationships`** |
+| Returns the list of domain relationships that are explicitly defined in the domain. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDERelationship` [**`domainEntityRelationshipByName(String name, boolean createIfNeeded)`**](#class_MTDEntity_domainEntityRelationshipByName) |
+| Returns the domain specific version of the specified relationship. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasPrimaryParentRelationship`** |
+| Indicates whether this domain entity has a primary parent relationship. A primary parent relationship is one that has been declared as `parent` and **not** declared `optional`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDEntity` **`primaryParentEntity`** |
+| Returns the primary parent entity to this domain entity. A primary parent entity is the entity referenced by a relationship of this entity that has been declared as a `parent` relationship and **not** declared `optional`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDERelationship` **`primaryParentRelationship`** |
+| Returns the primary parent relationship of this domain entity. A primary parent relationship is one that has been declared as `parent` and **not** declared `optional`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` **`relationships`** |
+| Returns the all the domain relationships of this domain entity. |
+
+
+<a name="class_MTDEntity_domainEntityRelationshipByName">
+#### Method `MTDERelationship domainEntityRelationshipByName(String name, boolean createIfNeeded)`
+</a>
+
+Returns the domain specific version of the specified relationship.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the relationship to return. |
+|`boolean createIfNeeded` | If the domain based relationship has not yet been created, specifying `true` will make sure it is created before returning it. Otherwise `null` will be returned if it was not yet created. |
+
+
+
+
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+| Method/Property |
+|---|
+| `MTDEAttribute` [**`attributeOfTypeTagged(String tag)`**](#class_MTDEntity_attributeOfTypeTagged) |
+| Returns the first domain attribute of this domain entity that has the specified tag. Of course, in theory there could be more than one, so this should be used when a template is expecting there to be just one per domain entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDEAttribute` [**`attributeTagged(String tag)`**](#class_MTDEntity_attributeTagged) |
+| Returns the domain attribute tagged with the specified tag. Although it is possible to have more than one, this method is used when expecting just one by nature of the tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` [**`attributesTagged(String tag)`**](#class_MTDEntity_attributesTagged) |
+| Returns all the domain attributes tagged with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasAttributeOfTypeTagged(String tag)`**](#class_MTDEntity_hasAttributeOfTypeTagged) |
+| Indicates if this domain entity has a domain entity with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasAttributeTagged(String tag)`**](#class_MTDEntity_hasAttributeTagged) |
+| Indicates whether this domain entity has an attribute tagged with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasAttributeWithTagPrefixed(String tagPrefix)`**](#class_MTDEntity_hasAttributeWithTagPrefixed) |
+| Indicates whether this domain entity has an attribute who's tag starts with the specified tag prefix. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasPrimaryParentEntityTagged(String tag)`**](#class_MTDEntity_hasPrimaryParentEntityTagged) |
+| Indicates whether a primary parent entity to this domain entity has been tagged with the specified tag. A primary parent entity is the entity referenced by a relationship of this entity that has been declared as a `parent` relationship and **not** declared `optional`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasRelationshipTagged(String tag)`**](#class_MTDEntity_hasRelationshipTagged) |
+| Indicates whether this domain entity has a domain relationship with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasRelationshipToEntityTagged(String tag)`**](#class_MTDEntity_hasRelationshipToEntityTagged) |
+| Indicates whether this domain entity has a relationship **to** a domain entity with the specified tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDEntity` [**`primaryParentEntityTagged(String tag)`**](#class_MTDEntity_primaryParentEntityTagged) |
+| Returns the primary parent entity to this domain entity if it has been tagged with the specified tag. A primary parent entity is the entity referenced by a relationship of this entity that has been declared as a `parent` relationship and **not** declared `optional`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDERelationship` [**`relationshipTagged(String tag)`**](#class_MTDEntity_relationshipTagged) |
+| Returns the domain relationship tagged with the specified tag. Although it is possible to have more than one, this method is used when expecting just one by nature of the tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDERelationship` [**`relationshipToEntityTagged(String tag)`**](#class_MTDEntity_relationshipToEntityTagged) |
+| Returns the first found domain relationship of this domain entity that is tagged with the specified tag. Although it is possible to have more than one, this method is used when expecting just one by nature of the tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` [**`relationshipsTagged(String tag)`**](#class_MTDEntity_relationshipsTagged) |
+| Returns all the domain relationships tagged with the specified tag. |
+
+<a name="class_MTDEntity_attributeOfTypeTagged">
+#### Method `MTDEAttribute attributeOfTypeTagged(String tag)`
+</a>
+
+Returns the first domain attribute of this domain entity that has the specified tag. Of course, in theory there could be more than one, so this should be used when a template is expecting there to be just one per domain entity.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTDEntity_attributeTagged">
+#### Method `MTDEAttribute attributeTagged(String tag)`
+</a>
+
+Returns the domain attribute tagged with the specified tag. Although it is possible to have more than one, this method is used when expecting just one by nature of the tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTDEntity_attributesTagged">
+#### Method `Collection attributesTagged(String tag)`
+</a>
+
+Returns all the domain attributes tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTDEntity_hasAttributeOfTypeTagged">
+#### Method `boolean hasAttributeOfTypeTagged(String tag)`
+</a>
+
+Indicates if this domain entity has a domain entity with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTDEntity_hasAttributeTagged">
+#### Method `boolean hasAttributeTagged(String tag)`
+</a>
+
+Indicates whether this domain entity has an attribute tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTDEntity_hasAttributeWithTagPrefixed">
+#### Method `boolean hasAttributeWithTagPrefixed(String tagPrefix)`
+</a>
+
+Indicates whether this domain entity has an attribute who's tag starts with the specified tag prefix.
+
+| Parameter | Description |
+|-----|-----|
+|`String tagPrefix` | The tag prefix with which to search. |
+
+<a name="class_MTDEntity_hasPrimaryParentEntityTagged">
+#### Method `boolean hasPrimaryParentEntityTagged(String tag)`
+</a>
+
+Indicates whether a primary parent entity to this domain entity has been tagged with the specified tag. A primary parent entity is the entity referenced by a relationship of this entity that has been declared as a `parent` relationship and **not** declared `optional`.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTDEntity_hasRelationshipTagged">
+#### Method `boolean hasRelationshipTagged(String tag)`
+</a>
+
+Indicates whether this domain entity has a domain relationship with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTDEntity_hasRelationshipToEntityTagged">
+#### Method `boolean hasRelationshipToEntityTagged(String tag)`
+</a>
+
+Indicates whether this domain entity has a relationship **to** a domain entity with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTDEntity_primaryParentEntityTagged">
+#### Method `MTDEntity primaryParentEntityTagged(String tag)`
+</a>
+
+Returns the primary parent entity to this domain entity if it has been tagged with the specified tag. A primary parent entity is the entity referenced by a relationship of this entity that has been declared as a `parent` relationship and **not** declared `optional`.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag to check. |
+
+<a name="class_MTDEntity_relationshipTagged">
+#### Method `MTDERelationship relationshipTagged(String tag)`
+</a>
+
+Returns the domain relationship tagged with the specified tag. Although it is possible to have more than one, this method is used when expecting just one by nature of the tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTDEntity_relationshipToEntityTagged">
+#### Method `MTDERelationship relationshipToEntityTagged(String tag)`
+</a>
+
+Returns the first found domain relationship of this domain entity that is tagged with the specified tag. Although it is possible to have more than one, this method is used when expecting just one by nature of the tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+<a name="class_MTDEntity_relationshipsTagged">
+#### Method `Collection relationshipsTagged(String tag)`
+</a>
+
+Returns all the domain relationships tagged with the specified tag.
+
+| Parameter | Description |
+|-----|-----|
+|`String tag` | The tag with which to search. |
+
+### Configuration Category
+
+These methods relate to a part of application configuration.
+
+| Method/Property |
+|---|
+| `MTSpace` **`space`** |
+| Returns the space in which this domain entity was defined. |
+
+### Interface Category
+
+These methods relate to an interface.
+
+| Method/Property |
+|---|
+| `MTDEInterface` [**`interface(String name)`**](#class_MTDEntity_interface) |
+| This returns an interface by name that was defined as part of this domain entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` **`interfaces`** |
+| Returns all the interfaces associated with this domain entity. |
+
+<a name="class_MTDEntity_interface">
+#### Method `MTDEInterface interface(String name)`
+</a>
+
+This returns an interface by name that was defined as part of this domain entity.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | *no description* |
+
+
+
+<a name="class_MTDEnum">
+## MTDEnum Class
+</a>
+
+Represents an enum in the context of a domain.
+
+This class has the following methods broken up into categories:
+
+
+<a name="class_MTDEnumItem">
+## MTDEnumItem Class
+</a>
+
+Represents an enum item in the context of a domain.
+
+This class has the following methods broken up into categories:
+
+
+<a name="class_MTDomain">
+## MTDomain Class
+</a>
+
+Represents a domain.
+
+This class has the following methods broken up into categories:
+
+
+
+# Expression Model
+
+Model classes used to describe expressions are of this type. The classes are briefly described in the following table, then each will be described in more detail below the table.
+
+| Class | Description |
+|-----|-----|
+|[`MTConstant`](#class_MTConstant)|This represents a constant in a model expression.|
+|[`MTExpression`](#class_MTExpression)|An expression is a tree of operations, constants, methods and operands that evaluate to something at runtime. An example of an expression is like a constraint placed on an attribute.|
+|[`MTMethodCall`](#class_MTMethodCall)|A method call in a model expression must map to a language specific method. For instance, if we define the following function in the Java language: `functions { length(string str) "${str}.length()" }` then we can use `length(string str)` method in our expressions. Passing the object of this class through the `language` filter will result in remapping it to use the `length()` method on the `str` string object.|
+|[`MTOperand`](#class_MTOperand)|This represents some operand of an expression such as a parameter of an entity or an enum item.|
+|[`MTOperation`](#class_MTOperation)|Represents an operation inside an expression. Each type of operation (add, subtract, not, etc.) can have its own number of inputs, where each input is an expression. The output of the operation is effectively an object of this class. You can assign the object of this class as the operand of another operation, thus creating a multi-operation expression.|
+
+<a name="class_MTConstant">
+## MTConstant Class
+</a>
+
+This represents a constant in a model expression.
+
+This class has the following methods broken up into categories:
+
+### Type Category
+
+These methods relate to data types.
+
+| Method/Property |
+|---|
+| `Boolean` **`booleanValue`** |
+| Returns the boolean value of this constant. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Double` **`doubleValue`** |
+| Returns the double floating-point value of this constant. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Long` **`longValue`** |
+| Returns the long value of this constant. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`stringValue`** |
+| Returns the string value of this constant. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`toString`** |
+| Returns the constant represented as a string. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Type` **`type`** |
+| Returns the data type of this constant. |
+
+### Enum Category
+
+These methods relate to enums.
+
+| Method/Property |
+|---|
+| `MTEnumItem` **`enumItem`** |
+| If the constant value is an enum item, this will return the enum item. You can use the `isEnumItem` property to determine if this is an enum item. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isEnumItem`** |
+| Indicates whether this constant is of the enum item type. If so, you will need to use the `enumItem` property to obtain the enum item object. |
+
+
+<a name="class_MTExpression">
+## MTExpression Class
+</a>
+
+An expression is a tree of operations, constants, methods and operands that evaluate to something at runtime. An example of an expression is like a constraint placed on an attribute.
+
+This class has the following methods broken up into categories:
+
+### Other Category
+
+These methods don't really have a category.
+
+| Method/Property |
+|---|
+| `boolean` **`isConstant`** |
+| Indicates whether this expression is a constant. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isMethodCall`** |
+| Indicates whether this expression is a method call. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isOperand`** |
+| Indicates whether this expression is an operand (variable). |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isOperation`** |
+| Indicates whether this expression is an operation. |
+
+
+<a name="class_MTMethodCall">
+## MTMethodCall Class
+</a>
+
+A method call in a model expression must map to a language specific method. For instance, if we define the following function in the Java language: `functions { length(string str) "${str}.length()" }` then we can use `length(string str)` method in our expressions. Passing the object of this class through the `language` filter will result in remapping it to use the `length()` method on the `str` string object.
+
+This class has the following methods broken up into categories:
+
+### Other Category
+
+These methods don't really have a category.
+
+| Method/Property |
+|---|
+| `MTExpression` [**`argument(int i)`**](#class_MTMethodCall_argument) |
+| Returns the expression of a specified argument of the method call. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`argumentCount`** |
+| Returns the number of arguments of the method call. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`arguments`** |
+| Returns all the expressions assigned to the arguments of the method. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`name`** |
+| Returns the name of the method call. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`toString`** |
+| Returns the string representation of the method call (good for debug). |
+
+<a name="class_MTMethodCall_argument">
+#### Method `MTExpression argument(int i)`
+</a>
+
+Returns the expression of a specified argument of the method call.
+
+| Parameter | Description |
+|-----|-----|
+|`int i` | The index of argument (where 0 is the first). |
+
+
+
+
+
+
+<a name="class_MTOperand">
+## MTOperand Class
+</a>
+
+This represents some operand of an expression such as a parameter of an entity or an enum item.
+
+This class has the following methods broken up into categories:
+
+### Other Category
+
+These methods don't really have a category.
+
+| Method/Property |
+|---|
+| `MTAttribute` **`attribute`** |
+| If this operand is an attribute of an entity this will return the attribute object. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTEnumItem` **`enumItem`** |
+| If this operand is an enum item this will return the enum item object. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`toString`** |
+| Returns a string representing the operand. This is what appears for an operand when an expression is rendered to a string. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Type` **`type`** |
+| Indicates the type of operand this is. |
+
+
+<a name="class_MTOperation">
+## MTOperation Class
+</a>
+
+Represents an operation inside an expression. Each type of operation (add, subtract, not, etc.) can have its own number of inputs, where each input is an expression. The output of the operation is effectively an object of this class. You can assign the object of this class as the operand of another operation, thus creating a multi-operation expression.
+
+This class has the following methods broken up into categories:
+
+### Other Category
+
+These methods don't really have a category.
+
+| Method/Property |
+|---|
+| `Operator` **`op`** |
+| Returns the operator of the operation. This is the actual add, subtract, multiply, etc. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTExpression` [**`operand(int i)`**](#class_MTOperation_operand) |
+| Returns the operand expression for a specified input of the operation. An operation can have up to 3 inputs (you can use the `operandCount` property to know how many this one has). |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`operandCount`** |
+| Returns the number of operands (inputs) for this operation. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`operatorSymbol`** |
+| Returns a string representation of the operator of this operation (e.g., `+`, `-`, `*`, etc.). |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`toString`** |
+| Returns a string representation for this operation (for debug purposes). |
+
+
+<a name="class_MTOperation_operand">
+#### Method `MTExpression operand(int i)`
+</a>
+
+Returns the operand expression for a specified input of the operation. An operation can have up to 3 inputs (you can use the `operandCount` property to know how many this one has).
+
+| Parameter | Description |
+|-----|-----|
+|`int i` | The index of the specific operand (input) of the operation you want to be returned. |
+
+
+
+
+
+
+# Foundation Model
+
+The model classes of this type are intended to provide support for foundation type functions. Currently only array/set classes are supported. The classes are briefly described in the following table, then each will be described in more detail below the table.
+
+| Class | Description |
+|-----|-----|
+|[`MFArray`](#class_MFArray)|This class represents a ordered array of objects. To create an empty array you can use: `$[let myList = @[]@]` then can use these methods on that variable (`myList` in this example) to access the array functionality that is exposed here.|
+|[`MFSet`](#class_MFSet)|This class represents a unique set of objects. You cannot create an object of this class in template code, however, some classes have methods that will return such an object. Since this class does not offer methods to manipulate the object, it should be considered immutable. You can iterate through the items in a set using the `foreach` instruction. For example: `$[foreach item in mySet] ... $[/foreach]` would allow you to process each item(object) in the set.|
+
+<a name="class_MFArray">
+## MFArray Class
+</a>
+
+This class represents a ordered array of objects. To create an empty array you can use: `$[let myList = @[]@]` then can use these methods on that variable (`myList` in this example) to access the array functionality that is exposed here.
+
+This class has the following methods broken up into categories:
+
+### Other Category
+
+These methods don't really have a category.
+
+| Method/Property |
+|---|
+| `MFArray` [**`add(Object o)`**](#class_MFArray_add) |
+| Allows you to add an object to this array. The `do` template instruction can be used to do this (e.g., `$[do array.add(obj)]`. This method returns the array itself so you can chain other array methods after this one. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MFArray` [**`addAll(MFArray otherArray)`**](#class_MFArray_addAll) |
+| Allows you to add all elements of another array to this array. The `do` template instruction can be used to do  this (e.g., `$[do array.addAll(otherArray)]`. This method returns the array itself so you can chain other array methods after this one. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MFArray` **`clear`** |
+| This method removes all items in the array. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`contains(Object object)`**](#class_MFArray_contains) |
+| Indicates if the array contains the specified object. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MFArray` **`copy`** |
+| Allows you to make a copy of this array. Since it returns the new array you can chain other array methods after this one. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`count`** |
+| Returns the number of items in the array. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Object` **`first`** |
+| Returns the first item in the array. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Object` [**`get(Long index)`**](#class_MFArray_get) |
+| Returns the specified item by its index into the array. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` [**`indexOf(Object o)`**](#class_MFArray_indexOf) |
+| Returns the index into the array associated with the specified object. If the object is not found, a -1 is returned. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isEmpty`** |
+| Indicates if the array is empty (no items). |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Object` **`last`** |
+| Returns the last item in the array. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MFArray` [**`remove(Object o)`**](#class_MFArray_remove) |
+| Allows you to remove a specified object from the array. This method returns the array itself so you can chain other array methods after this one. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `ArrayList` **`values`** |
+| Returns all the values of the array. When iterating this array with a `foreach` you do **not** need to use this method. |
+
+<a name="class_MFArray_add">
+#### Method `MFArray add(Object o)`
+</a>
+
+Allows you to add an object to this array. The `do` template instruction can be used to do this (e.g., `$[do array.add(obj)]`. This method returns the array itself so you can chain other array methods after this one.
+
+| Parameter | Description |
+|-----|-----|
+|`Object o` | The object to add to the array. |
+
+<a name="class_MFArray_addAll">
+#### Method `MFArray addAll(MFArray otherArray)`
+</a>
+
+Allows you to add all elements of another array to this array. The `do` template instruction can be used to do  this (e.g., `$[do array.addAll(otherArray)]`. This method returns the array itself so you can chain other array methods after this one.
+
+| Parameter | Description |
+|-----|-----|
+|`MFArray otherArray` | The other array to add to this array. |
+
+
+<a name="class_MFArray_contains">
+#### Method `boolean contains(Object object)`
+</a>
+
+Indicates if the array contains the specified object.
+
+| Parameter | Description |
+|-----|-----|
+|`Object object` | The object of which to determine its presence in the array. |
+
+
+
+
+<a name="class_MFArray_get">
+#### Method `Object get(Long index)`
+</a>
+
+Returns the specified item by its index into the array.
+
+| Parameter | Description |
+|-----|-----|
+|`Long index` | The index into the array that points to the item to be returned. |
+
+<a name="class_MFArray_indexOf">
+#### Method `int indexOf(Object o)`
+</a>
+
+Returns the index into the array associated with the specified object. If the object is not found, a -1 is returned.
+
+| Parameter | Description |
+|-----|-----|
+|`Object o` | The object of which to locate its index. |
+
+
+
+<a name="class_MFArray_remove">
+#### Method `MFArray remove(Object o)`
+</a>
+
+Allows you to remove a specified object from the array. This method returns the array itself so you can chain other array methods after this one.
+
+| Parameter | Description |
+|-----|-----|
+|`Object o` | The object to remove from this array. |
+
+
+
+<a name="class_MFSet">
+## MFSet Class
+</a>
+
+This class represents a unique set of objects. You cannot create an object of this class in template code, however, some classes have methods that will return such an object. Since this class does not offer methods to manipulate the object, it should be considered immutable. You can iterate through the items in a set using the `foreach` instruction. For example: `$[foreach item in mySet] ... $[/foreach]` would allow you to process each item(object) in the set.
+
+This class has the following methods broken up into categories:
+
+### Other Category
+
+These methods don't really have a category.
+
+| Method/Property |
+|---|
+| `boolean` [**`contains(Object object)`**](#class_MFSet_contains) |
+| Indicates if the set contains the specified object. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`count`** |
+| Returns the number of items in the set. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isEmpty`** |
+| Indicates if the set is empty (no items). |
+
+<a name="class_MFSet_contains">
+#### Method `boolean contains(Object object)`
+</a>
+
+Indicates if the set contains the specified object.
+
+| Parameter | Description |
+|-----|-----|
+|`Object object` | The object of which to determine its presence in the set. |
+
+
+
+
+
+# Tagging Model
+
+Model classes used to describe tags are of this type. The classes are briefly described in the following table, then each will be described in more detail below the table.
+
+| Class | Description |
+|-----|-----|
+|[`MTTagDef`](#class_MTTagDef)|This class represents the definition of a tag. This is mostly to allow documentation of tags that are used in templates and placed on entities and attributes (including domain entities and domain attributes).|
+|[`MTTagValueDef`](#class_MTTagValueDef)|This class represents the definition of an optional value that can be assigned to a tag.|
+
+<a name="class_MTTagDef">
+## MTTagDef Class
+</a>
+
+This class represents the definition of a tag. This is mostly to allow documentation of tags that are used in templates and placed on entities and attributes (including domain entities and domain attributes).
+
+This class has the following methods broken up into categories:
+
+### Type Category
+
+These methods relate to data types.
+
+| Method/Property |
+|---|
+| `MTTagValueDef` **`valueDef`** |
+| Returns an object that describes the data type of a value assigned to this tag. |
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+| Method/Property |
+|---|
+| `boolean` **`hasValue`** |
+| Indicates whether this tag is assigned a value. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isStartsWith`** |
+| Indicates whether this tag is one in which the developer would use as a tag prefix, that is all tags that start with this string value are associated with this tag. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`name`** |
+| Returns the tag name (this is the same as the `tag` property). |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`tag`** |
+| Returns the tag as a string. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTTagContext` **`tagContext`** |
+| Returns an object that describes the context when this tag would be used. |
+
+
+<a name="class_MTTagValueDef">
+## MTTagValueDef Class
+</a>
+
+This class represents the definition of an optional value that can be assigned to a tag.
+
+This class has the following methods broken up into categories:
+
+### Other Category
+
+These methods don't really have a category.
+
+| Method/Property |
+|---|
+| `DataType` **`dataType`** |
+| Returns the data type expected for a value set on a tag. |
+
+
+
+# Template Model
+
+Classes used by the template engine to structure and execute the code. The classes are briefly described in the following table, then each will be described in more detail below the table.
+
+| Class | Description |
+|-----|-----|
+|[`FTAuthor`](#class_FTAuthor)|A template author connects itself to a publisher outlet for the purpose of authoring (sending) code there.|
+|[`FTPublisher`](#class_FTPublisher)|The Publisher class is responsible for inserting code from authors to its outlets. Inside the publisher block it will declare one or more outlets that an author can connect with to author code into.|
+|[`FTTemplate`](#class_FTTemplate)|Represents an actual template containing code to execute.|
+
+<a name="class_FTAuthor">
+## FTAuthor Class
+</a>
+
+A template author connects itself to a publisher outlet for the purpose of authoring (sending) code there.
+
+This class has the following methods broken up into categories:
+
+### Namespace Category
+
+These methods relate to a namespace.
+
+| Method/Property |
+|---|
+| `MFSet` **`fullPublisherNamespaces`** |
+| Returns the set of **full** namespaces associated with this author. A **full** namespace is one which combines parent author namespaces with this author namespaces. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Set` **`namespaces`** |
+| Returns the set of declared namespaces of this author. If this author instruction is embedded in another author instruction then this will not be a full namespace. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MFSet` **`publisherNamespaces`** |
+| Returns the set of publisher namespaces used by this author. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTNamespace` **`topPublisherNamespace`** |
+| Returns the namespace of the top author in an author hierarchy starting from this author. |
+
+### Template Category
+
+These methods relate to a template.
+
+| Method/Property |
+|---|
+| `FTTemplate` **`template`** |
+| Returns the template in which this author was declared. |
+
+### Publisher Category
+
+These methods relate to a publisher.
+
+| Method/Property |
+|---|
+| `FTPublishPhase` **`phase`** |
+| Returns the declared publishing phase in which this author should execute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `FTPublishScope` **`scope`** |
+| Returns the declared scope in which this author will execute. |
+
+### Author Category
+
+These methods relate to an author.
+
+| Method/Property |
+|---|
+| `List` **`childAuthors`** |
+| Returns the list (if any) of child authors. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasChildAuthors`** |
+| Indicates whether this author has child authors. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasParent`** |
+| Indicates whether this author has a parent author. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `FTAuthor` **`parentAuthor`** |
+| Returns the parent author instruction to this one. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `FTAuthor` **`topAuthor`** |
+| Returns the top author of an author hierarchy starting from this author. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`uniqueId`** |
+| Returns a unique ID for this author. |
+
+### Outlet Category
+
+These methods relate to an outlet.
+
+| Method/Property |
+|---|
+| `List` **`childOutletAuthors`** |
+| Returns the list of child authors that connect to an outlet. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasChildOutletAuthors`** |
+| Indicates whether this author has child authors that connect to an outlet. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasChildOutletsWithIntermediateParents`** |
+| Indicates whether this author has children authors that connect to an outlet and there are intermediate parent authors (that is authors that don't connect to an outlet). |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isOutletAuthor`** |
+| Indicates whether this author connects to an outlet. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `FTOutlet` **`outlet`** |
+| If this author defines an outlet, this returns that outlet. Otherwise, it returns `null`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`outletName`** |
+| Returns the outlet for this author, if it has one. Otherwise it will return `null`. |
+
+
+<a name="class_FTPublisher">
+## FTPublisher Class
+</a>
+
+The Publisher class is responsible for inserting code from authors to its outlets. Inside the publisher block it will declare one or more outlets that an author can connect with to author code into.
+
+This class has the following methods broken up into categories:
+
+### Namespace Category
+
+These methods relate to a namespace.
+
+| Method/Property |
+|---|
+| `MTNamespace` **`namespace`** |
+| Returns the namespace for this publisher. |
+
+### Outlet Category
+
+These methods relate to an outlet.
+
+| Method/Property |
+|---|
+| `boolean` **`hasOutlets`** |
+| Indicates if this publisher has any outlets. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`outlets`** |
+| Returns all outlets of this publisher in order of declaration. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` [**`outletsByName(String outletName)`**](#class_FTPublisher_outletsByName) |
+| Returns an outlet of this publisher by name. |
+
+
+
+<a name="class_FTPublisher_outletsByName">
+#### Method `List outletsByName(String outletName)`
+</a>
+
+Returns an outlet of this publisher by name.
+
+| Parameter | Description |
+|-----|-----|
+|`String outletName` | The name of the outlet to return. |
+
+
+<a name="class_FTTemplate">
+## FTTemplate Class
+</a>
+
+Represents an actual template containing code to execute.
+
+This class has the following methods broken up into categories:
+
+### Domain Category
+
+These methods relate to a domain.
+
+| Method/Property |
+|---|
+| `String` **`defaultDomainName`** |
+| Returns the default domain name declared by this template. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasReferencedDomains`** |
+| Indicates whether this template makes reference to any domains. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`referencedDomainNames`** |
+| Returns the names of all the domains referenced by this template (such as those by the domain filter). |
+
+### Function Category
+
+These methods relate to functions.
+
+| Method/Property |
+|---|
+| `FTFunction` [**`functionWithName(String functionName)`**](#class_FTTemplate_functionWithName) |
+| Returns the function by the specified name. This function must be declared in this template. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` **`functions`** |
+| Returns all the functions declared in this template. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasFunctionWithName(String functionName)`**](#class_FTTemplate_hasFunctionWithName) |
+| Indicates whether this template has a function by the specified name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasFunctions`** |
+| Indicates whether this template has at least one function definition. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasOnlyFunctions`** |
+| Indicates whether this template has only function definitions. |
+
+<a name="class_FTTemplate_functionWithName">
+#### Method `FTFunction functionWithName(String functionName)`
+</a>
+
+Returns the function by the specified name. This function must be declared in this template.
+
+| Parameter | Description |
+|-----|-----|
+|`String functionName` | The name of the function to return. |
+
+
+<a name="class_FTTemplate_hasFunctionWithName">
+#### Method `boolean hasFunctionWithName(String functionName)`
+</a>
+
+Indicates whether this template has a function by the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String functionName` | The name of the function to check. |
+
+
+
+### Language Category
+
+These methods relate to language definitions.
+
+| Method/Property |
+|---|
+| `String` **`language`** |
+| Returns the name of the language defined by this template. |
+
+### Tagging Category
+
+These methods relate to the tagging.
+
+| Method/Property |
+|---|
+| `boolean` **`hasReferencedTags`** |
+| Indicates whether this template makes reference to any tags. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `List` **`referencedTags`** |
+| Returns a list of tag names that are referenced by this template. |
+
+### Template Category
+
+These methods relate to a template.
+
+| Method/Property |
+|---|
+| `boolean` **`hasImportedTemplates`** |
+| Indicates whether this template has imported other templates. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Set` **`importedTemplates`** |
+| Returns the templates that this template has imported. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isImported`** |
+| Indicates whether this template object has been imported. If so it is likely in a list returned by `importedTemplates`. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `String` **`name`** |
+| Returns the name of this template. |
+
+### Publisher Category
+
+These methods relate to a publisher.
+
+| Method/Property |
+|---|
+| `boolean` **`hasPublishers`** |
+| Indicates whether this template contains any publishers. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` **`publishers`** |
+| Returns the publishers declared in this template. |
+
+### Author Category
+
+These methods relate to an author.
+
+| Method/Property |
+|---|
+| `List` **`authors`** |
+| Returns the authors declared in this template. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasAuthors`** |
+| Indicates whether this template contains any authors. |
+
+
+

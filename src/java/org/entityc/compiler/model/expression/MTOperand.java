@@ -72,10 +72,20 @@ public class MTOperand extends MTExpression {
         return enumItem;
     }
 
-    @ModelMethod(description = "Returns a string representing the operand (for debug purposes).")
+    @ModelMethod(description = "Returns a string representing the operand. This is what appears for an operand when "
+                               + "an expression is rendered to a string.")
     @Override
     public String toString() {
-        return getFullname();
+        switch (type) {
+            case ATTRIBUTE: {
+                String attributeName = names.get(1);
+                return attributeName;
+            }
+            case UNKNOWN:
+            case ENTITY:
+                return names.size() > 0 ? names.get(0) : "";
+        }
+        return "";
     }
 
     private String getFullname() {
