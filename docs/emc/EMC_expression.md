@@ -175,7 +175,7 @@ If this operand is an enum item this will return the enum item object.
 
 #### `String` **`toString`**
 
-Returns a string representing the operand (for debug purposes).
+Returns a string representing the operand. This is what appears for an operand when an expression is rendered to a string.
 
 <hr/>
 

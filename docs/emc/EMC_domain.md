@@ -688,7 +688,7 @@ Returns the domain relationship tagged with the specified tag. Although it is po
 
 #### `MTDERelationship relationshipToEntityTagged(String tag)`
 
-Returns the first found domain relationship of this domain entity that is tagged with the specified tag. Although it is possible to have more than one, this method is used when expecting just one by nature of the tag 
+Returns the first found domain relationship of this domain entity that is tagged with the specified tag. Although it is possible to have more than one, this method is used when expecting just one by nature of the tag.
 
 | Parameter | Description |
 |-----|-----|

@@ -7,6 +7,7 @@ Domains serve the following functions:
 * Namespace declaration
 * Renaming
 * Bit field mapping
+* Feature representation via specialization
 
 Declaring a domain is simply done as:
 
@@ -178,3 +179,7 @@ To compress them into a single field for some domain, you would do the following
 	}
 
 The number in the parentheses is the number of bits for that field. The order the fields are defined is important. The bits of the int32 are allocated starting with bit 0. So `enableFeatureA` is bit 0, `enableFeatureB` is bit 1 and `mode` is bits 2 through 5.
+
+## Feature Representation via Specialization
+
+Domain specialization is a way in which you can extend a domain, typically defined outside your application, and make it specific to your application. A template library will often implement features using a domain. To configure a feature you specialize its designated domain and within that specialization, tag entities, attributes, and relationships as documented by that domain. With those tags in place, when the templates for the feature run, they will access the tags to direct how code will be synthesized.
