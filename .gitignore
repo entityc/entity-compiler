@@ -10,3 +10,4 @@ client/javaclient/clubs
 client/zcios/ClubsProto
 server/clubs
 *.idea
+.ec

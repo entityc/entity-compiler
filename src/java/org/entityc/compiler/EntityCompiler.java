@@ -172,7 +172,6 @@ public class EntityCompiler {
         // root node for all things read in during this execution session
         MTRoot root = new MTRoot(null);
 
-        boolean      createECDirectory = cmdLineParser.createECDirectory;
         List<String> sourceFilenames   = new ArrayList<>();
         String       configurationName = cmdLineParser.configurationName;
 
@@ -201,11 +200,6 @@ public class EntityCompiler {
             sourceFilenames.addAll(cmdLineParser.sourceFileNames);
         }
 
-        // entity compiler project directory (to keep track of things related to running the compiler for this project)
-        ECSessionManager.getInstance().setProjectBaseDirPath(".");
-        if (createECDirectory) {
-            ECSessionManager.getInstance().setCreateIfDoesntExist(true);
-        }
         ECSessionManager.getInstance().start();
 
         // get all filenames passed on command line and parse those files

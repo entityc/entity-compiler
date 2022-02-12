@@ -18,7 +18,6 @@ public class ECSessionManager {
     private static final ECSessionManager            instance              = new ECSessionManager();
     private final        Map<String, ECSessionFiles> sessionsByName        = new HashMap<>();
     private              String                      projectBaseDirPath; // the directory with the .ec directory in it
-    private              String                      cwdPath;
     private              File                        ecSessionsDirectory;
     private              boolean                     createIfDoesntExist   = false;
 
@@ -47,42 +46,37 @@ public class ECSessionManager {
 
     public void start() {
         if (projectBaseDirPath == null) {
-            projectBaseDirPath = ".";
-        }
-        File    cwd   = new File(projectBaseDirPath);
-        boolean found = false;
-        try {
-            this.cwdPath = cwd.getCanonicalPath();
-            found = findECDirectory(this.cwdPath);
-        } catch (IOException e) {
-            found = false;
-        }
-        if (!found) {
-            if (!createIfDoesntExist) {
-                ECLog.logFatal("Unable to locate the project base directory. Ensure the compiler is invoked inside the project directory structure.");
+            try {
+                String invocationDirectory = new File(".").getCanonicalPath();
+                projectBaseDirPath = findECDirectory(invocationDirectory);
+                if (projectBaseDirPath == null) {
+                    projectBaseDirPath = invocationDirectory;
+                }
+            } catch (IOException e) {
+                ECLog.logFatal("Unable to locate current working directory");
             }
         }
 
         if (ecSessionsDirectory == null) {
-            ecSessionsDirectory = new File(projectBaseDirPath + File.separator + ECDirectoryName + File.separator + SessionsDirectoryName);
+            ecSessionsDirectory = new File(
+                    projectBaseDirPath + File.separator + ECDirectoryName + File.separator + SessionsDirectoryName);
         }
         ecSessionsDirectory.mkdirs();
     }
 
-    private boolean findECDirectory(String fromHerePath) {
+    private String findECDirectory(String fromHerePath) {
         if (fromHerePath.equals(File.separator)) {
-            return false; // can't go up any more
+            return null; // can't go up any more
         }
         File ecDirectory = new File(fromHerePath + File.separator + ECDirectoryName);
         if (ecDirectory.exists()) {
-            this.projectBaseDirPath = fromHerePath;
-            return true;
+            return fromHerePath;
         }
         File parentDirectory = new File(fromHerePath + File.separator + "..");
         try {
             return findECDirectory(parentDirectory.getCanonicalPath());
         } catch (IOException e) {
-            return false;
+            return null;
         }
     }
 

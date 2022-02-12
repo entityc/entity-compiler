@@ -29,7 +29,6 @@ class CommandLineParser {
     public        boolean             deleteSchema         = false;
     public        String              configurationName;
     public        List<String>        templateSearchPaths  = new ArrayList<>();
-    public        boolean             createECDirectory    = false;
     public        String              templateToFormat;
     public        String              templateToFormatInPath;
     public        String              templateToFormatOutPath;
@@ -69,10 +68,6 @@ class CommandLineParser {
 
             if ((arg.equals("-c") || arg.equals("-config") || arg.equals("--config")) && index < args.length) {
                 configurationName = args[index++];
-            }
-
-            if (arg.equals("-i") || arg.equals("-init") || arg.equals("--init")) {
-                createECDirectory = true;
             }
 
             if (arg.equals("-tp") && index < args.length) {
