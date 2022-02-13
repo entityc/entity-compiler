@@ -134,6 +134,7 @@ Here is the full list of filters:
 | [`reverse`](#filter_detail_reverse) | Given a collection of objects, this will return a collection that has the reverse order of the input. |
 | [`sort`](#filter_detail_sort) | Given a collection of objects, this will return a collection that is sorted by name. This is useful when generating code that is consistent each time in terms of the order of objects in the output. |
 | [`title`](#filter_detail_title) | Given a string of words in camel case format, this will capitalize each word in the string except those words that are typically not capitalized in a title (such as 'of', 'the'. 'and', etc.). |
+| [`trim`](#filter_detail_trim) | Removes white space from both ends of the input string. |
 | [`type`](#filter_detail_type) | Filters attribute lists optionally by its type (only array/single type supported currently). |
 | [`uncapitalize`](#filter_detail_uncapitalize) | Uncapitalizes the input string - that is, it forces the first character to be lowercase. |
 | [`uppercase`](#filter_detail_uppercase) | Forces all characters of the input to be uppercase. |
@@ -488,6 +489,20 @@ Valid inputs for this filter are:
 |---|---|
 | `String` | The string representation of some type of identifier or name that us using camel case to combine words without spaces. |
 | `MTNamed` | Any class that has a `name` property or `getName()` method. |
+
+<hr/>
+
+<a name="filter_detail_trim">
+##### Filter: `trim`
+</a>
+
+Removes white space from both ends of the input string.
+
+Valid inputs for this filter are:
+
+| Class of Valid Input | Description |
+|---|---|
+| `String` | The string you want to trim. |
 
 <hr/>
 
