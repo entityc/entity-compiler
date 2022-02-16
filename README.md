@@ -35,8 +35,8 @@ The best way to understand how the Entity Compiler works is to check out the [tu
 
 |Tutorial|Description|
 | ------	| ---------	|
-| [Entity Compiler](https://github.com/entityc/ec-tutorials/EntityCompiler) | Gives you the basics of the Entity Compiler, both its entity language and template engine. |
-| [Tutorial Microservice](https://github.com/entityc/ec-tutorials/TutorialMicroservice) | Demonstrates the potential of the Entity Compiler by building an entire microservice along with an Web Admin Console and student website.|
+| [Entity Compiler](https://github.com/entityc/ec-tutorials/tree/main/EntityCompiler) | Gives you the basics of the Entity Compiler, both its entity language and template engine. |
+| [Tutorial Microservice](https://github.com/entityc/ec-tutorials/tree/main/TutorialMicroservice) | Demonstrates the potential of the Entity Compiler by building an entire microservice along with an Web Admin Console and student website.|
 
 ## Libraries
 
