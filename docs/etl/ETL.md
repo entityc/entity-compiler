@@ -146,9 +146,8 @@ For the filters that have a parameter or options, they are given a subsection be
 
 <hr/>
 
-<a name="filter_detail_append">
+<a name="filter_detail_append"></a>
 ##### Filter: `append`
-</a>
 
 Appends two lists together to form a new list.
 
@@ -175,9 +174,8 @@ This filter has the following parameters:
 
 <hr/>
 
-<a name="filter_detail_capitalize">
+<a name="filter_detail_capitalize"></a>
 ##### Filter: `capitalize`
-</a>
 
 Capitalizes the input string - that is, it forces the first character to be uppercase.
 
@@ -189,9 +187,8 @@ Valid inputs for this filter are:
 
 <hr/>
 
-<a name="filter_detail_dashes">
+<a name="filter_detail_dashes"></a>
 ##### Filter: `dashes`
-</a>
 
 Converts a string using the camel case to represent words to a string that uses the dash character as a separator between words. For instance, the string "EntityCompiler" would convert to "Entity-Compiler". This is often followed with the "lowercase" when used tocreate part of a URL path.
 
@@ -203,9 +200,8 @@ Valid inputs for this filter are:
 
 <hr/>
 
-<a name="filter_detail_domain">
+<a name="filter_detail_domain"></a>
 ##### Filter: `domain`
-</a>
 
 Allows you to convert a model element (such as an entity or attribute) into a domain-specific version of that element. The domain-specific element can have altered properties such as a different name or different tags. For convenience this filter can also accept domain specific elements in which case it effectively replaces the domain with the specified one.
 
@@ -238,9 +234,8 @@ This filter has the following parameters:
 
 <hr/>
 
-<a name="filter_detail_fullname">
+<a name="filter_detail_fullname"></a>
 ##### Filter: `fullname`
-</a>
 
 When the input is an domain-based entity, it will combine the namespace of the domain with the name of the entity in that domain to form a period based full name (e.g., `com.example.model.Widget`). This can be useful for construction a Java import statement, for instance.
 
@@ -258,9 +253,8 @@ This filter has the following parameters:
 
 <hr/>
 
-<a name="filter_detail_has">
+<a name="filter_detail_has"></a>
 ##### Filter: `has`
-</a>
 
 deprecated
 
@@ -282,9 +276,8 @@ The following options are available:
 
 <hr/>
 
-<a name="filter_detail_join">
+<a name="filter_detail_join"></a>
 ##### Filter: `join`
-</a>
 
 Given a multiline string, it joins all lines into one (replacing all carriage returns with a space).
 
@@ -296,9 +289,8 @@ Valid inputs for this filter are:
 
 <hr/>
 
-<a name="filter_detail_json">
+<a name="filter_detail_json"></a>
 ##### Filter: `json`
-</a>
 
 This is used on an entity object that you want to convert into a JSON string. For attribute values it will randomly generate based on their type. This is currently only used when generating Postman configuration files to provide a sample POST body.
 
@@ -320,9 +312,8 @@ The following options are available:
 
 <hr/>
 
-<a name="filter_detail_language">
+<a name="filter_detail_language"></a>
 ##### Filter: `language`
-</a>
 
 Using this filter allows the template to remain agnostic to the syntax of the language for which they are generating code. For instance, if you feed in a type object, it will use the language assigned to the template and look up the keyword for the type in that language. For instance, if the type is `string` and the language is `java`, it would output `String`.
 
@@ -352,9 +343,8 @@ The following options are available:
 
 <hr/>
 
-<a name="filter_detail_lowercase">
+<a name="filter_detail_lowercase"></a>
 ##### Filter: `lowercase`
-</a>
 
 Forces all characters of the input to be lowercase.
 
@@ -366,9 +356,8 @@ Valid inputs for this filter are:
 
 <hr/>
 
-<a name="filter_detail_map">
+<a name="filter_detail_map"></a>
 ##### Filter: `map`
-</a>
 
 This filter is probably the most complicated one but can be very powerful in helping to pattern match an expression at its input with one provided as a parameter. When the expressions match, it not only returns true but also maps operands from the input expression to the parameter expression.
 
@@ -386,9 +375,8 @@ This filter has the following parameters:
 
 <hr/>
 
-<a name="filter_detail_name">
+<a name="filter_detail_name"></a>
 ##### Filter: `name`
-</a>
 
 This simply calls `getName()` on the input. It is more of a convenient way to get the name by using a filter.
 
@@ -400,9 +388,8 @@ Valid inputs for this filter are:
 
 <hr/>
 
-<a name="filter_detail_path">
+<a name="filter_detail_path"></a>
 ##### Filter: `path`
-</a>
 
 This will convert a string or namespace object into a string where by a '/' character is used as a delimiter instead of a '.'. This is useful when you need to convert a namespace into a filepath.
 
@@ -415,9 +402,8 @@ Valid inputs for this filter are:
 
 <hr/>
 
-<a name="filter_detail_plural">
+<a name="filter_detail_plural"></a>
 ##### Filter: `plural`
-</a>
 
 This will attempt to pluralize the last word of the input string. If it can't determine the pluralization it may just return the same string.
 
@@ -429,9 +415,8 @@ Valid inputs for this filter are:
 
 <hr/>
 
-<a name="filter_detail_reverse">
+<a name="filter_detail_reverse"></a>
 ##### Filter: `reverse`
-</a>
 
 Given a collection of objects, this will return a collection that has the reverse order of the input.
 
@@ -452,9 +437,8 @@ Valid inputs for this filter are:
 
 <hr/>
 
-<a name="filter_detail_sort">
+<a name="filter_detail_sort"></a>
 ##### Filter: `sort`
-</a>
 
 Given a collection of objects, this will return a collection that is sorted by name. This is useful when generating code that is consistent each time in terms of the order of objects in the output.
 
@@ -477,9 +461,8 @@ Valid inputs for this filter are:
 
 <hr/>
 
-<a name="filter_detail_title">
+<a name="filter_detail_title"></a>
 ##### Filter: `title`
-</a>
 
 Given a string of words in camel case format, this will capitalize each word in the string except those words that are typically not capitalized in a title (such as 'of', 'the'. 'and', etc.).
 
@@ -492,9 +475,8 @@ Valid inputs for this filter are:
 
 <hr/>
 
-<a name="filter_detail_trim">
+<a name="filter_detail_trim"></a>
 ##### Filter: `trim`
-</a>
 
 Removes white space from both ends of the input string.
 
@@ -506,9 +488,8 @@ Valid inputs for this filter are:
 
 <hr/>
 
-<a name="filter_detail_type">
+<a name="filter_detail_type"></a>
 ##### Filter: `type`
-</a>
 
 Filters attribute lists optionally by its type (only array/single type supported currently).
 
@@ -529,9 +510,8 @@ The following options are available:
 
 <hr/>
 
-<a name="filter_detail_uncapitalize">
+<a name="filter_detail_uncapitalize"></a>
 ##### Filter: `uncapitalize`
-</a>
 
 Uncapitalizes the input string - that is, it forces the first character to be lowercase.
 
@@ -543,9 +523,8 @@ Valid inputs for this filter are:
 
 <hr/>
 
-<a name="filter_detail_uppercase">
+<a name="filter_detail_uppercase"></a>
 ##### Filter: `uppercase`
-</a>
 
 Forces all characters of the input to be uppercase.
 
@@ -557,9 +536,8 @@ Valid inputs for this filter are:
 
 <hr/>
 
-<a name="filter_detail_view">
+<a name="filter_detail_view"></a>
 ##### Filter: `view`
-</a>
 
 Given a domain entity and the name of a view, this will return the view object.
 
@@ -577,9 +555,8 @@ This filter has the following parameters:
 
 <hr/>
 
-<a name="filter_detail_words">
+<a name="filter_detail_words"></a>
 ##### Filter: `words`
-</a>
 
 Given a string of words in camel case format, this will simply break up the words using a space character as a delimiter and does not change upper or lower case.
 
@@ -591,9 +568,8 @@ Valid inputs for this filter are:
 
 <hr/>
 
-<a name="filter_detail_wrap">
+<a name="filter_detail_wrap"></a>
 ##### Filter: `wrap`
-</a>
 
 Given a sentence or paragraph string and an optional line width, this will perform a word wrap of the string to the output. You can optionally provide a line prefix (such as a line comment designator). The column position of the first line is used as the starting column position of each wrapped line of text.
 

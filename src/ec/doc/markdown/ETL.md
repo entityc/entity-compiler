@@ -129,9 +129,8 @@ For the filters that have a parameter or options, they are given a subsection be
 $[foreach filter in manager.filters()]
 <hr/>
 
-<a name="filter_detail_${filter.name}">
+<a name="filter_detail_${filter.name}"></a>
 ##### Filter: `${filter.name}`
-</a>
 
 ${filter.description}
 
