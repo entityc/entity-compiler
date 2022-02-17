@@ -1,150 +1,42 @@
-$[D summary,main "This template contains the author that is responsible for generating the create object service methods."]
-$[D "**Create**"]
-$[D ""]
-$[D "The create method is called by create endpoints implemented in the controller class. This method"]
-$[D "in turn calls a create method in the repository class however before that it will assign"]
-$[D "a UUID primary key. This is also where it places some of the in-memory caching code. It will"]
-$[D "also set relationships associated with the logged in (principle) user."]
+$[log]
+$[foreach typedef in space.typedefs]
 
-$[D summary, main "Generates the Spring Boot Service classes for all entities in your project space."]
-$[D main, summary ""]
-$[D main, summary "Generates the Spring Boot Service classes for all entities in your project space."]
-$[D "
-When your application involves release and version management of some entity, this template has functions that can be useful. The template is centered around the support of a particular structure of entities that have specific relationships between eachother.
-
-The entities involved in the pattern shown below are as follows:
-
-| Entity | Description |
-|:------:|-------------|
-| O  | **Object** - This is the main entity you are trying to manage in terms of versioning and release management. For instance, lets say your entity is called Widget. This would be the non-versioned Widget.|
-| V  | **Version** - This represents a entity that tracks versions of the O entity. It would have attributes that need to be under version control. In our example, this would be a version of a Widget so might be named WidgetVersion.|
-| VR | **Version Release** - This entity binds our O and V entities to a release. So  |
-| R  | **Release** - This represents a release of one or more O,V pairs. |
-| P  | **Parent** - This is an *optional* entity that defines a context for the R entity (as a parent entity to it). |
-
-
-```
-    +-------+    +-------+      +--------+        +-------+          +-------+
-    |   P   +---<|   R   +-----<|   VR   |>-------+   V   |>---------+   O   |>--+
-    +----+--+    +-------+      +--------+        +-------+          +----+--+   |
-         |                            Y                                   |      |
-         |                            +-----------------------------------+      |
-         +-----------------------------------------------------------------------+
-Tag->           release:top    release:binder    release:version    release:object
-
-```
-
-These functions help support the detection of this pattern not just in terms of the tags but also the relationships between the entities.
-"
-]
-$[D "easily expanded to support many other features."]
-$[let something = !otherthing]
-        $[capture parentId]${relationship|domain: Model|wrap:("hello") cache blah:"asdf"}Id$[/capture]
-package ${domain.namespace};
-
-$[receive distinct imports]
-
-$[import "service/authors/ServiceBaseAuthor"]
-$[import "service/authors/ServiceCRUDAuthors"]
-$[*import "service/authors/ServiceCacheAuthor"*]
-$[import "service/authors/ServiceUploadAuthor"]
-
-$[foreach space.modules]
-${module.name} is one of the modules.
+Typedef: ${typedef.name}
 $[/foreach]
+$[foreach enum in space.enums]
 
-$[function abc D "this is a description of this function" (argument1 D "description for arg 1 that can be pretty long because it has a lot to say about this argument for some reason so it just keeps rambling on and on aobut it.", argument2 D "another description this time for arg 2")]
-$[/function]
+Enum: ${enum.name}
+$[/foreach]
+$[foreach entity in space.entities]
 
-$[function xyz
-  D main, summary "this is a description of this function"
-  (argumentA D "description for arg 1 that can be pretty long because it has a lot to say about this argument for some reason so it just keeps rambling on and on aobut it.",argumentHLM D "another description this time for arg 2"
-  )
-]
-$[/function]
-$[call xyz ( argumentA:"",  argumentHLM:5 )]
-
-$[publisher org.entitycompiler.springboot.service
-  D "This publisher ultimately builds the Service classes for the Spring Boot application but it relies on many"
-  D "authors to fill it out with methods required to implement the application."
-]
-$[language java]
-$[domain Service]
-$[switch track]
-  $[case justin]laskdjf;askljdf
-  $[case hard] qwerqwer
-  $[default]do this
+$[let qualifier = entity.isSecondary ? "Secondary " : ""]
+${qualifier}Entity: ${entity.name}
+$[foreach attribute in entity.attributes]
+$[switch attribute.type]
+$[case uuid]
+$[let typeLongName="Unique Identifier - 128 bits"]
+$[case int32]
+$[let typeLongName="32-bit Integer"]
+$[case int64]
+$[let typeLongName="64-bit Integer"]
+$[case float]
+$[let typeLongName="32-bit Floating Point"]
+$[case double]
+$[let typeLongName="64-bit Floating Point"]
+$[case string]
+$[let typeLongName="String of characters"]
+$[case enum]
+$[let typeLongName="Enum named " + attribute.type.name]
+$[case typedef]
+$[let typeLongName="Typedef named " + attribute.type.name]
+$[case entity]
+$[let typeLongName="Entity named " + attribute.type.name]
+$[default]
+$[let typeLongName="Unknown"]
 $[/switch]
-$[foreach module in space.modules]
-  $[if module.isIncluded]$[continue]$[/if]
-  $[outlet moduleLoopTop
-  D "This is just inside the module foreach. An author could use this to filter out modules, for instance."]
-$[/outlet]
-  $[foreach module.entities as entity]
-    $[if !(entity.isSecondary     || entity.isImplicit|| entity.isExtern || entity.isTransient)+5*(4+xyz*efv)]xx$[continue]$[/if]
-    $[outlet entityLoopTop
-    D "This is just inside the entity foreach. An author could use this to filter out entities, for instance."]
-    $[/outlet]
-    $[file domain.namespace|path entity|domain|name "java"]
-$[outlet commentHeader
-D "This outlet simply allows you to place comments at the top of the source file."
-]$[/outlet]
-
-$[foreach ab in bc]
-    ${ab.name}dude$[let this=that]wer
+  Attribute
+    Name: ${attribute.name}
+    Type: ${typeLongName}
 $[/foreach]
-
-package ${domain.namespace};
-
-$[receive distinct imports D "This will receive Java import statements."]
-$[send imports]
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
-$[/send]
-
-@Service
-@Transactional
-$[outlet classAnnotation
-D "This allows an author to add an annotation to the class definition."
-]$[/outlet]
-public class ${className} {
-
-$[receive distinct memberDecl]
-$[receive distinct caches]
-
-$[outlet members
-D "This is the top section of the class where member variables typically are placed."
-]
-    // no members
-$[/outlet]
-
-$[outlet constructor
-D "The constructor outlet lets you replace the simple constructor with one that supports other functions such as"
-D "auto wired objects."
-]
-    public ${className}() {}
-$[/outlet]
-
-$[outlet methods
-D "This outlet is where authors place the build of generated code. Some of these authors may also be publishers"
-D "to give access to specific methods."
-]
-    // no methods
-$[/outlet]
-}
-    $[/file]
-  $[/foreach]
 $[/foreach]
-$[/publisher]
-$[file domain.namespace|path "README" "md"]
-# Service Classes
-
-The classes in this directory are Service classes as part of the Spring Framework.
-
-## Generated by
-
-Entity Compiler v${compiler.version}
-
-Template: `${template.name}`
-
-$[/file]
+$[/log]
