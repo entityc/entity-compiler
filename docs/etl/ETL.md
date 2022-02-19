@@ -67,8 +67,6 @@ For instance, you can use the `log` instruction as follows to surround template 
 	At this point the entity name is: ${entity.name}
 	$[/log]
 
-The rest of this section will briefly go through all the supported instructions. As instructions are described below, they will indicate whether or not they require an end-instruction tag in their usage.
-
 For a full list of instructions see: [Template Instructions](ETL_Instructions.md)
 
 ### Expressions
