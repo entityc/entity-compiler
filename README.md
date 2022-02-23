@@ -51,6 +51,10 @@ The following libraries are available that support the Entity Compiler. Each has
 
 Although many working microservices have been built using this compiler and its two template libraries, they are not quite ready for generating production level code. They should be considered Alpha level - not optimized for performance, low test coverage and not functionally complete. It is certainly at a level to play with and see the capability it provides in synthesizing code. For those who wish to develop their own template library you could achieve production quality that way, but you are encouraged to contribute with others on an open source library such as the two above.  
 
+## Building and Running
+
+The next release will include a Maven project file that will allow you to build. For now, the current Github release includes a `ec.jar` jar file. To run the compiler simply perform: `java -jar ec.jar` followed by arguments (for instance: `java -jar ec.jar -help`)
+
 ## Licensing
 
 All projects of the EntityC Organization are under the BSD 3-clause License.
