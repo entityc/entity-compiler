@@ -53,7 +53,20 @@ Although many working microservices have been built using this compiler and its 
 
 ## Building and Running
 
-The next release will include a Maven project file that will allow you to build. For now, the current Github release includes a `ec.jar` jar file. To run the compiler simply perform: `java -jar ec.jar` followed by arguments (for instance: `java -jar ec.jar -help`)
+> It is recommended to use version 3.6.0 or above of Maven (use `mvn --version` to get its version if it is already installed).
+
+This repository includes a Maven project file (`pom.xml`). This allows you to build the project and create an "executable" jar file. To do this, open a shell and go inside the repository's local directory (aka Project Directory) and run:
+
+    mvn clean package
+
+This will build the project and produce a directory called `target`. Inside this `target` directory there should be the built jar file `ec.jar`. You may want to move this jar file to a `bin` directory in your local account (such as `~/bin`), then also have a shell script in this `bin` directory that wraps this jar file to appear as a command line executable. For example, you could create a file called just `ec` (located in your `bin` directory) that looks like the following:
+
+```shell
+    #!/bin/sh
+    java -jar ~/bin/ec.jar $@
+```
+
+Then to run the compiler in a shell simply perform: `ec` followed by arguments (for instance: `ec -help`)
 
 ## Licensing
 
