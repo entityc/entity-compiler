@@ -1,6 +1,7 @@
 out
 entities/srcout
 schema
+target
 server/generated
 client/javaclient/generated/src
 client/javaclient/generated/target
@@ -11,3 +12,4 @@ client/zcios/ClubsProto
 server/clubs
 *.idea
 .ec
+*.iml
