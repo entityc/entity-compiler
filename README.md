@@ -66,6 +66,8 @@ This will build the project and produce a directory called `target`. Inside this
     java -jar ~/bin/ec.jar $@
 ```
 
+Of course, you will need to add your `bin` directory to your executable search path (e.g., `export PATH=$PATH:~/bin`).
+
 Then to run the compiler in a shell simply perform: `ec` followed by arguments (for instance: `ec -help`)
 
 ## Licensing
