@@ -129,7 +129,7 @@ public class TemplateTransform extends MTBaseTransform {
         parser.addErrorListener(errorListener);
         TemplateGrammer.TemplateContext templateContext = parser.template();
 
-        TemplateASTVisitor visitor = new TemplateASTVisitor(templateName, getConfiguration(), sourceRepositoryName, suppressImport);
+        TemplateASTVisitor visitor = new TemplateASTVisitor(templateName, getConfiguration(), root.getSpace().getRepositoryByName(sourceRepositoryName), suppressImport);
         template = (FTTemplate) visitor.visit(templateContext);
         template.setName(getName());
         template.processIndents(true);

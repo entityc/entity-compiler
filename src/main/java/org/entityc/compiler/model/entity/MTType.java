@@ -96,9 +96,15 @@ public class MTType extends MTNode {
     }
 
     @ModelMethod(category = ModelMethodCategory.TYPE,
-        description = "Indicates whether this type is one of the integer data types.")
+            description = "Indicates whether this type is one of the integer data types.")
     public boolean isIntegerType() {
         return isNativeDataType(MTNativeType.DataType.INT32) || isNativeDataType(MTNativeType.DataType.INT64);
+    }
+
+    @ModelMethod(category = ModelMethodCategory.TYPE,
+            description = "Indicates whether this type is one of the integer data types.")
+    public boolean isBooleanType() {
+        return isNativeDataType(MTNativeType.DataType.BOOLEAN);
     }
 
     public String getTypeAsCaseValue() {

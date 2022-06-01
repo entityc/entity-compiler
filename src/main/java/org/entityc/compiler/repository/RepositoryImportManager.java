@@ -41,6 +41,9 @@ public class RepositoryImportManager {
     }
 
     public RepositoryFile getRepositoryFileByName(String identifier) {
+        if (!repositoryFilesByIdentifier.containsKey(identifier)) {
+            ECLog.logWarning("Cannot find file import by identifier: " + identifier);
+        }
         return repositoryFilesByIdentifier.get(identifier);
     }
 
@@ -64,20 +67,21 @@ public class RepositoryImportManager {
             if (EntityCompiler.isVerbose()) {
                 ECLog.logInfo("Found file already in cache: " + cacheRepositoryFile.getFilepath());
             }
-            addRepositoryFile(cacheRepositoryFile);
+            addRepositoryFile(repositoryImport.getIdentifier(), cacheRepositoryFile);
             return cacheRepositoryFile;
         }
         RepositoryFile file = importersByType.get(repository.getType()).importFromRepository(repository, repositoryImport, cacheRepositoryFile, extension);
         if (file == null || !file.exists()) {
-            ECLog.logFatal("Unable to import file: " + repositoryName + "/" + repositoryImport.getFilename() + "." + extension);
+            String nameOrPath = repository.getType() == MTRepositoryType.LOCAL ? repository.getPath() : repositoryName;
+            ECLog.logFatal("Unable to import " + repository.getType() + " file: " + nameOrPath + "/" + filename);
         }
-        addRepositoryFile(file);
+        addRepositoryFile(repositoryImport.getIdentifier(), file);
         return file;
     }
 
-    private void addRepositoryFile(RepositoryFile repositoryFile) {
+    private void addRepositoryFile(String identifier, RepositoryFile repositoryFile) {
         repositoryFilesInOrder.add(repositoryFile);
-        repositoryFilesByIdentifier.put(repositoryFile.getFilepath(), repositoryFile);
+        repositoryFilesByIdentifier.put(identifier, repositoryFile);
     }
 
     private String fileIdentifier(String repositoryName, String filename) {

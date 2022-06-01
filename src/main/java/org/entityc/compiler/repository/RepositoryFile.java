@@ -7,6 +7,8 @@
 package org.entityc.compiler.repository;
 
 import org.entityc.compiler.model.config.MTRepository;
+import org.entityc.compiler.model.config.MTRepositoryType;
+import org.entityc.compiler.util.ECLog;
 
 import java.io.File;
 
@@ -42,6 +44,10 @@ public class RepositoryFile {
 
     public boolean exists() {
         File checkFile = new File(filepath);
-        return checkFile.exists();
+        boolean exists = checkFile.exists();
+        if (!exists && repository.getType() == MTRepositoryType.LOCAL) {
+            ECLog.logWarning("File doesn't exist: " + filepath);
+        }
+        return exists;
     }
 }

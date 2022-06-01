@@ -112,7 +112,7 @@ public class FTForeach extends FTContainerNode {
         // convert expression to a type of list
         Object forValue = collectionExpression.getValue(session);
         if (forValue == null) {
-            ECLog.logFatal(this, "Unable to evaluate 'foreach' expression: " + collectionExpression);
+            ECLog.logFatal(this, "Unable to evaluate 'foreach' expression: " + collectionExpression + " because it evaluates to null.");
         }
         if (forValue instanceof MFArray) {
             forValue = ((MFArray) forValue).getValues();

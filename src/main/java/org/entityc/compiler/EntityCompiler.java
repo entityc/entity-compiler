@@ -100,8 +100,8 @@ class LogHandler extends Handler {
 
 public class EntityCompiler {
 
-    public static final  String            COMPILER_VERSION = "0.12.0";
-    public static final  String            LANGUAGE_VERSION = "0.12.0";
+    public static final  String            COMPILER_VERSION = "0.12.2";
+    public static final  String            LANGUAGE_VERSION = "0.12.2";
     private static       CommandLineParser cmdLineParser;
 
     public static final List<String> GetTemplateSearchPaths() {
@@ -308,6 +308,9 @@ public class EntityCompiler {
         for (MTTransform transformSpec : configuration.getTransforms()) {
             if (transformSpec.isTemplate()) {
                 MTTemplate     template = (MTTemplate) transformSpec;
+                if (cmdLineParser.templateToRun != null && !template.getName().equals(cmdLineParser.templateToRun)) {
+                    continue;
+                }
                 RepositoryFile repositoryFile;
                 String         templateFilename;
                 if (template.getRepositoryImport() != null) {
@@ -456,7 +459,7 @@ public class EntityCompiler {
                 }
             }
         }
-
+        // PROTOBUF COMPILER
         for (MTProtoc protoc : configuration.getProtocs()) {
 
             String languageOption = null;

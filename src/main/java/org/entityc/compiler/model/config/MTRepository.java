@@ -55,14 +55,12 @@ public class MTRepository extends MTNode {
         if (tagDelimIndex == -1) {
             ECLog.logFatal("You need to specify a tag at the end of the setup URI.");
         }
-        tag      = setupUri.substring(tagDelimIndex + 1);
-        setupUri = setupUri.substring(0, tagDelimIndex);
         Integer secondPathDelimIndex = setupUri.indexOf("/", firstPathDelimIndex + 1);
         boolean hasNoPath            = secondPathDelimIndex == -1;
-        if (hasNoPath) {
-            secondPathDelimIndex = setupUri.length();
-        }
-        repoName = setupUri.substring(firstPathDelimIndex + 1, secondPathDelimIndex);
+        tag      = setupUri.substring(tagDelimIndex + 1, hasNoPath ?
+                                                         setupUri.length() :
+                                                         secondPathDelimIndex);
+        repoName = setupUri.substring(firstPathDelimIndex + 1, tagDelimIndex);
         path     = "";
         if (!hasNoPath) {
             path = setupUri.substring(secondPathDelimIndex + 1);
@@ -186,5 +184,30 @@ public class MTRepository extends MTNode {
                 addTemplatePath(templateName, content.getPath());
             }
         }
+    }
+
+    public String getUri() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("[");
+        builder.append(name);
+        builder.append("]");
+        builder.append(type.getName());
+        builder.append(":");
+        if (organization != null) {
+            builder.append(organization);
+            builder.append("/");
+        }
+        if (repoName != null) {
+            builder.append(repoName);
+            builder.append("/");
+        }
+        if (path != null) {
+            builder.append(path);
+        }
+        if (tag != null) {
+            builder.append("#");
+            builder.append(tag);
+        }
+        return builder.toString();
     }
 }

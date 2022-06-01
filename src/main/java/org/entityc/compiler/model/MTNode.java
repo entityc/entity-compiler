@@ -225,6 +225,7 @@ public abstract class MTNode extends MFObject {
             if (tagValues.get(tag) != null) {
                 tagWithValue.add((String)tagValues.get(tag));
             }
+            tagList.add(tagWithValue);
         }
         return tagList;
     }
