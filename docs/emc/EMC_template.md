@@ -195,13 +195,13 @@ Returns all outlets of this publisher in order of declaration.
 
 <hr/>
 
-#### `List outletsByName(String outletName)`
+#### `List outletsByName(String arg0)`
 
 Returns an outlet of this publisher by name.
 
 | Parameter | Description |
 |-----|-----|
-|`String outletName` | The name of the outlet to return. |
+|`String arg0` | The name of the outlet to return. |
 
 
 
@@ -241,13 +241,13 @@ These methods relate to functions.
 
 <hr/>
 
-#### `FTFunction functionWithName(String functionName)`
+#### `FTFunction functionWithName(String arg0)`
 
 Returns the function by the specified name. This function must be declared in this template.
 
 | Parameter | Description |
 |-----|-----|
-|`String functionName` | The name of the function to return. |
+|`String arg0` | The name of the function to return. |
 
 <hr/>
 
@@ -257,13 +257,13 @@ Returns all the functions declared in this template.
 
 <hr/>
 
-#### `boolean hasFunctionWithName(String functionName)`
+#### `boolean hasFunctionWithName(String arg0)`
 
 Indicates whether this template has a function by the specified name.
 
 | Parameter | Description |
 |-----|-----|
-|`String functionName` | The name of the function to check. |
+|`String arg0` | The name of the function to check. |
 
 <hr/>
 

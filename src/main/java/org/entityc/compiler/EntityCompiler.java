@@ -308,6 +308,9 @@ public class EntityCompiler {
         for (MTTransform transformSpec : configuration.getTransforms()) {
             if (transformSpec.isTemplate()) {
                 MTTemplate     template = (MTTemplate) transformSpec;
+                if (cmdLineParser.templateToRun != null && !template.getName().equals(cmdLineParser.templateToRun)) {
+                    continue;
+                }
                 RepositoryFile repositoryFile;
                 String         templateFilename;
                 if (template.getRepositoryImport() != null) {
@@ -456,7 +459,7 @@ public class EntityCompiler {
                 }
             }
         }
-
+        // PROTOBUF COMPILER
         for (MTProtoc protoc : configuration.getProtocs()) {
 
             String languageOption = null;

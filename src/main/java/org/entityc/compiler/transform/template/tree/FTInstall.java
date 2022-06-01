@@ -92,7 +92,7 @@ public class FTInstall extends FTNode {
         }
         Object destFilepathObject = destNamespaceExpression.getValue(session);
         if (!(destFilepathObject instanceof String)) {
-            ECLog.logFatal("Destination expression of install instruction must resolve to a string value.");
+            ECLog.logFatal(this, "Destination expression of install instruction must resolve to a string value.");
         }
         String destFilepath   = (String) destFilepathObject;
         String sourceFilePath = ((FTConstant) sourceExpression).getStringValue();
@@ -103,13 +103,13 @@ public class FTInstall extends FTNode {
         }
 
         if (sourceRepositoryName == null) {
-            ECLog.logFatal("Cannot install files without an associated Repository.");
+            ECLog.logFatal(this, "Cannot install files without an associated Repository.");
         }
 
         MTRepository repository = session.getConfiguration().getSpace().getRepositoryByName(sourceRepositoryName);
 
         if (repository == null) {
-            ECLog.logFatal("Unable to find repository: " + sourceRepositoryName);
+            ECLog.logFatal(this, "Unable to find repository: " + sourceRepositoryName);
         }
 
         //ECLog.logInfo("Full relative path for install source file: " + repository.getPath() + "/" + sourceFilePath);
@@ -186,7 +186,7 @@ public class FTInstall extends FTNode {
                 ftFile.open(session);
                 FileUtils.copyFile(fileToInstall, new File(ftFile.getFullFilePath()));
             } catch (IOException e) {
-                ECLog.logFatal("Unable to copy file \"" + fileToInstall.getName() + "\" in install.");
+                ECLog.logFatal(this, "Unable to copy file \"" + fileToInstall.getName() + "\" in install.");
             }
             return;
         }

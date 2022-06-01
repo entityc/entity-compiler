@@ -15,6 +15,7 @@ import org.entityc.compiler.doc.annotation.ModelMethodCategory;
 import org.entityc.compiler.doc.annotation.ModelMethodParameter;
 import org.entityc.compiler.model.MTCodeFormat;
 import org.entityc.compiler.model.config.MTConfiguration;
+import org.entityc.compiler.model.config.MTRepository;
 import org.entityc.compiler.model.config.MTSpace;
 import org.entityc.compiler.model.domain.MTDomain;
 import org.entityc.compiler.model.domain.MTNamed;
@@ -39,42 +40,43 @@ import static org.entityc.compiler.transform.template.formatter.ConfigurableElem
  * The top most node of the template
  */
 @ModelClass(type = ModelClassType.TEMPLATE,
-    description = "Represents an actual template containing code to execute.")
+        description = "Represents an actual template containing code to execute.")
 public class FTTemplate extends FTContainerNode implements MTNamed {
 
-    private final List<FTFunction>         calledExternalFunctions = new ArrayList<>();
-    private final Map<String, FTPublisher> publishers              = new HashMap<>();
-    private final List<FTAuthor>           authors                 = new ArrayList<>();
-    private       String                   name;
-    private       ECVersion                version;
-    private       String                   language;
-    private       String                   defaultDomainName;
-    private       boolean                  imported;
-    private       List<String>             referencedDomainNames   = new ArrayList<>();
-    private       Map<String, FTFunction>  functionsByName         = new HashMap<>();
-    private       List<String>             referencedTags          = new ArrayList<>();
-    private       Set<FTTemplate>          importedTemplates       = new HashSet<>();
-    private       boolean                  hasOnlyFunctions        = false;
-    private static DocumentationManager documentationManager = new DocumentationManager();
+    private final  List<FTFunction>         calledExternalFunctions = new ArrayList<>();
+    private final  Map<String, FTPublisher> publishers              = new HashMap<>();
+    private final  List<FTAuthor>           authors                 = new ArrayList<>();
+    private        String                   name;
+    private        ECVersion                version;
+    private        String                   language;
+    private        String                   defaultDomainName;
+    private        boolean                  imported;
+    private        List<String>             referencedDomainNames   = new ArrayList<>();
+    private        Map<String, FTFunction>  functionsByName         = new HashMap<>();
+    private        List<String>             referencedTags          = new ArrayList<>();
+    private        Set<FTTemplate>          importedTemplates       = new HashSet<>();
+    private        boolean              hasOnlyFunctions        = false;
+    private        MTRepository         repository;
+    private static DocumentationManager documentationManager    = new DocumentationManager();
 
     public FTTemplate(ParserRuleContext ctx) {
         super(ctx, null);
     }
 
     @ModelMethod(category = ModelMethodCategory.AUTHOR,
-        description = "Returns the authors declared in this template.")
+            description = "Returns the authors declared in this template.")
     public List<FTAuthor> getAuthors() {
         return authors;
     }
 
     @ModelMethod(category = ModelMethodCategory.PUBLISHER,
-        description = "Indicates whether this template contains any publishers.")
+            description = "Indicates whether this template contains any publishers.")
     public boolean hasPublishers() {
         return !this.publishers.isEmpty();
     }
 
     @ModelMethod(category = ModelMethodCategory.PUBLISHER,
-        description = "Returns the publishers declared in this template.")
+            description = "Returns the publishers declared in this template.")
     public Collection<FTPublisher> getPublishers() {
         return publishers.values();
     }
@@ -88,25 +90,25 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
     }
 
     @ModelMethod(category = ModelMethodCategory.AUTHOR,
-        description = "Indicates whether this template contains any authors.")
+            description = "Indicates whether this template contains any authors.")
     public boolean hasAuthors() {
         return !this.authors.isEmpty();
     }
 
     @ModelMethod(category = ModelMethodCategory.TEMPLATE,
-        description = "Returns the templates that this template has imported.")
+            description = "Returns the templates that this template has imported.")
     public Set<FTTemplate> getImportedTemplates() {
         return importedTemplates;
     }
 
     @ModelMethod(category = ModelMethodCategory.TEMPLATE,
-        description = "Indicates whether this template has imported other templates.")
+            description = "Indicates whether this template has imported other templates.")
     public boolean hasImportedTemplates() {
         return importedTemplates.size() > 0;
     }
 
     @ModelMethod(category = ModelMethodCategory.FUNCTION,
-        description = "Indicates whether this template has only function definitions.")
+            description = "Indicates whether this template has only function definitions.")
     public boolean hasOnlyFunctions() {
         return hasOnlyFunctions;
     }
@@ -119,14 +121,15 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
     }
 
     @ModelMethod(category = ModelMethodCategory.TAGGING,
-        description = "Returns a list of tag names that are referenced by this template.")
+            description = "Returns a list of tag names that are referenced by this template.")
     public List<String> referencedTags() {
         return referencedTags;
     }
 
     @ModelMethod(category = ModelMethodCategory.TEMPLATE,
-        description = "Indicates whether this template object has been imported. If so it is likely in a list returned by "
-                      + "`importedTemplates`.")
+            description =
+                    "Indicates whether this template object has been imported. If so it is likely in a list returned by "
+                    + "`importedTemplates`.")
     public boolean isImported() {
         return imported;
     }
@@ -136,13 +139,13 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
     }
 
     @ModelMethod(category = ModelMethodCategory.FUNCTION,
-        description = "Indicates whether this template has at least one function definition.")
+            description = "Indicates whether this template has at least one function definition.")
     public boolean hasFunctions() {
         return !functionsByName.isEmpty();
     }
 
     @ModelMethod(category = ModelMethodCategory.DOMAIN,
-        description = "Returns the default domain name declared by this template.")
+            description = "Returns the default domain name declared by this template.")
     public String getDefaultDomainName() {
         return defaultDomainName;
     }
@@ -188,7 +191,7 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
 
     @Override
     @ModelMethod(category = ModelMethodCategory.TEMPLATE,
-        description = "Returns the name of this template.")
+            description = "Returns the name of this template.")
     public String getName() {
         return name;
     }
@@ -206,7 +209,7 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
     }
 
     @ModelMethod(category = ModelMethodCategory.LANGUAGE,
-        description = "Returns the name of the language defined by this template.")
+            description = "Returns the name of the language defined by this template.")
     public String getLanguage() {
         return language;
     }
@@ -216,19 +219,19 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
     }
 
     @ModelMethod(category = ModelMethodCategory.DOMAIN,
-        description = "Returns the names of all the domains referenced by this template (such as those by the domain filter).")
+            description = "Returns the names of all the domains referenced by this template (such as those by the domain filter).")
     public List<String> getReferencedDomainNames() {
         return referencedDomainNames;
     }
 
     @ModelMethod(category = ModelMethodCategory.TAGGING,
-        description = "Indicates whether this template makes reference to any tags.")
+            description = "Indicates whether this template makes reference to any tags.")
     public boolean hasReferencedTags() {
         return referencedTags.size() > 0;
     }
 
     @ModelMethod(category = ModelMethodCategory.DOMAIN,
-        description = "Indicates whether this template makes reference to any domains.")
+            description = "Indicates whether this template makes reference to any domains.")
     public boolean hasReferencedDomains() {
         return referencedDomainNames.size() > 0;
     }
@@ -253,9 +256,9 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
     }
 
     @ModelMethod(category = ModelMethodCategory.FUNCTION,
-        description = "Indicates whether this template has a function by the specified name.")
+            description = "Indicates whether this template has a function by the specified name.")
     public boolean hasFunctionWithName(
-        @ModelMethodParameter(description = "The name of the function to check.")
+            @ModelMethodParameter(description = "The name of the function to check.")
             String functionName) {
         if (functionsByName.containsKey(functionName)) {
             return true;
@@ -314,9 +317,9 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
     }
 
     @ModelMethod(category = ModelMethodCategory.FUNCTION,
-        description = "Returns the function by the specified name. This function must be declared in this template.")
+            description = "Returns the function by the specified name. This function must be declared in this template.")
     public FTFunction getFunctionWithName(
-        @ModelMethodParameter(description = "The name of the function to return.")
+            @ModelMethodParameter(description = "The name of the function to return.")
             String functionName) {
         FTFunction function = functionsByName.get(functionName);
         if (function == null) {
@@ -335,7 +338,7 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
     }
 
     @ModelMethod(category = ModelMethodCategory.FUNCTION,
-        description = "Returns all the functions declared in this template.")
+            description = "Returns all the functions declared in this template.")
     public Collection<FTFunction> getFunctions() {
         return functionsByName.values();
     }
@@ -347,5 +350,13 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
 
     public static int GetTemplateLexerSymbol() {
         return 0;
+    }
+
+    public void setRepository(MTRepository repository) {
+        this.repository = repository;
+    }
+
+    public MTRepository getRepository() {
+        return repository;
     }
 }

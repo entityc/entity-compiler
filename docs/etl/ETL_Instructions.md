@@ -49,7 +49,7 @@ This instruction will execute a piece of the template but instead of it going ou
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *variable* | `String` | The name of the variable you wish to be assigned with the captured string value. |
+| *arg2* | `String` | The name of the variable you wish to be assigned with the captured string value. |
 
 #### *template-block*
 
@@ -70,8 +70,8 @@ Assigns the resulting value after evaluating the provided *expression* to the pr
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *variable* | `String` | The variable to receive the assigned value. |
-| *expression* | `FTExpression` | The expression that will be evaluated. |
+| *arg1* | `String` | The variable to receive the assigned value. |
+| *arg2* | `FTExpression` | The expression that will be evaluated. |
 
 <a name="category_context"></a>
 ## Context
@@ -160,7 +160,7 @@ The `case` instruction is part of a `switch` instruction that provides a branch 
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *identifier* | `String` | An identifier that represents ... |
+| *arg2* | `String` | An identifier that represents ... |
 
 #### *template-block*
 
@@ -231,7 +231,7 @@ This instruction must be preceded by an `if` instruction. If the expression of t
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *expression* | `FTExpression` | The expression that is evaluated to determine whether to execute the template  code of this instruction. |
+| *arg2* | `FTExpression` | The expression that is evaluated to determine whether to execute the template  code of this instruction. |
 
 #### *template-block*
 
@@ -267,9 +267,9 @@ This usage iterates over the provided collection but also allows you to conditio
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *loopVariable* | `String` | The loop variable. Each iteration of the collection represented by the collection expression will be assigned to a variable by this name. |
-| *collectionExpression* | `FTExpression` | This is the expression that represents a collection through which to iterate. |
-| *conditionalExpression* | `FTExpression` | This expression allows you to conditionally include item by item in the collection. For each item in the collection, it will evaluate this expression. If it is `true` then that item is included in the collection, otherwise it is excluded. For this to work, this expression typically includes the loop variable but can in fact be any expression. |
+| *arg2* | `String` | The loop variable. Each iteration of the collection represented by the collection expression will be assigned to a variable by this name. |
+| *arg3* | `FTExpression` | This is the expression that represents a collection through which to iterate. |
+| *arg4* | `FTExpression` | This expression allows you to conditionally include item by item in the collection. For each item in the collection, it will evaluate this expression. If it is `true` then that item is included in the collection, otherwise it is excluded. For this to work, this expression typically includes the loop variable but can in fact be any expression. |
 
 #### *template-block*
 
@@ -290,7 +290,7 @@ This instruction evaluates the provided instruction and if it resolves to `true`
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *expression* | `FTExpression` | The expression that is evaluated to determine whether to execute the template code of this instruction. |
+| *arg2* | `FTExpression` | The expression that is evaluated to determine whether to execute the template code of this instruction. |
 
 #### *template-block*
 
@@ -314,7 +314,7 @@ This `switch` instruction works much like it does in most languages. The provide
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *expression* | `FTExpression` | The instruction evaluates this expression and branches to the matching case. |
+| *arg2* | `FTExpression` | The instruction evaluates this expression and branches to the matching case. |
 
 #### *template-block*
 
@@ -351,10 +351,10 @@ Defines a block of the template who's output will be directed to a specified fil
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| `ifdoesnotexist` | option | If specified, the file will only be written if it does not already exist. This would be used for files you want to initially setup for the user but after this initial setup, the user is expected to maintain the file. |
-| *pathExpression* | `FTExpression` | The path of the directory containing the destination file. This path is relative to the directory where the compiler was launched. |
-| *filenameExpression* | `FTExpression` | This is the filename for the output file. |
-| *extensionExpression* | `FTExpression` | This is the file extension for the output file. |
+| `arg2` | option | If specified, the file will only be written if it does not already exist. This would be used for files you want to initially setup for the user but after this initial setup, the user is expected to maintain the file. |
+| *arg3* | `FTExpression` | The path of the directory containing the destination file. This path is relative to the directory where the compiler was launched. |
+| *arg4* | `FTExpression` | This is the filename for the output file. |
+| *arg5* | `FTExpression` | This is the file extension for the output file. |
 
 #### *template-block*
 
@@ -375,8 +375,8 @@ You can import template files that simply contain function declarations so that 
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *templatePath* | `String` | The path to the template file relative to the current repository importer. |
-| *repositoryName* | `String` | This is an optional repository name when you want to import from a different repository than the current repository. |
+| *arg1* | `String` | The path to the template file relative to the current repository importer. |
+| *arg2* | `String` | This is an optional repository name when you want to import from a different repository than the current repository. |
 
 <hr/>
 
@@ -393,9 +393,9 @@ When setting up a project using files from a library, this instruction makes it 
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| `copy` | option | If specified, the file will be copied verbatim without trying to execute any template code. |
-| *sourceExpression* | `FTExpression` | Defines the path and filename with extension of the source file. The path is relative to the directory in which the template was configured. |
-| *destExpression* | `FTExpression` | Defines the destination path and directory name to copy the file into. The path is relative to the directory in which the template was configured. |
+| `arg1` | option | If specified, the file will be copied verbatim without trying to execute any template code. |
+| *arg2* | `FTExpression` | Defines the path and filename with extension of the source file. The path is relative to the directory in which the template was configured. |
+| *arg3* | `FTExpression` | Defines the destination path and directory name to copy the file into. The path is relative to the directory in which the template was configured. |
 
 <hr/>
 
@@ -412,10 +412,10 @@ This instruction is used to load specific types of data from a file that will al
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *type* | `Type` | One of a supported type of file to read. Only `proto` is supported at this time. |
-| *pathExpression* | `FTExpression` | The path of the directory containing the source file. This path is relative to the directory where the compiler was launched. |
-| *filenameExpression* | `FTExpression` | This is the filename of the input file. |
-| *extensionExpression* | `FTExpression` | This is the file extension of the input file. |
+| *arg1* | `Type` | One of a supported type of file to read. Only `proto` is supported at this time. |
+| *arg2* | `FTExpression` | The path of the directory containing the source file. This path is relative to the directory where the compiler was launched. |
+| *arg3* | `FTExpression` | This is the filename of the input file. |
+| *arg4* | `FTExpression` | This is the file extension of the input file. |
 
 <hr/>
 
@@ -432,7 +432,7 @@ This instruction is designed to help you debug a template by allowing you to sen
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *level* | `String` | The level can be used to classify the level of severity of the log output. The options are `info`, `debug`, `warning`, `error` and `fatal`. For the first three the only difference in the output is the prefix of each line which is the level name in all caps followed by `> `. For `error`, output is directed to system error. For `fatal`, output is also sent to system error but after the output, the compiler terminates, stopping any further execution of the template. |
+| *arg2* | `String` | The level can be used to classify the level of severity of the log output. The options are `info`, `debug`, `warning`, `error` and `fatal`. For the first three the only difference in the output is the prefix of each line which is the level name in all caps followed by `> `. For `error`, output is directed to system error. For `fatal`, output is also sent to system error but after the output, the compiler terminates, stopping any further execution of the template. |
 
 #### *template-block*
 
@@ -464,7 +464,7 @@ This instruction is used to call a function by its name and has the ability to m
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *functionName* | `String` | The name of the function to call. |
+| *arg1* | `String` | The name of the function to call. |
 
 #### See Also
 
@@ -484,9 +484,9 @@ The function instruction allows you to define a block of template code that you 
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *name* | `String` | The name of the function. |
-| *output* | `FTFunctionArgument` | An output argument of the function. |
-| *input* | `FTFunctionArgument` | An input argument of the function. |
+| *arg2* | `String` | The name of the function. |
+| *arg0* | `FTFunctionArgument` | An output argument of the function. |
+| *arg0* | `FTFunctionArgument` | An input argument of the function. |
 
 #### *template-block*
 
@@ -533,7 +533,7 @@ This instruction simply evaluates an expression. It is useful when the expressio
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *expression* | `FTExpression` | The expression you want to evaluate. |
+| *arg1* | `FTExpression` | The expression you want to evaluate. |
 
 <a name="category_movement"></a>
 ## Movement
@@ -560,8 +560,8 @@ Creates a receive point with a give name to where a `send` instruction can send 
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| `distinct` | option | An option that, if specified, will make sure that all lines of text that are sent to this receive point are distinct, that is, there are no duplicates. This is useful for a receive point for import statements since you don't want to duplicate them but you also don't want to complicate the send logic to avoid them. |
-| *name* | `String` | The name of the receive point. The `send` instruction will reference this name when sending code/text here. |
+| `arg1` | option | An option that, if specified, will make sure that all lines of text that are sent to this receive point are distinct, that is, there are no duplicates. This is useful for a receive point for import statements since you don't want to duplicate them but you also don't want to complicate the send logic to avoid them. |
+| *arg2* | `String` | The name of the receive point. The `send` instruction will reference this name when sending code/text here. |
 
 <hr/>
 
@@ -578,7 +578,7 @@ Sends its block of text to the specified receiver. This receiver must have been 
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *receiveName* | `String` | The name of the receiver (declared with a `receive` instruction) where the block of this instruction should be sent. |
+| *arg2* | `String` | The name of the receiver (declared with a `receive` instruction) where the block of this instruction should be sent. |
 
 #### *template-block*
 
@@ -610,10 +610,10 @@ The author instruction defines a block of template that you want to be inserted 
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *namespaces* | `Set` | One or more publisher namespaces (separated by a comma ',') to which the authoring should be performed. Any authoring options will be applied to all specified publisher namespaces. |
-| *outletName* | `String` | The name of the outlet to which you want to author this block of template. |
-| *phase* | `FTPublishPhase` | Sets the publishing phase when you want the authoring to occur. The default is the `Connect` phase. |
-| *scope* | `FTPublishScope` | Sets the publishing scope this code should execute within. The default is the `Author` scope. |
+| *arg4* | `Set` | One or more publisher namespaces (separated by a comma ',') to which the authoring should be performed. Any authoring options will be applied to all specified publisher namespaces. |
+| *arg5* | `String` | The name of the outlet to which you want to author this block of template. |
+| *arg6* | `FTPublishPhase` | Sets the publishing phase when you want the authoring to occur. The default is the `Connect` phase. |
+| *arg7* | `FTPublishScope` | Sets the publishing scope this code should execute within. The default is the `Author` scope. |
 
 #### *template-block*
 
@@ -634,7 +634,7 @@ Specifies an outlet inside a publisher. This will be a place where authors can s
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *name* | `String` | The name of the outlet. Authors will use this name along with that of its publisher's namespace to identify the outlet. |
+| *arg2* | `String` | The name of the outlet. Authors will use this name along with that of its publisher's namespace to identify the outlet. |
 
 #### *template-block*
 
@@ -655,7 +655,7 @@ This instruction allows you to establish a block of template code as a **publish
 
 | Argument | Type | Description |
 |----------|------|-------------|
-| *namespace* | `MTNamespace` | A publisher defines a namespace that is intended to be unique among all other publishers that an application developer would encounter. Using a **reverse domain name** at the start of this identifier would be best. |
+| *arg2* | `MTNamespace` | A publisher defines a namespace that is intended to be unique among all other publishers that an application developer would encounter. Using a **reverse domain name** at the start of this identifier would be best. |
 
 #### *template-block*
 

@@ -25,4 +25,8 @@ public enum MTRepositoryType {
         }
         return null;
     }
+
+    public String getName() {
+        return name;
+    }
 }

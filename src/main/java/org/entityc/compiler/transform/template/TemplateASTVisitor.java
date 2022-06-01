@@ -12,6 +12,7 @@ import org.entityc.compiler.EntityCompiler;
 import org.entityc.compiler.model.MTNamespace;
 import org.entityc.compiler.model.config.MTConfiguration;
 import org.entityc.compiler.model.config.MTFile;
+import org.entityc.compiler.model.config.MTRepository;
 import org.entityc.compiler.model.config.MTRepositoryImport;
 import org.entityc.compiler.repository.RepositoryCache;
 import org.entityc.compiler.repository.RepositoryFile;
@@ -79,7 +80,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
 
     private final Stack<Stack<FTContainerNode>> stacks      = new Stack<>();
     private final MTConfiguration               configuration;
-    private final String                        sourceRepositoryName;
+    private final MTRepository                  repository;
     private final String                        templateName;
     private final Stack<FTAuthor>               authorStack = new Stack<>();
     private       FTTemplate                    template;
@@ -90,18 +91,19 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         // cast
     }
 
-    public TemplateASTVisitor(String templateName, MTConfiguration configuration, String sourceRepositoryName, boolean suppressImport) {
+    public TemplateASTVisitor(String templateName, MTConfiguration configuration, MTRepository repository, boolean suppressImport) {
         super();
-        this.configuration        = configuration;
-        this.sourceRepositoryName = sourceRepositoryName;
-        this.templateName         = templateName;
-        this.suppressImport       = suppressImport;
+        this.configuration  = configuration;
+        this.repository     = repository;
+        this.templateName   = templateName;
+        this.suppressImport = suppressImport;
     }
 
     @Override
     public Object visitTemplate(TemplateGrammer.TemplateContext ctx) {
         template = new FTTemplate(ctx);
         template.setName(templateName);
+        template.setRepository(repository);
         push(template);
 
         for (TemplateGrammer.ChunkContext chunk : ctx.chunk()) {
@@ -114,8 +116,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         //System.out.println("PUSH: " + containerNode.getClass().getSimpleName());
         if (stacks.isEmpty()) {
             pushOnNewStack(containerNode);
-        }
-        else {
+        } else {
             topStack().push(containerNode);
         }
     }
@@ -180,8 +181,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
                 sb                   = new StringBuilder();
                 previousWasEndOfLine = true;
                 firstOtherOfLine     = null;
-            }
-            else {
+            } else {
                 sb.append(other.getText());
                 lastOtherOnLine = other;
             }
@@ -297,8 +297,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             for (TemplateGrammer.IdentifierContext identifierContext : ctx.identifier()) {
                 categories.add(identifierContext.getText());
             }
-        }
-        else {
+        } else {
             categories.add(FTDescription.DefaultCategory);
         }
 
@@ -319,7 +318,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         FTExpression sourceArg        = resolveFileArg(ctx.fileArg(0));
         FTExpression destNamespaceArg = resolveFileArg(ctx.fileArg(1));
         FTInstall    install          = new FTInstall(ctx, ctx.Copy() != null, sourceArg, destNamespaceArg);
-        install.setSourceRepositoryName(sourceRepositoryName);
+        install.setSourceRepositoryName(repository.getName());
         currentContainer(ctx).addChild(install);
         return install;
     }
@@ -383,8 +382,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         int    identifierIndex    = 0;
         if (ctx.STRING() != null) {
             templatePath = ECStringUtil.ProcessParserString(ctx.STRING().getText());
-        }
-        else if (ctx.identifier() != null) {
+        } else if (ctx.identifier() != null) {
             templatePath = ctx.identifier(0).getText();
             identifierIndex++;
         }
@@ -397,7 +395,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         currentContainer(ctx).addChild(ftImport);
 
         if (fromRepositoryName == null) {
-            fromRepositoryName = sourceRepositoryName;
+            fromRepositoryName = repository.getName();
         }
         if (this.suppressImport) {
             return null;
@@ -417,7 +415,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             File templateFile = TransformManager.FindTemplateFile(templateName + ".eml");
             if (templateFile == null) {
                 RepositoryImportManager importManager = new RepositoryImportManager(
-                    RepositoryCache.CacheStructure.UserCache);
+                        RepositoryCache.CacheStructure.UserCache);
                 MTRepositoryImport repositoryImport = new MTRepositoryImport(null, false);
                 repositoryImport.setRepositoryName(fromRepositoryName);
                 repositoryImport.setFilename(templatePath);
@@ -435,8 +433,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             currentContainer(ctx).resolveFunctionCalls(importedTemplate);
 
             return null;
-        }
-        else {
+        } else {
             if (EntityCompiler.isVerbose()) {
                 ECLog.logInfo(ctx, "Template already loaded: " + templateName);
             }
@@ -473,7 +470,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
 
         if (ctx.functionDeclArgList().size() > 0) {
             for (TemplateGrammer.FunctionDeclArgContext functionDeclArgContext : ctx.functionDeclArgList(
-                0).functionDeclArg()) {
+                    0).functionDeclArg()) {
                 FTFunctionArgument argument = new FTFunctionArgument(functionDeclArgContext,
                                                                      functionDeclArgContext.identifier().getText());
                 function.addInputArgument(argument);
@@ -485,7 +482,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             }
             if (ctx.functionDeclArgList().size() > 1) {
                 for (TemplateGrammer.FunctionDeclArgContext functionDeclArgContext : ctx.functionDeclArgList(
-                    1).functionDeclArg()) {
+                        1).functionDeclArg()) {
                     FTFunctionArgument argument = new FTFunctionArgument(functionDeclArgContext,
                                                                          functionDeclArgContext.identifier().getText());
                     function.addOutputArgument(argument);
@@ -511,8 +508,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             for (TemplateGrammer.IdentifierContext identifierContext : ctx.identifier()) {
                 categories.add(identifierContext.getText());
             }
-        }
-        else {
+        } else {
             categories.add(FTDescription.DefaultCategory);
         }
 
@@ -531,8 +527,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         FTCall call = null;
         if (function == null) {
             call = new FTCall(ctx, functionName);
-        }
-        else {
+        } else {
             call = new FTCall(ctx, function);
         }
         call.setExplicit(ctx.Explicit() != null);
@@ -580,8 +575,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
                     }
                     call.setInputArgValueExpression(argument.getName(), new FTOperand(ctx, argument.getName()));
                 }
-            }
-            else {
+            } else {
                 if (usedFunctionArgs.size() < ctx.inputCallArgList().callArg().size()) {
                     ECLog.logFatal(ctx, "The call with explicit arguments is missing some arguments.");
                 }
@@ -607,8 +601,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
                                     loopVariableName,
                                     collectionExpression,
                                     conditionalExpression);
-        }
-        else {
+        } else {
             foreach = new FTForeach(ctx, currentContainer(ctx),
                                     loopVariableName,
                                     collectionExpression);
@@ -633,12 +626,10 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             if (ctx.filterParamExpression() != null && ctx.filterParamExpression().identifier() != null) {
                 String param = ctx.filterParamExpression().identifier().getText();
                 filterExpression = new FTFilterExpression(ctx, filter, param);
-            }
-            else if (ctx.filterParamExpression() != null && ctx.filterParamExpression().expression() != null) {
+            } else if (ctx.filterParamExpression() != null && ctx.filterParamExpression().expression() != null) {
                 filterExpression = new FTFilterExpression(ctx, filter,
                                                           visitExpression(ctx.filterParamExpression().expression()));
-            }
-            else {
+            } else {
                 filterExpression = new FTFilterExpression(ctx, filter);
             }
             int numOptions = ctx.filterOption().size();
@@ -650,16 +641,14 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
                 Object                              value      = true;
                 if (foc.identifier().size() > 1) {
                     value = foc.identifier(1).getText();
-                }
-                else if (foc.constant() != null) {
+                } else if (foc.constant() != null) {
                     value = foc.constant().getText();
                 }
                 if (value instanceof String) {
                     String valueStr = (String) value;
                     if (valueStr.equals("true")) {
                         value = true;
-                    }
-                    else if (valueStr.equals("false")) {
+                    } else if (valueStr.equals("false")) {
                         value = false;
                     }
                 }
@@ -757,8 +746,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             String operatorStr = null;
             if (binary && FTOperation.Operator.isValidOperator(ctx.bop.getText())) {
                 operatorStr = ctx.bop.getText();
-            }
-            else if (unary) {
+            } else if (unary) {
                 operatorStr = ctx.prefix.getText();
             }
 
@@ -800,8 +788,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
                 FTExpression operandExpression = visitExpression(expressionContext);
                 if (operandExpression != null) {
                     inputs.add(operandExpression);
-                }
-                else {
+                } else {
                     ECLog.logError(expressionContext, "Not able to parse expression: " + expressionContext.getText());
                 }
             }
@@ -814,19 +801,15 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
 
             FTOperation operation = new FTOperation(ctx, operator, inputs);
             return operation;
-        }
-        else if (ctx.primary() != null) {
+        } else if (ctx.primary() != null) {
             if (ctx.primary().identifier() != null) {
                 return new FTOperand(ctx.primary().identifier(), ctx.primary().identifier().getText());
-            }
-            else if (ctx.primary().constant() != null) {
+            } else if (ctx.primary().constant() != null) {
                 return visitConstant(ctx.primary().constant());
-            }
-            else if (ctx.primary().expression() != null) {
+            } else if (ctx.primary().expression() != null) {
                 return visitExpression(ctx.primary().expression()); // for the case '(' expression ')'
             }
-        }
-        else if (ctx.methodCall() != null) {
+        } else if (ctx.methodCall() != null) {
             FTExpression operandExpression = ctx.expression().size() > 0 ?
                                              visitExpression(ctx.expression(0)) :
                                              null;
@@ -839,8 +822,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
                 }
             }
             return methodCall;
-        }
-        else if (ctx.arraySpecifier() != null) {
+        } else if (ctx.arraySpecifier() != null) {
             return visitArraySpecifier(ctx.arraySpecifier());
         }
         return null;
@@ -862,17 +844,13 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         if (ctx.BOOLEAN != null) {
             boolean value = ctx.BOOLEAN.getText().equals("true");
             return new FTConstant(ctx, value);
-        }
-        else if (ctx.INTEGER() != null) {
+        } else if (ctx.INTEGER() != null) {
             return new FTConstant(ctx, Long.parseLong(ctx.INTEGER().getText()));
-        }
-        else if (ctx.FLOAT() != null) {
+        } else if (ctx.FLOAT() != null) {
             return new FTConstant(ctx, Double.parseDouble(ctx.FLOAT().getText()));
-        }
-        else if (ctx.STRING() != null) {
+        } else if (ctx.STRING() != null) {
             return new FTConstant(ctx, ECStringUtil.ProcessParserString(ctx.STRING().getText()));
-        }
-        else if (ctx.HashConstant() != null) {
+        } else if (ctx.HashConstant() != null) {
             String name = ctx.HashConstant().getText();
             if (name.startsWith("#")) {
                 name = name.substring(1);
@@ -883,8 +861,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
                 defaultValue = defaultConstant.getStringValue();
             }
             return new FTGlobalConstant(ctx, name, defaultValue);
-        }
-        else if (ctx.builtinType() != null) {
+        } else if (ctx.builtinType() != null) {
             List<String> parts = new ArrayList<>();
             for (TerminalNode node : ctx.IDENT()) {
                 parts.add(node.getText());
@@ -940,8 +917,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             parentSwitch.addCase(ftCase);
             pushOnNewStack(ftCase);
             super.visitCaseTag(ctx);
-        }
-        else {
+        } else {
             ECLog.logFatal(ctx, "Case statement not inside a parent switch block.");
         }
         return ftCase;
@@ -960,8 +936,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             parentSwitch.addCase(defaultCase);
             pushOnNewStack(defaultCase);
             super.visitDefaultTag(ctx);
-        }
-        else {
+        } else {
             ECLog.logFatal(ctx, "Default statement not inside a parent switch block.");
         }
         return defaultCase;
@@ -973,8 +948,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         FTExpression expression = null;
         if (ctx.expression() == null) {
             expression = new FTConstant(ctx, "$");
-        }
-        else {
+        } else {
             expression = visitExpression(ctx.expression());
         }
         FTExpressionTag expressionTag = new FTExpressionTag(ctx, expression);
@@ -1119,8 +1093,8 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             namespaces = new HashSet<>();
             for (TemplateGrammer.NamespaceIdentContext namespaceIdentContext : ctx.namespaceIdentList().namespaceIdent()) {
                 namespaces.add(
-                    new MTNamespace(ctx, segmentsForPathID(namespaceIdentContext.IDENT()).toArray(new String[0]),
-                                    false));
+                        new MTNamespace(ctx, segmentsForPathID(namespaceIdentContext.IDENT()).toArray(new String[0]),
+                                        false));
             }
         }
 
@@ -1148,14 +1122,12 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
                 if (phase == null) {
                     ECLog.logFatal(ctx, "Publish phase not supported: " + optionValue);
                 }
-            }
-            else if (optionName.equals("scope")) {
+            } else if (optionName.equals("scope")) {
                 scope = FTPublishScope.getByName(optionValue);
                 if (scope == null) {
                     ECLog.logFatal(ctx, "Publish scope not supported: " + optionValue);
                 }
-            }
-            else {
+            } else {
                 ECLog.logFatal(ctx, "Publish option not supported: " + optionName);
             }
         }

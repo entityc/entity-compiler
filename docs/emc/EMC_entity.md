@@ -261,13 +261,13 @@ These methods relate to the tagging.
 
 <hr/>
 
-#### `boolean secondaryEntityIsTagged(String tag)`
+#### `boolean secondaryEntityIsTagged(String arg0)`
 
 For attributes that are of a secondary entity type, this indicates whether the attribute as been tagged with the specified tag..
 
 | Parameter | Description |
 |-----|-----|
-|`String tag` | The tag with which to check. |
+|`String arg0` | The tag with which to check. |
 
 
 
@@ -420,13 +420,13 @@ These methods relate to entity templates.
 
 <hr/>
 
-#### `MTEntity entityOfTemplateArg(String templateArgName)`
+#### `MTEntity entityOfTemplateArg(String arg0)`
 
 Returns the entity associated with a specified entity template argument.
 
 | Parameter | Description |
 |-----|-----|
-|`String templateArgName` | The convention is usually an upper case letter but depends on how the entity template was defined. For instance, if it is defined as: `Factory<C>` then you would pass the string "C" to get the entity associated with that argument that was used when instantiating this entity template. |
+|`String arg0` | The convention is usually an upper case letter but depends on how the entity template was defined. For instance, if it is defined as: `Factory<C>` then you would pass the string "C" to get the entity associated with that argument that was used when instantiating this entity template. |
 
 <hr/>
 
@@ -476,13 +476,13 @@ These methods relate to attributes.
 
 <hr/>
 
-#### `MTAttribute attributeByFullName(String fullName)`
+#### `MTAttribute attributeByFullName(String arg0)`
 
 Returns an attribute by its full name, where the full name is with regards to secondary entities being used as attributes. For instance, If an entity instantiates a secondary entity named say `Profile` as `profile`, and that secondary entity instantiates another secondary entity named `Picture` as `picture` which has an attribute say `size`, then the full name of the `size` attribute would be `profile.picture.size`. So this method is called on the top primary entity.
 
 | Parameter | Description |
 |-----|-----|
-|`String fullName` | The full name of the attribute based on its secondary entity hierarchy. |
+|`String arg0` | The full name of the attribute based on its secondary entity hierarchy. |
 
 <hr/>
 
@@ -492,13 +492,13 @@ Returns the number of attributes declared in this entity.
 
 <hr/>
 
-#### `MTAttribute attributeNamed(String name)`
+#### `MTAttribute attributeNamed(String arg0)`
 
 Returns an attribute of this entity with the specified name.
 
 | Parameter | Description |
 |-----|-----|
-|`String name` | The name of the attribute to return. |
+|`String arg0` | The name of the attribute to return. |
 
 <hr/>
 
@@ -514,23 +514,23 @@ Returns a list of attributes that are either directly declared or are inferred t
 
 <hr/>
 
-#### `int fieldNumber(MTAttribute attribute)`
+#### `int fieldNumber(MTAttribute arg0)`
 
 Returns the field number of the specified attribute. Field numbers are assigned to attributes in the order in which they are read from the model source file.
 
 | Parameter | Description |
 |-----|-----|
-|`MTAttribute attribute` | The attribute associated with the field number that you want returned. |
+|`MTAttribute arg0` | The attribute associated with the field number that you want returned. |
 
 <hr/>
 
-#### `int fieldNumberByName(String fieldName)`
+#### `int fieldNumberByName(String arg0)`
 
 Returns the field number of the specified field name. Field numbers are assigned to attributes in the order in which they are read from the model source file.
 
 | Parameter | Description |
 |-----|-----|
-|`String fieldName` | The field name (attribute or relationship) associated with the field number that you want returned. |
+|`String arg0` | The field name (attribute or relationship) associated with the field number that you want returned. |
 
 <hr/>
 
@@ -546,23 +546,23 @@ This list contains all the attribute names of not just the directly declared att
 
 <hr/>
 
-#### `boolean hasAttributeNamed(String name)`
+#### `boolean hasAttributeNamed(String arg0)`
 
 Indicates whether this entity has an attribute with the specified name.
 
 | Parameter | Description |
 |-----|-----|
-|`String name` | The name of the attribute. |
+|`String arg0` | The name of the attribute. |
 
 <hr/>
 
-#### `boolean hasAttributeOfDataType(DataType dataType)`
+#### `boolean hasAttributeOfDataType(DataType arg0)`
 
 Indicates whether any of the attributes of this entity are of the specified data type.
 
 | Parameter | Description |
 |-----|-----|
-|`DataType dataType` | The data type of which to search for attributes. |
+|`DataType arg0` | The data type of which to search for attributes. |
 
 <hr/>
 
@@ -589,43 +589,43 @@ Indicates whether all relationships of this entity that are declared as `parent`
 
 <hr/>
 
-#### `int fieldNumberByDomainRelationship(MTDERelationship relationship)`
+#### `int fieldNumberByDomainRelationship(MTDERelationship arg0)`
 
 Returns the field number of the specified *domain* relationship. This is the same order as the non-domain specific relationship.
 
 | Parameter | Description |
 |-----|-----|
-|`MTDERelationship relationship` | The domain relationship associated with the field number that you want returned. |
+|`MTDERelationship arg0` | The domain relationship associated with the field number that you want returned. |
 
 <hr/>
 
-#### `int fieldNumberByRelationship(MTRelationship relationship)`
+#### `int fieldNumberByRelationship(MTRelationship arg0)`
 
 Returns the field number of the specified relationship. Field numbers are assigned to relationships in the order in which they are read from the model source file.
 
 | Parameter | Description |
 |-----|-----|
-|`MTRelationship relationship` | The relationship associated with the field number that you want returned. |
+|`MTRelationship arg0` | The relationship associated with the field number that you want returned. |
 
 <hr/>
 
-#### `List findPossibleRelationshipsWithEntity(MTEntity entity)`
+#### `List findPossibleRelationshipsWithEntity(MTEntity arg0)`
 
 Given an entity, this method finds possible relationships to this entity.
 
 | Parameter | Description |
 |-----|-----|
-|`MTEntity entity` | The entity from which to find relationships. |
+|`MTEntity arg0` | The entity from which to find relationships. |
 
 <hr/>
 
-#### `MTRelationship findRelationshipWithToEntity(MTEntity entity)`
+#### `MTRelationship findRelationshipWithToEntity(MTEntity arg0)`
 
 Given an entity object, this method will try to find and return a relationship on this entity that is to the provided entity. If none is found, `null` will be returned.
 
 | Parameter | Description |
 |-----|-----|
-|`MTEntity entity` | The entity of which to search. |
+|`MTEntity arg0` | The entity of which to search. |
 
 <hr/>
 
@@ -677,23 +677,23 @@ Returns the relationship that is both a `parent` relationship and **not** `optio
 
 <hr/>
 
-#### `MTRelationship primaryParentRelationship(String entityName)`
+#### `MTRelationship primaryParentRelationship(String arg0)`
 
 Returns the one relationship of this entity that is both declared as `parent` and **not** declared as `optional` and is **to** the named entity.
 
 | Parameter | Description |
 |-----|-----|
-|`String entityName` | The name of the entity that the relationship is **to**. |
+|`String arg0` | The name of the entity that the relationship is **to**. |
 
 <hr/>
 
-#### `MTRelationship relationshipByName(String relationshipName)`
+#### `MTRelationship relationshipByName(String arg0)`
 
 Returns a relationship of this entity by name. If a relationship is not found with this name `null` will be returned.
 
 | Parameter | Description |
 |-----|-----|
-|`String relationshipName` | The name of the relationship to return. |
+|`String arg0` | The name of the relationship to return. |
 
 <hr/>
 
@@ -709,13 +709,13 @@ Returns the list of relationships of this entity.
 
 <hr/>
 
-#### `List relationshipsWithToEntity(MTEntity toEntity)`
+#### `List relationshipsWithToEntity(MTEntity arg0)`
 
 Returns a list of relationships from this entity to a specified entity.
 
 | Parameter | Description |
 |-----|-----|
-|`MTEntity toEntity` | The entity that the relationships are **to**. |
+|`MTEntity arg0` | The entity that the relationships are **to**. |
 
 <hr/>
 
@@ -747,13 +747,13 @@ These methods relate to enums.
 
 <hr/>
 
-#### `MTEnum enum(String name)`
+#### `MTEnum enum(String arg0)`
 
 Returns an enum declared in this entity by a specified name.
 
 | Parameter | Description |
 |-----|-----|
-|`String name` | The name of the enum to return. |
+|`String arg0` | The name of the enum to return. |
 
 <hr/>
 
@@ -768,83 +768,83 @@ These methods relate to the tagging.
 
 <hr/>
 
-#### `MTAttribute attributeOfTypeTagged(String tag)`
+#### `MTAttribute attributeOfTypeTagged(String arg0)`
 
 Returns an attribute of this entity that has a type (which can be another entity) that is tagged with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String tag` | The tag with which to search. |
+|`String arg0` | The tag with which to search. |
 
 <hr/>
 
-#### `MTAttribute attributeTagged(String tag)`
+#### `MTAttribute attributeTagged(String arg0)`
 
 Returns an attribute of this entity that is tagged with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String tag` | The tag with which to search. |
+|`String arg0` | The tag with which to search. |
 
 <hr/>
 
-#### `boolean hasAttributeOfTypeTagged(String tag)`
+#### `boolean hasAttributeOfTypeTagged(String arg0)`
 
 Indicates whether this entity has a type (which can be another entity) that is tagged with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String tag` | The tag with which to search. |
+|`String arg0` | The tag with which to search. |
 
 <hr/>
 
-#### `boolean hasAttributeTagged(String tag)`
+#### `boolean hasAttributeTagged(String arg0)`
 
 Indicates whether this entity has at least one attribute with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String tag` | The tag with which to search. |
+|`String arg0` | The tag with which to search. |
 
 <hr/>
 
-#### `boolean hasRelationshipTagged(String tag)`
+#### `boolean hasRelationshipTagged(String arg0)`
 
 Indicates whether this entity has at least one relationship with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String tag` | The tag with which to search. |
+|`String arg0` | The tag with which to search. |
 
 <hr/>
 
-#### `boolean hasRelationshipToEntityTagged(String tag)`
+#### `boolean hasRelationshipToEntityTagged(String arg0)`
 
 Indicates whether the entity **to** which a relationship references is tagged with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String tag` | The tag with which to search. |
+|`String arg0` | The tag with which to search. |
 
 <hr/>
 
-#### `MTRelationship relationshipTagged(String tag)`
+#### `MTRelationship relationshipTagged(String arg0)`
 
 Returns a relationship of this entity that is tagged with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String tag` | The tag with which to search. |
+|`String arg0` | The tag with which to search. |
 
 <hr/>
 
-#### `MTRelationship relationshipToEntityTagged(String tag)`
+#### `MTRelationship relationshipToEntityTagged(String arg0)`
 
 Returns the entity **to** which a relationship references that is tagged with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String tag` | The tag with which to search. |
+|`String arg0` | The tag with which to search. |
 
 
 
@@ -917,23 +917,23 @@ These methods relate to the tagging.
 
 <hr/>
 
-#### `boolean hasItemTagged(String tag)`
+#### `boolean hasItemTagged(String arg0)`
 
 Indicates if any of the enum's items have been tagged with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String tag` | The tag with which to search. |
+|`String arg0` | The tag with which to search. |
 
 <hr/>
 
-#### `Collection itemsTagged(String tag)`
+#### `Collection itemsTagged(String arg0)`
 
 Returns any of the enum items tagged with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String tag` | The tag with which to search. |
+|`String arg0` | The tag with which to search. |
 
 
 
@@ -989,13 +989,13 @@ Returns all the other modules that entities of this module make reference to.
 
 <hr/>
 
-#### `List referencedModules(Boolean includeToOneRelationships)`
+#### `List referencedModules(Boolean arg0)`
 
 Returns all the other modules that entities of this module make reference to.
 
 | Parameter | Description |
 |-----|-----|
-|`Boolean includeToOneRelationships` | Whether to include one-to-one or many-to-one relationships when determining references. |
+|`Boolean arg0` | Whether to include one-to-one or many-to-one relationships when determining references. |
 
 
 ### Entity Category
@@ -1010,13 +1010,13 @@ Returns all the entities of this module.
 
 <hr/>
 
-#### `MTEntity entity(String name)`
+#### `MTEntity entity(String arg0)`
 
 Returns an entity of this module by its name.
 
 | Parameter | Description |
 |-----|-----|
-|`String name` | The name of the entity to return. |
+|`String arg0` | The name of the entity to return. |
 
 <hr/>
 
@@ -1038,13 +1038,13 @@ Indicates if this module contains any primary entities. If it contains at least 
 
 <hr/>
 
-#### `boolean isExternEntity(String entityName)`
+#### `boolean isExternEntity(String arg0)`
 
 Indicates whether the specified entity is externally declared (such as in a different space).
 
 | Parameter | Description |
 |-----|-----|
-|`String entityName` | The name of the entity to check. |
+|`String arg0` | The name of the entity to check. |
 
 
 ### Enum Category
@@ -1053,13 +1053,13 @@ These methods relate to enums.
 
 <hr/>
 
-#### `MTEnum enum(String name)`
+#### `MTEnum enum(String arg0)`
 
 Returns an enum of this module by its name.
 
 | Parameter | Description |
 |-----|-----|
-|`String name` | The name of the enum to return. |
+|`String arg0` | The name of the enum to return. |
 
 <hr/>
 
@@ -1074,13 +1074,13 @@ These methods relate to typedefs.
 
 <hr/>
 
-#### `MTTypedef typedef(String name)`
+#### `MTTypedef typedef(String arg0)`
 
 Returns a typedef of this module by its name.
 
 | Parameter | Description |
 |-----|-----|
-|`String name` | The name of the typedef to return. |
+|`String arg0` | The name of the typedef to return. |
 
 <hr/>
 
@@ -1143,13 +1143,13 @@ Returns the data type enum of this native type.
 
 <hr/>
 
-#### `boolean isDataType(DataType dataType)`
+#### `boolean isDataType(DataType arg0)`
 
 Indicates whether this is of the specified data type.
 
 | Parameter | Description |
 |-----|-----|
-|`DataType dataType` | The data type with which to compare. |
+|`DataType arg0` | The data type with which to compare. |
 
 <hr/>
 
@@ -1287,13 +1287,13 @@ These methods relate to the tagging.
 
 <hr/>
 
-#### `boolean hasToEntityTagged(String tag)`
+#### `boolean hasToEntityTagged(String arg0)`
 
 Indicates whether the "to" entity of this relationship has been tagged with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String tag` | The tag with which to search. |
+|`String arg0` | The tag with which to search. |
 
 
 
@@ -1348,13 +1348,13 @@ Indicates whether this type is one of the integer data types.
 
 <hr/>
 
-#### `boolean isNativeDataType(DataType dataType)`
+#### `boolean isNativeDataType(DataType arg0)`
 
 Indicates whether this type is of the specified data types.
 
 | Parameter | Description |
 |-----|-----|
-|`DataType dataType` | The native data type from which to compare. |
+|`DataType arg0` | The native data type from which to compare. |
 
 <hr/>
 
