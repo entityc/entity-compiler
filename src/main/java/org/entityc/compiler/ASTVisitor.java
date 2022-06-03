@@ -722,7 +722,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                     new MTNamespace(ns, segmentsForPathID(ns.namespaceIdent().id()).toArray(new String[0]), false));
         }
 
-        List<EntityLanguageParser.SpaceImportContext> importContexts = body.spaceImport();
+//        List<EntityLanguageParser.SpaceImportContext> importContexts = body.spaceImport();
 
         setNodeDescription(space, body.descriptionStatement(), false);
         space.addTagsWithValues(tagStringsFromTagStatements(body.tagStatement()));

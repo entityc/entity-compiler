@@ -28,27 +28,36 @@ public class GitHubRepositoryImporter implements RepositoryImporter {
     }
 
     @Override
-    public RepositoryFile importFromRepository(MTRepository repository, MTRepositoryImport repositoryImport, RepositoryFile cachedRepositoryFile, String extension) {
+    public RepositoryFile importFromRepository(MTRepository repository, MTRepositoryImport repositoryImport, RepositoryFile cachedRepositoryFile, String extension, String alternatePath) {
         try {
             if (github == null) {
                 github = GitHub.connect();
             }
         } catch (IOException e) {
-            ECLog.logFatal("Unable to connect to GitHub: " + repository.getOrganization() + "/" + repository.getRepoName() + "\n" + e.getMessage());
+            ECLog.logFatal(
+                    "Unable to connect to GitHub: " + repository.getOrganization() + "/" + repository.getRepoName()
+                    + "\n" + e.getMessage());
         }
-        String pathPart = repository.getPath() != null && !repository.getPath().isEmpty() ? repository.getPath() + "/" : "";
-        String gitRepoPath = pathPart + repositoryImport.getFilename() + "." + extension;
-        GHRepository repo = null;
+        String       pathPart    = alternatePath != null ?
+                                   (alternatePath + "/") :
+                                   repository.getPath() != null && !repository.getPath().isEmpty() ?
+                                   repository.getPath() + "/" :
+                                   "";
+        String       gitRepoPath = pathPart + repositoryImport.getFilename() + "." + extension;
+        GHRepository repo        = null;
         try {
-            repo        = github.getRepository(repository.getOrganization() + "/" + repository.getRepoName());
+            repo = github.getRepository(repository.getOrganization() + "/" + repository.getRepoName());
         } catch (IOException e) {
-            ECLog.logFatal("Unable to connect to repository: " + repository.getOrganization() + "/" + repository.getRepoName());
+            ECLog.logFatal("Unable to connect to repository: " + repository.getOrganization() + "/"
+                           + repository.getRepoName());
         }
         try {
             ECLog.logInfo("Downloading file: " + gitRepoPath + " " + repository.getTag());
-            GHContent    fileContent = repo.getFileContent(gitRepoPath, repository.getTag());
+            GHContent fileContent = repo.getFileContent(gitRepoPath, repository.getTag());
             if (fileContent == null) {
-                ECLog.logFatal(repositoryImport, "Could not find file in repository: " + cachedRepositoryFile.getFilepath() + " with tag " + repository.getTag());
+                ECLog.logFatal(repositoryImport,
+                               "Could not find file in repository: " + cachedRepositoryFile.getFilepath() + " with tag "
+                               + repository.getTag());
             }
             String outputFilepath = cachedRepositoryFile.getFilepath();
             // in case the filename has sub directories, make sure they are created
@@ -63,7 +72,8 @@ public class GitHubRepositoryImporter implements RepositoryImporter {
                 }
             }
             if (EntityCompiler.isVerbose()) {
-                ECLog.logInfo("Importing file \"" + gitRepoPath + "\" from GitHub by tag \"" + repository.getTag() + "\".");
+                ECLog.logInfo(
+                        "Importing file \"" + gitRepoPath + "\" from GitHub by tag \"" + repository.getTag() + "\".");
             }
 
             File             outputFile = new File(outputFilepath);
@@ -71,7 +81,9 @@ public class GitHubRepositoryImporter implements RepositoryImporter {
             IOUtils.copy(fileContent.read(), fos);
             fos.close();
         } catch (IOException e) {
-            ECLog.logFatal("Unable to import file from GitHub: " + repository.getOrganization() + "/" + repository.getRepoName() + "/" + gitRepoPath + " tag: " + repository.getTag() + " message: " + e.getMessage());
+            ECLog.logFatal("Unable to import file from GitHub: " + repository.getOrganization() + "/"
+                           + repository.getRepoName() + "/" + gitRepoPath + " tag: " + repository.getTag()
+                           + " message: " + e.getMessage());
         }
         return cachedRepositoryFile;
     }

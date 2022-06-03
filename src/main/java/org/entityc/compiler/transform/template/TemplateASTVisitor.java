@@ -405,7 +405,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             templateName = templateName.substring(templateName.lastIndexOf('/') + 1);
         }
         if (EntityCompiler.isVerbose()) {
-            ECLog.logInfo(ctx, "Found Import of template: " + templatePath);
+            ECLog.logInfo(ctx, "Found Import of template: " + templatePath + " from repository " + fromRepositoryName);
             if (fromRepositoryName == null) {
                 ECLog.logError("Without source repository!");
             }
@@ -422,6 +422,9 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
                 RepositoryFile repositoryFile = importManager.importFromRepository(configuration.getSpace(),
                                                                                    repositoryImport, "eml", false);
                 templateFile = new File(repositoryFile.getFilepath());
+            }
+            if (templateFile == null || !templateFile.exists()) {
+                ECLog.logFatal("Cannot find template file at path: " + templateFile.getAbsolutePath());
             }
             if (EntityCompiler.isVerbose()) {
                 ECLog.logInfo("Importing template: " + templateName);

@@ -707,6 +707,9 @@ public class EntityCompiler {
             if (space != null) {
                 space.setIncludeMode(false);
             }
+            if (foundSpace != null) {
+                foundSpace.setRepositoryThatImportedThisSpace(repositoryFile.getRepository());
+            }
             if (firstInput && foundSpace != null) {
                 root.setSpace(foundSpace);
             }
