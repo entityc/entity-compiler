@@ -1318,6 +1318,12 @@ If this type is an enum type then it returns the enum type object. Otherwise it 
 
 <hr/>
 
+#### `boolean` **`isBooleanType`**
+
+Indicates whether this type is one of the integer data types.
+
+<hr/>
+
 #### `boolean` **`isByteArrayType`**
 
 Indicates whether this type is both an array type and also `byte` data type.

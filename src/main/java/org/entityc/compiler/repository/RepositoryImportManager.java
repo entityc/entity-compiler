@@ -53,26 +53,42 @@ public class RepositoryImportManager {
         String       repositoryName = repositoryImport.getRepositoryName();
         MTRepository repository     = space.getRepositoryByName(repositoryName);
         if (repository == null) {
-            ECLog.logFatal(repositoryImport, "In space \"" + space.getName() + "\" cannot find a repository named \"" + repositoryName + "\".");
+            ECLog.logFatal(repositoryImport,
+                           "In space \"" + space.getName() + "\" cannot find a repository named \"" + repositoryName
+                           + "\".");
         } else if (!repository.isValid()) {
             ECLog.logFatal(repository, "Repository specification is not valid.");
         }
 
-        String name     = repositoryImport.getFilename();
-        String filename = name + "." + extension;
+        String           name     = repositoryImport.getFilename();
+        String           filename = name + "." + extension;
+        MTRepositoryType type     = repository.getType();
+        boolean shouldUseSpaceRepository = space.getRepositoryThatImportedThisSpace() != null
+                                           && type == MTRepositoryType.LOCAL;
 
-        RepositoryFile cacheRepositoryFile = repositoryCache.getRepositoryFile(repository, filename, asInclude);
+        MTRepository sourceRepository = repository;
+        String alternatePath = null;
+        if (shouldUseSpaceRepository) {
+            sourceRepository = space.getRepositoryThatImportedThisSpace();
+            alternatePath = repository.getPath();
+        }
 
-        if (cacheRepositoryFile.exists()) { // check if it exists in the cache already
+        RepositoryImporter repositoryImporter = importersByType.get(sourceRepository.getType());
+        RepositoryFile cacheRepositoryFile = repositoryCache.getRepositoryFile(sourceRepository, filename, asInclude);
+        if (sourceRepository.getType() != MTRepositoryType.LOCAL && cacheRepositoryFile.exists()) { // check if it exists in the cache already
             if (EntityCompiler.isVerbose()) {
                 ECLog.logInfo("Found file already in cache: " + cacheRepositoryFile.getFilepath());
             }
             addRepositoryFile(repositoryImport.getIdentifier(), cacheRepositoryFile);
             return cacheRepositoryFile;
         }
-        RepositoryFile file = importersByType.get(repository.getType()).importFromRepository(repository, repositoryImport, cacheRepositoryFile, extension);
+
+        RepositoryFile file = repositoryImporter.importFromRepository(sourceRepository, repositoryImport,
+                                                                             cacheRepositoryFile, extension, alternatePath);
         if (file == null || !file.exists()) {
-            String nameOrPath = repository.getType() == MTRepositoryType.LOCAL ? repository.getPath() : repositoryName;
+            String nameOrPath = repository.getType() == MTRepositoryType.LOCAL ?
+                                repository.getPath() :
+                                repositoryName;
             ECLog.logFatal("Unable to import " + repository.getType() + " file: " + nameOrPath + "/" + filename);
         }
         addRepositoryFile(repositoryImport.getIdentifier(), file);
@@ -89,11 +105,12 @@ public class RepositoryImportManager {
     }
 
     private String getRepositoryCachePath(MTRepository repository) {
-        return repository.getOrganization() + File.separator + repository.getRepoName() + File.separator + repository.getTag();
+        return repository.getOrganization() + File.separator + repository.getRepoName() + File.separator
+               + repository.getTag();
     }
 
     public void close() {
-        repositoryFilesInOrder = new ArrayList<>();
+        repositoryFilesInOrder      = new ArrayList<>();
         repositoryFilesByIdentifier = new HashMap<>();
         for (RepositoryImporter importer : importersByType.values()) {
             importer.close();

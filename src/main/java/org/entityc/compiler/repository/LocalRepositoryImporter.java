@@ -20,7 +20,7 @@ import java.io.IOException;
 public class LocalRepositoryImporter implements RepositoryImporter {
 
     @Override
-    public RepositoryFile importFromRepository(MTRepository repository, MTRepositoryImport repositoryImport, RepositoryFile cachedRepositoryFile, String extension) {
+    public RepositoryFile importFromRepository(MTRepository repository, MTRepositoryImport repositoryImport, RepositoryFile cachedRepositoryFile, String extension, String alternatePath) {
         String outputFilepath = cachedRepositoryFile.getFilepath();
         // in case the filename has sub directories, make sure they are created
         if (outputFilepath.contains(File.separator)) {
@@ -36,7 +36,7 @@ public class LocalRepositoryImporter implements RepositoryImporter {
 
         String inputFilepath = repository.getPath() + "/" + repositoryImport.getFilename() + "." + extension;
         if (inputFilepath.equals(outputFilepath)) {
-            ECLog.logInfo("Don't need to copy file: " + cachedRepositoryFile.getFilepath());
+            //ECLog.logInfo("Don't need to copy file: " + cachedRepositoryFile.getFilepath());
         } else {
             try {
                 FileInputStream fis = new FileInputStream(inputFilepath);
