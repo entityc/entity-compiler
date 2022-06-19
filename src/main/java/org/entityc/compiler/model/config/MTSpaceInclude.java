@@ -14,6 +14,7 @@ public class MTSpaceInclude {
     private final List<MTRepositoryImport> imports           = new ArrayList<>();
     private final List<String>             importEnumNames   = new ArrayList<>(); // enums to import even if in an include
     private final List<String>             importEntityNames = new ArrayList<>(); // entities to import even if in an include
+    private final List<String>             importModuleNames = new ArrayList<>(); // modules to import even if in an include
 
     public List<String> getImportEntityNames() {
         return importEntityNames;
@@ -37,5 +38,13 @@ public class MTSpaceInclude {
 
     public void addEntityName(String name) {
         importEntityNames.add(name);
+    }
+
+    public void addModuleName(String name) {
+        importModuleNames.add(name);
+    }
+
+    public List<String> getImportModuleNames() {
+        return importModuleNames;
     }
 }

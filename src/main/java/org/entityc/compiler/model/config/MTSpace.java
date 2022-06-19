@@ -62,6 +62,7 @@ public class MTSpace extends MTNode implements MTReferenceResolution, MTTemplate
     private final List<MTRepositoryImport>      repositoryImports    = new ArrayList<>();
     private final List<String>                  importEnumNames      = new ArrayList<>(); // enums to import even if in an include
     private final List<String>                  importEntityNames    = new ArrayList<>(); // entities to import even if in an include
+    private final List<String>                  importModuleNames    = new ArrayList<>(); // modules to import even if in an include
     private final HashMap<String, MTSpace>      connectedToSpaces    = new HashMap<>();
     private final Map<String, MTRepository>     repositoryMap        = new HashMap<>();
     private       boolean                       includeMode;
@@ -166,6 +167,7 @@ public class MTSpace extends MTNode implements MTReferenceResolution, MTTemplate
         repositoryImports.addAll(mtSpaceInclude.getImports());
         importEnumNames.addAll(mtSpaceInclude.getImportEnumNames());
         importEntityNames.addAll(mtSpaceInclude.getImportEntityNames());
+        importModuleNames.addAll(mtSpaceInclude.getImportModuleNames());
     }
 
     public void addConnectedToSpace(MTSpace space) {

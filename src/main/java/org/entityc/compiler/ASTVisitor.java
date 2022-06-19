@@ -830,6 +830,13 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                     }
                 }
             }
+            if (ctx.spaceIncludeBody().spaceIncludeImportModule() != null) {
+                for (EntityLanguageParser.SpaceIncludeImportModuleContext moduleContext : ctx.spaceIncludeBody().spaceIncludeImportModule()) {
+                    for (EntityLanguageParser.IdContext idContext : moduleContext.idList().id()) {
+                        spaceInclude.addModuleName(idContext.getText());
+                    }
+                }
+            }
         }
         currentSpace().addInclude(spaceInclude);
         return spaceInclude;

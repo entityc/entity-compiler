@@ -1306,6 +1306,7 @@ spaceIncludeBody
     :
     ( spaceIncludeImportEnum
     | spaceIncludeImportEntity
+    | spaceIncludeImportModule
     )*
     ;
 
@@ -1315,6 +1316,10 @@ spaceIncludeImportEnum
 
 spaceIncludeImportEntity
     : IMPORT ENTITY idList
+    ;
+
+spaceIncludeImportModule
+    : IMPORT MODULE idList
     ;
 
 idList
