@@ -359,4 +359,11 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
     public MTRepository getRepository() {
         return repository;
     }
+
+    public String getUri() {
+        if (repository != null) {
+            return repository.getUri() + "/" + getName();
+        }
+        return getName();
+    }
 }
