@@ -540,6 +540,19 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
         return false;
     }
 
+
+    @ModelMethod(
+            category = ModelMethodCategory.RELATIONSHIP,
+            description = "Indicates whether it has a least one relationship declared as parent to the specified entity.")
+    public boolean hasParentRelationshipToEntity(MTEntity parentEntity) {
+        for (MTRelationship relationship : relationships) {
+            if (relationship.isParent() && relationship.getTo().getEntityName().equals(parentEntity.name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     @ModelMethod(
         category = ModelMethodCategory.RELATIONSHIP,
         description = "Indicates whether all relationships of this entity that are declared as `parent` are also declared as `optional`.")
