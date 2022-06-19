@@ -165,6 +165,10 @@ public abstract class FTFilter extends FTNode {
         }
     }
 
+    public boolean hasOptionValue(Map<String, Object> options, FTFilterOption option) {
+        return options.containsKey(option.getName());
+    }
+
     @Override
     public void accept(FTVisitor visitor) {
         visitor.visit(this);
