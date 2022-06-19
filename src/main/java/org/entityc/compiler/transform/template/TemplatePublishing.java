@@ -50,13 +50,14 @@ import org.entityc.compiler.transform.template.tree.filter.FTFilter;
 import org.entityc.compiler.util.ECLog;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
 public class TemplatePublishing extends FTBaseVisitor {
 
-    private       Mode                     mode = Mode.IndexPublishers;
-    private final Map<String, FTPublisher> publisherMap = new HashMap<>();
+    private       Mode                              mode         = Mode.IndexPublishers;
+    private final Map<String, HashSet<FTPublisher>> publisherMap = new HashMap<>();
 
     public TemplatePublishing() {
         super(null);
@@ -121,7 +122,15 @@ public class TemplatePublishing extends FTBaseVisitor {
     @Override
     public void visitPublisher(FTPublisher publisher) {
         if (mode == Mode.IndexPublishers) {
-            publisherMap.put(publisher.getNamespace().toString(), publisher);
+            HashSet<FTPublisher> publishers;
+            String               namespaceStr = publisher.getNamespace().toString();
+            if (publisherMap.containsKey(namespaceStr)) {
+                publishers = publisherMap.get(namespaceStr);
+            } else {
+                publishers = new HashSet<>();
+            }
+            publishers.add(publisher);
+            publisherMap.put(namespaceStr, publishers);
             //ECLog.logInfo(publisher, "Indexed publisher: " + publisher.getNamespace().toString());
         }
     }
@@ -132,20 +141,29 @@ public class TemplatePublishing extends FTBaseVisitor {
             String outletName = author.getOutletName();
             if (outletName != null) {
                 for (MTNamespace fullPublisherNamespace : author.getFullNamespaces()) {
-                    String      publisherName = fullPublisherNamespace.toString();
-                    FTPublisher publisher     = publisherMap.get(publisherName);
-                    if (publisher == null) {
+                    String               publisherName = fullPublisherNamespace.toString();
+                    HashSet<FTPublisher> publishers    = publisherMap.get(publisherName);
+                    if (publishers == null) {
                         ECLog.logFatal(author, "Not able to find publisher: " + publisherName);
                     }
-                    List<FTOutlet> outlets = publisher.getOutletsByName(outletName);
-                    for (FTOutlet outlet : outlets) {
-                        if (outlet == null) {
-                            ECLog.logFatal(publisher, "Not able to find outlet \"" + outletName + "\" on publisher: "
-                                                      + publisherName);
-                        }
-                        author.setOutlet(outlet);
-                        outlet.addAuthor(author);
+                    for (FTPublisher publisher : publishers) {
+                        List<FTOutlet> outlets = publisher.getOutletsByName(outletName);
+                        if (outlets != null) {
+                            for (FTOutlet outlet : outlets) {
+                                if (outlet == null) {
+                                    ECLog.logFatal(publisher,
+                                                   "Not able to find outlet \"" + outletName + "\" on publisher: "
+                                                   + publisherName);
+                                }
+                                author.setOutlet(outlet);
+                                outlet.addAuthor(author);
 //                ECLog.logInfo(author, "FOUND publish submission to publisher: " + author.getPublisherNamespace().toString() + " outlet: " + outletName);
+                            }
+                        } else {
+                            ECLog.logWarning(publisher,
+                                             "Publisher " + publisherName + " does not have outlet named " + outletName
+                                             + ". Ignoring author.");
+                        }
                     }
                 }
             }

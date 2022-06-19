@@ -7,6 +7,7 @@
 package org.entityc.compiler.transform.template.tree;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.entityc.compiler.EntityCompiler;
 import org.entityc.compiler.doc.annotation.ModelClass;
 import org.entityc.compiler.doc.annotation.ModelClassType;
 import org.entityc.compiler.doc.annotation.ModelMethod;
@@ -19,6 +20,7 @@ import org.entityc.compiler.model.foundation.MFSet;
 import org.entityc.compiler.transform.template.TemplateLexer;
 import org.entityc.compiler.transform.template.formatter.TemplateFormatController;
 import org.entityc.compiler.transform.template.tree.expression.FTOperation;
+import org.entityc.compiler.util.ECLog;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -29,21 +31,21 @@ import java.util.Set;
 import static org.entityc.compiler.transform.template.formatter.ConfigurableElement.*;
 
 @TemplateInstruction(category = TemplateInstructionCategory.PUBLISHING,
-    name = "author",
-    usage = "`author to `*namespaces*` `[`outlet `*outletName*` `[*phase*]` `[*scope*]]",
-    summary = "Allows you to send text/code to the outlet of a publisher.",
-    description =
-        "The author instruction defines a block of template that you want to be inserted at a publisher's outlet. "
-        + "How this template code is executed by the publisher can be specified in this instruction with the "
-        + "phase and scope options.",
-    contents = "The block of template code this instruction surrounds will be executed by the publisher "
-               + "when it reaches the referenced outlet during its execution but only during its configured "
-               + "publisher execution *phase*. Essentially the publisher makes an execution pass for each "
-               + "of its phases, thus allowing an action decide when it executes. The configured *scope* "
-               + "of this action will determine the runtime environment that is used for execution.")
+        name = "author",
+        usage = "`author to `*namespaces*` `[`outlet `*outletName*` `[*phase*]` `[*scope*]]",
+        summary = "Allows you to send text/code to the outlet of a publisher.",
+        description =
+                "The author instruction defines a block of template that you want to be inserted at a publisher's outlet. "
+                + "How this template code is executed by the publisher can be specified in this instruction with the "
+                + "phase and scope options.",
+        contents = "The block of template code this instruction surrounds will be executed by the publisher "
+                   + "when it reaches the referenced outlet during its execution but only during its configured "
+                   + "publisher execution *phase*. Essentially the publisher makes an execution pass for each "
+                   + "of its phases, thus allowing an action decide when it executes. The configured *scope* "
+                   + "of this action will determine the runtime environment that is used for execution.")
 @ModelClass(type = ModelClassType.TEMPLATE,
-    description = "A template author connects itself to a publisher outlet for the purpose of "
-                  + "authoring (sending) code there.")
+        description = "A template author connects itself to a publisher outlet for the purpose of "
+                      + "authoring (sending) code there.")
 public class FTAuthor extends FTContainerNode {
 
     private final Set<MTNamespace> namespaces;
@@ -59,25 +61,26 @@ public class FTAuthor extends FTContainerNode {
 
     public FTAuthor(ParserRuleContext ctx, FTTemplate template, FTContainerNode parent, FTAuthor parentAuthor,
                     @TemplateInstructionArgument(
-                        description =
-                            "One or more publisher namespaces (separated by a comma ',') to which the authoring "
-                            + "should be performed. "
-                            + "Any authoring options will be applied to all specified publisher namespaces.")
-                        Set<MTNamespace> namespaces,
+                            description =
+                                    "One or more publisher namespaces (separated by a comma ',') to which the authoring "
+                                    + "should be performed. "
+                                    + "Any authoring options will be applied to all specified publisher namespaces.")
+                    Set<MTNamespace> namespaces,
                     @TemplateInstructionArgument(
-                        optional = true,
-                        description = "The name of the outlet to which you want to author this block of template.")
-                        String outletName,
+                            optional = true,
+                            description = "The name of the outlet to which you want to author this block of template.")
+                    String outletName,
                     @TemplateInstructionArgument(
-                        optional = true,
-                        description = "Sets the publishing phase when you want the authoring to occur. The default is "
-                                      + "the `Connect` phase.")
-                        FTPublishPhase phase,
+                            optional = true,
+                            description =
+                                    "Sets the publishing phase when you want the authoring to occur. The default is "
+                                    + "the `Connect` phase.")
+                    FTPublishPhase phase,
                     @TemplateInstructionArgument(
-                        optional = true,
-                        description = "Sets the publishing scope this code should execute within. The default is "
-                                      + "the `Author` scope.")
-                        FTPublishScope scope) {
+                            optional = true,
+                            description = "Sets the publishing scope this code should execute within. The default is "
+                                          + "the `Author` scope.")
+                    FTPublishScope scope) {
         super(ctx, parent);
         this.parentAuthor = parentAuthor;
         if (this.parentAuthor != null) {
@@ -92,22 +95,24 @@ public class FTAuthor extends FTContainerNode {
         this.scope      = scope != null ?
                           scope :
                           FTPublishScope.Author;
+        uniqueId        = ctx.start.getTokenSource().getSourceName() + "::" + ctx.start.getLine() + ":"
+                          + ctx.start.getCharPositionInLine() + 1;
         if (parentAuthor == null) {
             fullNamespaces = namespaces;
-        }
-        else if (namespaces != null) {
+        } else if (namespaces != null) {
             fullNamespaces = new HashSet<>();
+            if (EntityCompiler.isVerbose() && namespaces.size() > 1) {
+                ECLog.logInfo("Author: " + this.getUniqueId() + " has " + namespaces.size()
+                              + " publishers.");
+            }
             for (MTNamespace namespace : namespaces) {
                 for (MTNamespace publisherNamespace : parentAuthor.getFullNamespaces()) {
                     fullNamespaces.add(publisherNamespace.combine(ctx, namespace));
                 }
             }
-        }
-        else {
+        } else {
             fullNamespaces = parentAuthor.getFullNamespaces();
         }
-        uniqueId = ctx.start.getTokenSource().getSourceName() + "::" + ctx.start.getLine() + ":"
-                   + ctx.start.getCharPositionInLine() + 1;
     }
 
     public Set<MTNamespace> getFullNamespaces() {
@@ -115,43 +120,53 @@ public class FTAuthor extends FTContainerNode {
     }
 
     @ModelMethod(category = ModelMethodCategory.NAMESPACE,
-        description = "Returns the set of declared namespaces of this author. If this author instruction is embedded in "
-                      + "another author instruction then this will not be a full namespace.")
+            description =
+                    "Returns the set of declared namespaces of this author. If this author instruction is embedded in "
+                    + "another author instruction then this will not be a full namespace.")
     public Set<MTNamespace> getNamespaces() {
         return namespaces;
     }
 
     @ModelMethod(category = ModelMethodCategory.NAMESPACE,
-        description = "Returns the set of **full** namespaces associated with this author. A **full** namespace is "
-                      + "one which combines parent author namespaces with this author namespaces.")
+            description = "Returns the set of **full** namespaces associated with this author. A **full** namespace is "
+                          + "one which combines parent author namespaces with this author namespaces.")
     public MFSet getFullPublisherNamespaces() {
         return new MFSet(fullNamespaces);
     }
 
-    public Set<MTNamespace> getIntermediateParents() {
-        return new HashSet<>(); // don't support for now
+    public void getIntermediateParents(Set<FTAuthor> authors) {
+        if (!hasParent() || parentAuthor.outletName != null) {
+            return;
+        }
+        authors.add(parentAuthor);
     }
 
     public boolean hasIntermediateParents() {
 
-        return false; // don't support for now
+        if (!hasParent()) {
+            return false;
+        }
+        if (parentAuthor.outletName != null) {
+            return false;
+        }
+        return parentAuthor.hasIntermediateParents();
     }
 
     @ModelMethod(category = ModelMethodCategory.AUTHOR,
-        description = "Returns the parent author instruction to this one.")
+            description = "Returns the parent author instruction to this one.")
     public FTAuthor getParentAuthor() {
         return parentAuthor;
     }
 
     @ModelMethod(category = ModelMethodCategory.AUTHOR,
-        description = "Indicates whether this author has a parent author.")
+            description = "Indicates whether this author has a parent author.")
     public boolean hasParent() {
         return parentAuthor != null;
     }
 
     @ModelMethod(category = ModelMethodCategory.OUTLET,
-        description = "Indicates whether this author has children authors that connect to an outlet and there are "
-                      + "intermediate parent authors (that is authors that don't connect to an outlet).")
+            description = "Indicates whether this author has children authors that connect to an outlet and there are "
+                          + "intermediate parent authors (that is, authors that don't connect to an outlet).")
     public boolean hasChildOutletsWithIntermediateParents() {
         for (FTAuthor child : getChildOutletAuthors()) {
             if (child.hasIntermediateParents()) {
@@ -162,13 +177,13 @@ public class FTAuthor extends FTContainerNode {
     }
 
     @ModelMethod(category = ModelMethodCategory.AUTHOR,
-        description = "Returns the list (if any) of child authors.")
+            description = "Returns the list (if any) of child authors.")
     public List<FTAuthor> getChildAuthors() {
         return childAuthors;
     }
 
     @ModelMethod(category = ModelMethodCategory.OUTLET,
-        description = "Returns the list of child authors that connect to an outlet.")
+            description = "Returns the list of child authors that connect to an outlet.")
     public List<FTAuthor> getChildOutletAuthors() {
         ArrayList<FTAuthor> outletAuthors = new ArrayList<>();
         for (FTAuthor childAuthor : childAuthors) {
@@ -183,25 +198,25 @@ public class FTAuthor extends FTContainerNode {
     }
 
     @ModelMethod(category = ModelMethodCategory.OUTLET,
-        description = "Indicates whether this author has child authors that connect to an outlet.")
+            description = "Indicates whether this author has child authors that connect to an outlet.")
     public boolean hasChildOutletAuthors() {
         return !getChildOutletAuthors().isEmpty();
     }
 
     @ModelMethod(category = ModelMethodCategory.AUTHOR,
-        description = "Indicates whether this author has child authors.")
+            description = "Indicates whether this author has child authors.")
     public boolean hasChildAuthors() {
         return !childAuthors.isEmpty();
     }
 
     @ModelMethod(category = ModelMethodCategory.OUTLET,
-        description = "Indicates whether this author connects to an outlet.")
+            description = "Indicates whether this author connects to an outlet.")
     public boolean isOutletAuthor() {
         return outletName != null;
     }
 
     @ModelMethod(category = ModelMethodCategory.AUTHOR,
-        description = "Returns the top author of an author hierarchy starting from this author.")
+            description = "Returns the top author of an author hierarchy starting from this author.")
     public FTAuthor getTopAuthor() {
         if (parentAuthor != null) {
             return parentAuthor.getTopAuthor();
@@ -210,7 +225,7 @@ public class FTAuthor extends FTContainerNode {
     }
 
     @ModelMethod(category = ModelMethodCategory.NAMESPACE,
-        description = "Returns the namespace of the top author in an author hierarchy starting from this author.")
+            description = "Returns the namespace of the top author in an author hierarchy starting from this author.")
     public MTNamespace getTopPublisherNamespace() {
         if (parentAuthor != null) {
             return parentAuthor.getTopPublisherNamespace();
@@ -219,13 +234,13 @@ public class FTAuthor extends FTContainerNode {
     }
 
     @ModelMethod(category = ModelMethodCategory.TEMPLATE,
-        description = "Returns the template in which this author was declared.")
+            description = "Returns the template in which this author was declared.")
     public FTTemplate getTemplate() {
         return template;
     }
 
     @ModelMethod(category = ModelMethodCategory.OUTLET,
-        description = "If this author defines an outlet, this returns that outlet. Otherwise, it returns `null`.")
+            description = "If this author defines an outlet, this returns that outlet. Otherwise, it returns `null`.")
     public FTOutlet getOutlet() {
         return outlet;
     }
@@ -235,13 +250,13 @@ public class FTAuthor extends FTContainerNode {
     }
 
     @ModelMethod(category = ModelMethodCategory.PUBLISHER,
-        description = "Returns the declared publishing phase in which this author should execute.")
+            description = "Returns the declared publishing phase in which this author should execute.")
     public FTPublishPhase getPhase() {
         return phase;
     }
 
     @ModelMethod(category = ModelMethodCategory.PUBLISHER,
-        description = "Returns the declared scope in which this author will execute.")
+            description = "Returns the declared scope in which this author will execute.")
     public FTPublishScope getScope() {
         return scope;
     }
@@ -265,7 +280,7 @@ public class FTAuthor extends FTContainerNode {
     }
 
     @ModelMethod(category = ModelMethodCategory.AUTHOR,
-        description = "Returns a unique ID for this author.")
+            description = "Returns a unique ID for this author.")
     public String getUniqueId() {
         return uniqueId;
     }
@@ -325,13 +340,13 @@ public class FTAuthor extends FTContainerNode {
     }
 
     @ModelMethod(category = ModelMethodCategory.OUTLET,
-        description = "Returns the outlet for this author, if it has one. Otherwise it will return `null`.")
+            description = "Returns the outlet for this author, if it has one. Otherwise it will return `null`.")
     public String getOutletName() {
         return outletName;
     }
 
     @ModelMethod(category = ModelMethodCategory.NAMESPACE,
-        description = "Returns the set of publisher namespaces used by this author.")
+            description = "Returns the set of publisher namespaces used by this author.")
     public MFSet getPublisherNamespaces() {
         return new MFSet(namespaces);
     }
