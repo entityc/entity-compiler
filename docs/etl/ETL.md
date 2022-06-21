@@ -121,7 +121,8 @@ Here is the full list of filters:
 | [`domain`](#filter_detail_domain) | Allows you to convert a model element (such as an entity or attribute) into a domain-specific version of that element. The domain-specific element can have altered properties such as a different name or different tags. For convenience this filter can also accept domain specific elements in which case it effectively replaces the domain with the specified one. |
 | [`fullname`](#filter_detail_fullname) | When the input is an domain-based entity, it will combine the namespace of the domain with the name of the entity in that domain to form a period based full name (e.g., `com.example.model.Widget`). This can be useful for construction a Java import statement, for instance. |
 | [`has`](#filter_detail_has) | deprecated |
-| [`join`](#filter_detail_join) | Given a multiline string, it joins all lines into one (replacing all carriage returns with a space). |
+| [`is`](#filter_detail_is) | Checks to see if the input is a particular kind of thing. For now only `identifier` is supported which checks to make sure it is a string that starts with a letter and contains no special characters or spaces.. |
+| [`join`](#filter_detail_join) | Given a multiline string, it joins all lines into one (replacing all carriage returns with a space). Given an array of strings, it joins the strings by inserted the provided delimiter between them. |
 | [`json`](#filter_detail_json) | This is used on an entity object that you want to convert into a JSON string. For attribute values it will randomly generate based on their type. This is currently only used when generating Postman configuration files to provide a sample POST body. |
 | [`language`](#filter_detail_language) | Using this filter allows the template to remain agnostic to the syntax of the language for which they are generating code. For instance, if you feed in a type object, it will use the language assigned to the template and look up the keyword for the type in that language. For instance, if the type is `string` and the language is `java`, it would output `String`. |
 | [`lowercase`](#filter_detail_lowercase) | Forces all characters of the input to be lowercase. |
@@ -274,16 +275,45 @@ The following options are available:
 
 <hr/>
 
+<a name="filter_detail_is"></a>
+##### Filter: `is`
+
+Checks to see if the input is a particular kind of thing. For now only `identifier` is supported which checks to make sure it is a string that starts with a letter and contains no special characters or spaces..
+
+Valid inputs for this filter are:
+
+| Class of Valid Input | Description |
+|---|---|
+| `String` |  |
+
+This filter has the following parameters:
+
+| Usage with Parameter | Description |
+|---|---|
+| `is:`*thingOfThing* | The kind of thing you want to check for such as identifier. |
+
+<hr/>
+
 <a name="filter_detail_join"></a>
 ##### Filter: `join`
 
-Given a multiline string, it joins all lines into one (replacing all carriage returns with a space).
+Given a multiline string, it joins all lines into one (replacing all carriage returns with a space). Given an array of strings, it joins the strings by inserted the provided delimiter between them.
 
 Valid inputs for this filter are:
 
 | Class of Valid Input | Description |
 |---|---|
 | `String` | The base string to start joining onto. |
+| `MFArray` | The array of strings to join. |
+
+
+Options are specified in one of two ways: *option* (by itself) or *option*`:`*value* (with a value). When specifying just the *option*, it is equivalent to *option*`:true`.
+
+The following options are available:
+
+| Option | Description |
+|---|---|
+| `delim` | The delimiter to place between the joined strings. (default: a space) |
 
 <hr/>
 

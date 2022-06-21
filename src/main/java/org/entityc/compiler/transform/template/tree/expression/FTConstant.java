@@ -11,6 +11,7 @@ import org.entityc.compiler.transform.template.formatter.TemplateFormatControlle
 import org.entityc.compiler.transform.template.tree.FTTransformSession;
 import org.entityc.compiler.util.ECLog;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.entityc.compiler.util.ECStringUtil;
 
 public class FTConstant extends FTExpression {
 
@@ -51,7 +52,8 @@ public class FTConstant extends FTExpression {
     @Override
     public boolean format(TemplateFormatController formatController, int indentLevel) {
         if (type == Type.STRING) {
-            formatController.addExpressionElement(ConfigurableElement.QuotedString, "\"" + getStringValue() + "\"", this.getStartLineNumber());
+            formatController.addExpressionElement(ConfigurableElement.QuotedString, "\"" + ECStringUtil.EscapeString(
+                                                  getStringValue()) + "\"", this.getStartLineNumber());
         } else {
             ConfigurableElement element = null;
             switch (type) {

@@ -29,6 +29,7 @@ import org.entityc.compiler.transform.template.tree.FTLoad;
 import org.entityc.compiler.transform.template.tree.FTLog;
 import org.entityc.compiler.transform.template.tree.FTOutlet;
 import org.entityc.compiler.transform.template.tree.FTPreserve;
+import org.entityc.compiler.transform.template.tree.FTPrompt;
 import org.entityc.compiler.transform.template.tree.FTPublisher;
 import org.entityc.compiler.transform.template.tree.FTReceive;
 import org.entityc.compiler.transform.template.tree.FTReturn;
@@ -302,6 +303,11 @@ public class TemplateDocExtractor extends FTBaseVisitor {
 
     @Override
     public void visitLog(FTLog log) {
+
+    }
+
+    @Override
+    public void visitPrompt(FTPrompt prompt) {
 
     }
 

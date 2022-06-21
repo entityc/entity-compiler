@@ -129,6 +129,15 @@ public class TemplateTransform extends MTBaseTransform {
         parser.addErrorListener(errorListener);
         TemplateGrammer.TemplateContext templateContext = parser.template();
 
+        if (templateName == null) {
+            ECLog.logFatal("No template name given!");
+        }
+        if (root == null) {
+            ECLog.logFatal("No root node!");
+        }
+        if (root.getSpace() == null) {
+            ECLog.log("No space defined!");
+        }
         TemplateASTVisitor visitor = new TemplateASTVisitor(templateName, getConfiguration(), root.getSpace().getRepositoryByName(sourceRepositoryName), suppressImport);
         template = (FTTemplate) visitor.visit(templateContext);
         template.setName(getName());

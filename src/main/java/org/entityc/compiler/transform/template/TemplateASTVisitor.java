@@ -14,6 +14,7 @@ import org.entityc.compiler.model.config.MTConfiguration;
 import org.entityc.compiler.model.config.MTFile;
 import org.entityc.compiler.model.config.MTRepository;
 import org.entityc.compiler.model.config.MTRepositoryImport;
+import org.entityc.compiler.model.entity.MTNativeType;
 import org.entityc.compiler.repository.RepositoryCache;
 import org.entityc.compiler.repository.RepositoryFile;
 import org.entityc.compiler.repository.RepositoryImportManager;
@@ -45,6 +46,7 @@ import org.entityc.compiler.transform.template.tree.FTLoad;
 import org.entityc.compiler.transform.template.tree.FTLog;
 import org.entityc.compiler.transform.template.tree.FTOutlet;
 import org.entityc.compiler.transform.template.tree.FTPreserve;
+import org.entityc.compiler.transform.template.tree.FTPrompt;
 import org.entityc.compiler.transform.template.tree.FTPublishPhase;
 import org.entityc.compiler.transform.template.tree.FTPublishScope;
 import org.entityc.compiler.transform.template.tree.FTPublisher;
@@ -318,7 +320,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         FTExpression sourceArg        = resolveFileArg(ctx.fileArg(0));
         FTExpression destNamespaceArg = resolveFileArg(ctx.fileArg(1));
         FTInstall    install          = new FTInstall(ctx, ctx.Copy() != null, sourceArg, destNamespaceArg);
-        install.setSourceRepositoryName(repository.getName());
+        install.setSourceRepositoryName(repository == null ? null : repository.getName());
         currentContainer(ctx).addChild(install);
         return install;
     }
@@ -394,7 +396,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         FTImport ftImport = new FTImport(ctx, templatePath, fromRepositoryName);
         currentContainer(ctx).addChild(ftImport);
 
-        if (fromRepositoryName == null) {
+        if (fromRepositoryName == null && repository != null) {
             fromRepositoryName = repository.getName();
         }
         if (this.suppressImport) {
@@ -404,7 +406,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         if (templateName.contains("/")) {
             templateName = templateName.substring(templateName.lastIndexOf('/') + 1);
         }
-        if (EntityCompiler.isVerbose()) {
+        if (false && EntityCompiler.isVerbose()) {
             ECLog.logInfo(ctx, "Found Import of template: " + templatePath + " from repository " + fromRepositoryName);
             if (fromRepositoryName == null) {
                 ECLog.logError("Without source repository!");
@@ -858,12 +860,11 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             if (name.startsWith("#")) {
                 name = name.substring(1);
             }
-            String defaultValue = null;
+            FTConstant defaultConstant = null;
             if (ctx.constant() != null) {
-                FTConstant defaultConstant = visitConstant(ctx.constant());
-                defaultValue = defaultConstant.getStringValue();
+                defaultConstant = visitConstant(ctx.constant());
             }
-            return new FTGlobalConstant(ctx, name, defaultValue);
+            return new FTGlobalConstant(ctx, name, defaultConstant);
         } else if (ctx.builtinType() != null) {
             List<String> parts = new ArrayList<>();
             for (TerminalNode node : ctx.IDENT()) {
@@ -1023,6 +1024,19 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         currentContainer(ctx).addChild(logBlock);
         push(logBlock);
         return logBlock;
+    }
+
+    @Override
+    public FTPrompt visitPromptTag(TemplateGrammer.PromptTagContext ctx) {
+        String variableName = ctx.identifier() != null ?
+                           ECStringUtil.ProcessParserString(ctx.identifier().getText()) :
+                           null;
+        String typeAsString = ctx.primitiveType() == null ? "string" : ctx.primitiveType().getText();
+        MTNativeType nativeType = new MTNativeType(ctx.primitiveType(), typeAsString);
+        FTPrompt promptBlock = new FTPrompt(ctx, currentContainer(ctx), variableName, nativeType);
+        currentContainer(ctx).addChild(promptBlock);
+        push(promptBlock);
+        return promptBlock;
     }
 
     @Override

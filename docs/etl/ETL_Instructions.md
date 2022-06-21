@@ -267,9 +267,9 @@ This usage iterates over the provided collection but also allows you to conditio
 
 | Argument | Type | Description |
 |----------|------|-------------|
+| *arg4* | `FTExpression` | This expression allows you to conditionally include item by item in the collection. For each item in the collection, it will evaluate this expression. If it is `true` then that item is included in the collection, otherwise it is excluded. For this to work, this expression typically includes the loop variable but can in fact be any expression. |
 | *arg2* | `String` | The loop variable. Each iteration of the collection represented by the collection expression will be assigned to a variable by this name. |
 | *arg3* | `FTExpression` | This is the expression that represents a collection through which to iterate. |
-| *arg4* | `FTExpression` | This expression allows you to conditionally include item by item in the collection. For each item in the collection, it will evaluate this expression. If it is `true` then that item is included in the collection, otherwise it is excluded. For this to work, this expression typically includes the loop variable but can in fact be any expression. |
 
 #### *template-block*
 
@@ -335,6 +335,7 @@ Instructions that perform some type of file operation.
 | [`install`](#instruction_install) | Provides an easy way to install files into your local project. |
 | [`load`](#instruction_load) | Loads specifically supported files that can add certain data to the model. |
 | [`log`](#instruction_log) | Sends template output to system output for logging purposes. |
+| [`prompt`](#instruction_prompt) | Prompts the user on the command line for the input of a single string value. |
 
 <hr/>
 
@@ -437,6 +438,28 @@ This instruction is designed to help you debug a template by allowing you to sen
 #### *template-block*
 
 The template block is executed and its output sent to the system output. If it contains a `capture` block or any other such block instruction that redirects output, as soon as that block has finished, it will resume with sending output to the system out until it reaches the log's template block.
+
+<hr/>
+
+<a name="instruction_prompt"></a>
+### `prompt`
+
+This instruction allows you to prompt the user (with a provided message) to enter a value with standard input. This instruction should only used in situations when it is ok to prompt the user since it will halt execution while waiting for the user to enter a string value.
+
+#### Usage
+
+> `$[prompt `*variable*`]` ...***template-block***... `$[/prompt]`
+
+#### Arguments
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| *arg2* | `String` | The variable name is the variable that will receive the value input by the user. It is also used to fetch the default value in the event the user just hits return. |
+| *arg3* | `MTNativeType` | The data type for the variable that is to receive the user's response. If the value doesn't match the type, it will through error and ask again. |
+
+#### *template-block*
+
+The template block is executed and its output sent to the system output. Then immediately after that it will expect the user to enter a string value to standard input (where entering a return will end the input).
 
 <a name="category_function"></a>
 ## Function

@@ -14,11 +14,13 @@ import org.entityc.compiler.transform.template.formatter.ConfigurableElement;
 
 public class FTGlobalConstant extends FTConstant {
 
-    private final String name;
+    private final String     name;
+    private final FTConstant defaultConstant;
 
-    public FTGlobalConstant(ParserRuleContext ctx, String name, String defaultValue) {
-        super(ctx, defaultValue);
-        this.name = name;
+    public FTGlobalConstant(ParserRuleContext ctx, String name, FTConstant defaultConstant) {
+        super(ctx, defaultConstant == null ? null : defaultConstant.getStringValue());
+        this.name            = name;
+        this.defaultConstant = defaultConstant;
     }
 
     public String getName() {
@@ -32,8 +34,20 @@ public class FTGlobalConstant extends FTConstant {
 
     @Override
     public boolean format(TemplateFormatController formatController, int indentLevel) {
+        boolean hasDefaultConstant = defaultConstant != null;
+        if (hasDefaultConstant) {
+            formatController.addExpressionElement(ConfigurableElement.ExpressionOpenParen, "(",
+                                                  this.getStartLineNumber());
+        }
         formatController.addExpressionElement(ConfigurableElement.GlobalConstantPrefix, "#", this.getStartLineNumber());
         formatController.addExpressionElement(ConfigurableElement.GlobalConstantName, name, this.getStartLineNumber());
+        if (hasDefaultConstant) {
+            formatController.addExpressionElement(ConfigurableElement.ExpressionSelectItemDelim, ":",
+                                                  this.getStartLineNumber());
+            defaultConstant.format(formatController, indentLevel);
+            formatController.addExpressionElement(ConfigurableElement.ExpressionCloseParen, ")",
+                                                  this.getStartLineNumber());
+        }
         return true;
     }
 }

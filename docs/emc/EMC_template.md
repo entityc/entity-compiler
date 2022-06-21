@@ -137,7 +137,7 @@ Indicates whether this author has child authors that connect to an outlet.
 
 #### `boolean` **`hasChildOutletsWithIntermediateParents`**
 
-Indicates whether this author has children authors that connect to an outlet and there are intermediate parent authors (that is authors that don't connect to an outlet).
+Indicates whether this author has children authors that connect to an outlet and there are intermediate parent authors (that is, authors that don't connect to an outlet).
 
 <hr/>
 
