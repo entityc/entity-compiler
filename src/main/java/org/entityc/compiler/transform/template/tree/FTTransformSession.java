@@ -216,6 +216,22 @@ public class FTTransformSession {
         ((FTLog) logBlock).log();
     }
 
+    public void pushPromptBlock(FTPrompt promptBlock) {
+        promptBlock.getBody().clear();
+        bodyBlockStack.push(promptBlock);
+    }
+
+    public void popPromptBlock() {
+        if (bodyBlockStack.empty()) {
+            ECLog.logFatal("ERROR: An end of a block set was specified with no set block start.");
+        }
+        FTBodyBlock promptBlock = bodyBlockStack.pop();
+        if (!(promptBlock instanceof FTPrompt)) {
+            ECLog.logFatal("Unbalanced body blocks.");
+        }
+        ((FTPrompt) promptBlock).prompt(this);
+    }
+
     public void pushPreserveBlock(FTPreserve preserveBlock) {
         preserveBlock.getBody().clear();
         bodyBlockStack.push(preserveBlock);
@@ -285,9 +301,9 @@ public class FTTransformSession {
     }
 
     protected void sendToOutput(String text) {
-        if (debugMode) {
-            ECLog.logInfo("DEBUG>> OUTPUT>> " + text);
-        }
+//        if (debugMode) {
+//            ECLog.logInfo("DEBUG>> OUTPUT>> " + text);
+//        }
         // this is for interface strings that contain template elements
         if (stringOutputBuffer != null) {
             stringOutputBuffer.append(text);
@@ -359,9 +375,9 @@ public class FTTransformSession {
     }
 
     public Object getValue(String variableName) {
-        if (debugMode) {
-            ECLog.logInfo("DEBUG>> Getting value for \"" + variableName + "\" => " + scopeStack.peek().namedValues.get(variableName));
-        }
+//        if (debugMode) {
+//            ECLog.logInfo("DEBUG>> Getting value for \"" + variableName + "\" => " + scopeStack.peek().namedValues.get(variableName));
+//        }
         Scope currentScope = scopeStack.peek();
         boolean isInternalVariable = variableName.startsWith("__");
         for (Scope scope = currentScope; scope != null; scope = isInternalVariable ? scope.parentScopeForInternalVariables : scope.parentScope) {
@@ -460,14 +476,14 @@ public class FTTransformSession {
     }
 
     private void pushScope(Scope scope) {
-        if (EntityCompiler.isVerbose()) {
+        if (false && EntityCompiler.isVerbose()) {
             ECLog.logInfo("++++++ PUSHED SCOPE");
         }
         scopeStack.push(scope);
     }
 
     private void popScope() {
-        if (EntityCompiler.isVerbose()) {
+        if (false && EntityCompiler.isVerbose()) {
             ECLog.logInfo("------ POPPED SCOPE");
         }
         scopeStack.pop();

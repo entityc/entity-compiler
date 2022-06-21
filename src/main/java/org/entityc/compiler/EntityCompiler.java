@@ -100,8 +100,8 @@ class LogHandler extends Handler {
 
 public class EntityCompiler {
 
-    public static final  String            COMPILER_VERSION = "0.12.4";
-    public static final  String            LANGUAGE_VERSION = "0.12.2";
+    public static final  String            COMPILER_VERSION = "0.12.5";
+    public static final  String            LANGUAGE_VERSION = "0.12.3";
     private static       CommandLineParser cmdLineParser;
 
     public static final List<String> GetTemplateSearchPaths() {
@@ -180,7 +180,7 @@ public class EntityCompiler {
             MTRepository repository = new MTRepository(cmdLineParser.setupUri);
             repository.setName("SetupRepo");
             if (cmdLineParser.getDefineValue("appIdentifier") == null) {
-                ECLog.logFatal("Must define variable \"appIndentifier\" on the command line.");
+                ECLog.logFatal("Must define variable \"appIdentifier\" on the command line.");
             }
             EntityCompiler.ensureDirectory(cmdLineParser.getDefineValue("appIdentifier"));
             MTRepositoryImport repositoryImport = new MTRepositoryImport(null, false);

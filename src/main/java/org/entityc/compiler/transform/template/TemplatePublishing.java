@@ -30,6 +30,7 @@ import org.entityc.compiler.transform.template.tree.FTLog;
 import org.entityc.compiler.transform.template.tree.FTOutlet;
 import org.entityc.compiler.transform.template.tree.FTPreserve;
 import org.entityc.compiler.transform.template.tree.FTAuthor;
+import org.entityc.compiler.transform.template.tree.FTPrompt;
 import org.entityc.compiler.transform.template.tree.FTPublisher;
 import org.entityc.compiler.transform.template.tree.FTReceive;
 import org.entityc.compiler.transform.template.tree.FTReturn;
@@ -257,6 +258,11 @@ public class TemplatePublishing extends FTBaseVisitor {
 
     @Override
     public void visitLog(FTLog log) {
+
+    }
+
+    @Override
+    public void visitPrompt(FTPrompt prompt) {
 
     }
 

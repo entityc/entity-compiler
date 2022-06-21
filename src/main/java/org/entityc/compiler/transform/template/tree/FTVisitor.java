@@ -82,6 +82,8 @@ public interface FTVisitor {
 
     void visitLog(FTLog log);
 
+    void visitPrompt(FTPrompt prompt);
+
     void visitReceive(FTReceive receive);
 
     void visitReturn(FTReturn ftReturn);

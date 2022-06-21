@@ -54,6 +54,37 @@ public class ECStringUtil {
         return outputString.toString();
     }
 
+    /**
+     * Make sure characters that need to be escaped are escaped. This should be used when putting a string
+     * value into a string constant in generated code so that characters are escaped the way they were when
+     * initially read in.
+     *
+     * @param inputString The string with special characters that need to be escaped.
+     * @return The same string but with special characters escaped.
+     */
+    public static String EscapeString(String inputString) {
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < inputString.length(); i++) {
+            char ch = inputString.charAt(i);
+            switch (ch) {
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                default:
+                    sb.append(ch);
+                    break;
+            }
+        }
+
+        return sb.toString();
+    }
+
     public static String ProcessParserString(String inputString) {
         String finalString = inputString;
         if (finalString.length() > 1) {
@@ -248,13 +279,64 @@ public class ECStringUtil {
     }
 
     public static String GetClassNameFromFullName(String fullTypeName) {
-        String shortName    = fullTypeName;
-        int indexOfLastDollar = fullTypeName.lastIndexOf("$");
-        int indexOfLastDot = fullTypeName.lastIndexOf(".");
-        int maxIndex = Math.max(indexOfLastDollar,indexOfLastDot);
+        String shortName         = fullTypeName;
+        int    indexOfLastDollar = fullTypeName.lastIndexOf("$");
+        int    indexOfLastDot    = fullTypeName.lastIndexOf(".");
+        int    maxIndex          = Math.max(indexOfLastDollar, indexOfLastDot);
         if (maxIndex > 0) {
             shortName = fullTypeName.substring(maxIndex + 1);
         }
         return shortName;
+    }
+
+    public static boolean IsIdentifier(String text) {
+        //ECLog.logFatal("Checking if identifier: \"" + text + "\"...");
+        if (text == null || text.length() == 0) {
+            //ECLog.logFatal("In the text \"" + text + "\" is empty!");
+            return false;
+        }
+        if (!Character.isAlphabetic(text.charAt(0))) {
+            //ECLog.logFatal("In the text \"" + text + "\" the first letter is not a letter: [" + text.charAt(0) + "]");
+            return false;
+        }
+        for (int i = 1; i < text.length(); i++) {
+            if (!Character.isLetterOrDigit(text.charAt(i))) {
+                //ECLog.logFatal("In the text \"" + text + "\" there is a non-letter/number: [" + text.charAt(i) + "]");
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean IsNamespace(String text) {
+        if (text == null || text.length() == 0) {
+            return false;
+        }
+        for (int i = 1; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (!(Character.isLetterOrDigit(ch) || ch == '.')) {
+                return false;
+            }
+        }
+        for (String seg : text.split("\\.")) {
+            if (!IsIdentifier(seg)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public static boolean IsCapitalized(String text) {
+        if (text == null || text.length() == 0) {
+            return false;
+        }
+        return Character.isAlphabetic(text.charAt(0)) && Character.isUpperCase(text.charAt(0));
+    }
+
+    public static boolean IsUncapitalized(String text) {
+        if (text == null || text.length() == 0) {
+            return false;
+        }
+        return Character.isAlphabetic(text.charAt(0)) && !Character.isUpperCase(text.charAt(0));
     }
 }

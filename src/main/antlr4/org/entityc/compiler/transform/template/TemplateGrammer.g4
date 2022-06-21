@@ -83,6 +83,7 @@ instruction
   | versionTag
   | captureTag
   | logTag
+  | promptTag
   | letTag
   | doTag
   | switchTag
@@ -102,7 +103,7 @@ block
   ;
 
 blockEnd
-  : BlockEndTagStart (Function|Foreach|If|File|Capture|Switch|Log|Send|Preserve|Author|Publisher|Outlet) BlockTagEnd
+  : BlockEndTagStart (Function|Foreach|If|File|Capture|Switch|Log|Prompt|Send|Preserve|Author|Publisher|Outlet) BlockTagEnd
   ;
 
 descriptionTag
@@ -243,6 +244,10 @@ logTag
   : Log identifier?
   ;
 
+promptTag
+  : Prompt identifier (':' primitiveType)?
+  ;
+
 letTag
   : Let identifier EQUALS expression
   ;
@@ -322,7 +327,6 @@ primitiveType
     | STRING_TYPE
     | UUID_TYPE
     | DATE_TYPE
-    | ASSET_TYPE
     ;
 
 builtinType

@@ -8,6 +8,7 @@ package org.entityc.compiler.transform.template.formatter;
 
 import org.entityc.compiler.model.MTCodeFormat;
 import org.entityc.compiler.model.MTRoot;
+import org.entityc.compiler.model.config.MTSpace;
 import org.entityc.compiler.transform.template.StringTemplateTransform;
 import org.entityc.compiler.transform.template.tree.FTComment;
 import org.entityc.compiler.transform.template.tree.FTContainerNode;
@@ -47,7 +48,9 @@ public class TemplateFormatController {
     }
 
     public static String FormatCodeAsString(String code, MTCodeFormat codeFormat) {
-        MTRoot                  root      = new MTRoot(null);
+        MTRoot  root  = new MTRoot(null);
+        MTSpace space = new MTSpace(null, "formatSpace");
+        root.setSpace(space);
         StringTemplateTransform transform = new StringTemplateTransform(root, code);
         transform.load(true);
         FTTemplate               ftTemplate       = transform.getTemplate();
@@ -135,7 +138,8 @@ public class TemplateFormatController {
                 currentCharPos += segment.text.length();
             }
             if (segment.spaceAfter && (nextSegment == null || (!nextSegment.spaceBefore
-                                                               && nextSegment.element != ConfigurableElement.RequiredSpace))) {
+                                                               && nextSegment.element
+                                                                  != ConfigurableElement.RequiredSpace))) {
                 builder.append(" ");
                 currentCharPos++;
             }
@@ -164,11 +168,13 @@ public class TemplateFormatController {
             if (segment.element.isInstructionRelated()) {
                 foundInstruction = true;
             }
-            if (firstConsecutiveInstructionSegmentOfALine == null && (segment.element == ConfigurableElement.InstructionPrefix
-                                                                      || segment.element
-                                                                         == ConfigurableElement.InstructionBlockStartPrefix)) {
+            if (firstConsecutiveInstructionSegmentOfALine == null && (
+                    segment.element == ConfigurableElement.InstructionPrefix
+                    || segment.element
+                       == ConfigurableElement.InstructionBlockStartPrefix)) {
                 firstConsecutiveInstructionSegmentOfALine = segment;
-            } else if ((segment.isVariable() && segment.element == ConfigurableElement.VariablePrefix) || segment.isSource()) {
+            } else if ((segment.isVariable() && segment.element == ConfigurableElement.VariablePrefix)
+                       || segment.isSource()) {
                 firstConsecutiveInstructionSegmentOfALine = null;
             }
             if (nextSegment.startLineNumber != -1 && segment.endLineNumber != -1
@@ -598,7 +604,8 @@ public class TemplateFormatController {
     }
 
     public void addComment(FTComment comment) {
-        TextSegment segment = new TextSegment(TextSegmentType.Comment, ConfigurableElement.None, comment.getStartLineNumber(),
+        TextSegment segment = new TextSegment(TextSegmentType.Comment, ConfigurableElement.None,
+                                              comment.getStartLineNumber(),
                                               comment.getEndLineNumber(), comment.getText());
         segment.textBodyLevel = currentTextBodyLevel;
         textStack.push(segment);

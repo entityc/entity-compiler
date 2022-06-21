@@ -90,6 +90,7 @@ Let              : 'let' ;
 Do               : 'do' ;
 Load             : 'load' ;
 Log              : 'log' ;
+Prompt           : 'prompt' ;
 Extends          : 'extends' ;
 InstanceOf       : 'instanceof' ;
 Receive          : 'receive' ;

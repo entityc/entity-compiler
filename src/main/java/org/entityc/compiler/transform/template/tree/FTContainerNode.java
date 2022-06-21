@@ -142,7 +142,7 @@ public class FTContainerNode extends FTNode {
     }
 
     public FTFunction findFunctionWithName(String functionName) {
-        if (EntityCompiler.isVerbose()) {
+        if (false && EntityCompiler.isVerbose()) {
             ECLog.logInfo("Looking for function " + functionName + "() in a container of class " + this.getClass().getSimpleName());
             if (this instanceof FTTemplate) {
                 ECLog.logInfo("Looking for function " + functionName + "() in template " + ((FTTemplate)this).getName());
@@ -157,7 +157,7 @@ public class FTContainerNode extends FTNode {
                 return (FTFunction) child;
             } else if (child instanceof FTTemplate) {
                 if (((FTTemplate) child).hasFunctionWithName(functionName)) {
-                    if (EntityCompiler.isVerbose()) {
+                    if (false && EntityCompiler.isVerbose()) {
                         ECLog.logInfo("Looking for function " + functionName + "() in template " + ((FTTemplate)child).getName());
                     }
                     return ((FTTemplate) child).getFunctionWithName(functionName);

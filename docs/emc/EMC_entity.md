@@ -641,6 +641,16 @@ Indicates whether it has a least one relationship declared as parent.
 
 <hr/>
 
+#### `boolean hasParentRelationshipToEntity(MTEntity arg0)`
+
+Indicates whether it has a least one relationship declared as parent to the specified entity.
+
+| Parameter | Description |
+|-----|-----|
+|`MTEntity arg0` | *no description* |
+
+<hr/>
+
 #### `boolean` **`hasPrimaryParentRelationship`**
 
 Indicates whether this entity has a primary parent relationship. A primary parent relationship is one which is declared `parent` and **not** declared `optional`.
