@@ -1,0 +1,9 @@
+[
+  {
+    "springboot.admin": {
+      "title": "Spring Boot Microservice with Admin Portal",
+      "description": "Builds a simple Spring Boot based microservice complete with authentication and authorization and an admin web portal.",
+      "uri": "github:entityc/ec-springboot-lib:production/setups/BasicWebApp"
+    }
+  }
+]
