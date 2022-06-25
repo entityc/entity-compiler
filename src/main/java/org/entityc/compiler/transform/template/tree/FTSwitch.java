@@ -7,6 +7,7 @@
 package org.entityc.compiler.transform.template.tree;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.antlr.v4.runtime.misc.OrderedHashSet;
 import org.entityc.compiler.doc.annotation.TemplateInstruction;
 import org.entityc.compiler.doc.annotation.TemplateInstructionArgument;
 import org.entityc.compiler.doc.annotation.TemplateInstructionCategory;
@@ -19,8 +20,10 @@ import org.entityc.compiler.util.ECLog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import static java.lang.System.exit;
 
@@ -43,13 +46,14 @@ public class FTSwitch extends FTContainerNode {
 
     private final FTExpression        condition;
     private final Map<String, FTCase> caseMap     = new HashMap();
+    private final Set<FTCase>         cases       = new OrderedHashSet<>();
     private       FTCase              defaultCase = null;
 
     public FTSwitch(ParserRuleContext ctx, FTContainerNode parent,
                     @TemplateInstructionArgument(
                         description = "The instruction evaluates this expression and branches to the matching case."
                     )
-                        FTExpression expression) {
+                    FTExpression expression) {
         super(ctx, parent);
         this.condition = expression;
     }
@@ -63,6 +67,7 @@ public class FTSwitch extends FTContainerNode {
             defaultCase = ftCase;
             return;
         }
+        cases.add(ftCase);
         for (String key : ftCase.getIdentifiers()) {
             caseMap.put(key, ftCase);
         }
@@ -78,11 +83,9 @@ public class FTSwitch extends FTContainerNode {
         FTCase ftCase = null;
         if (value instanceof MTType) {
             ftCase = caseMap.get(((MTType) value).getTypeAsCaseValue());
-        }
-        else if (value instanceof MTOperation.Operator) {
+        } else if (value instanceof MTOperation.Operator) {
             ftCase = caseMap.get(((MTOperation.Operator) value).name());
-        }
-        else {
+        } else {
             ftCase = caseMap.get("" + value);
         }
         if (ftCase == null) {
@@ -106,7 +109,7 @@ public class FTSwitch extends FTContainerNode {
     public List<FTNode> getChildren() {
         ArrayList<FTNode> allChildren = new ArrayList<>();
         allChildren.addAll(super.getChildren());
-        allChildren.addAll(caseMap.values());
+        allChildren.addAll(cases);
         allChildren.add(defaultCase);
         return allChildren;
     }

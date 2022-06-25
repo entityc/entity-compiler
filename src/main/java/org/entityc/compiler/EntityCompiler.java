@@ -100,7 +100,7 @@ class LogHandler extends Handler {
 
 public class EntityCompiler {
 
-    public static final  String            COMPILER_VERSION = "0.12.5";
+    public static final  String            COMPILER_VERSION = "0.12.6";
     public static final  String            LANGUAGE_VERSION = "0.12.3";
     private static       CommandLineParser cmdLineParser;
 
