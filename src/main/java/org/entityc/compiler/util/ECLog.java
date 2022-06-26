@@ -20,7 +20,7 @@ public class ECLog {
     private static final String INFO    = "INFO";
     private static final String WARNING = "WARNING";
     private static final String ERROR   = "ERROR";
-    private static final String FATAL   = "ERROR";
+    private static final String FATAL   = "FATAL";
 
     static boolean exitOnFatal = true;
 

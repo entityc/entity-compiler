@@ -57,7 +57,7 @@ public class FileTemplateTransform extends TemplateTransform {
 
     public void load(boolean suppressImport) {
 
-        //ECLog.logInfo("Parsing template: " + getName());
+        //ECLog.logInfo("Parsing template: " + getName() + "  that has directory path: " + mtTemplate.getDirectoryName());
 
         if (!findTemplateFile()) {
             ECLog.logFatal("ERROR: Unable to find a template file with the name: " + templateFilename);
@@ -70,7 +70,7 @@ public class FileTemplateTransform extends TemplateTransform {
         } catch (IOException e) {
             ECLog.logFatal("Unable to open template source file: " + file.getAbsolutePath() + " (" + mtTemplate.getName() + ": " + templateFilename + ")");
         }
-        loadFromStream(mtTemplate.getName(), file.getName(), input, suppressImport);
+        loadFromStream(mtTemplate.getName(), mtTemplate.getDirectoryPath(), file.getName(), input, suppressImport);
     }
 
     public void formatCode(MTCodeFormat codeFormat) {

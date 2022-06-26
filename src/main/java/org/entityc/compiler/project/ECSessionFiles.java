@@ -1,15 +1,22 @@
 /*
  * Copyright (c) 2019-2022 The EntityC Project. All rights reserved.
  * Use of this file is governed by the BSD 3-clause license that
+ * can be found in the LICENSE.txt file in the project root.
+ */
+
+/*
+ * Copyright (c) 2019-2022 The EntityC Project. All rights reserved.
+ * Use of this file is governed by the BSD 3-clause license that
  * can be found in the LICENSE.md file in the project root.
  */
 
-package org.entityc.compiler.util;
+package org.entityc.compiler.project;
 
 import com.google.gson.Gson;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import org.entityc.compiler.EntityCompiler;
+import org.entityc.compiler.util.ECLog;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -50,6 +57,7 @@ public class ECSessionFiles {
         if (filesNotInLatestSessionFiles == null) {
             return;
         }
+        // remove those not in current this.filePaths
         filesNotInLatestSessionFiles.removeAll(this.filePaths);
 
         for (String pathOfFileToRemove : filesNotInLatestSessionFiles) {
@@ -61,6 +69,10 @@ public class ECSessionFiles {
         }
     }
 
+    /**
+     * Load the last set of files generated.
+     * @return The set of last files generated.
+     */
     private Set<String> load() {
         Set<String> returnSet = new HashSet<>();
         Gson        gson      = new Gson();

@@ -57,7 +57,7 @@ public class StringTemplateTransform extends TemplateTransform {
 
     public void load(boolean suppressImport) {
         CharStream input = CharStreams.fromString(inputStringValue);
-        loadFromStream("<string template>", "String", input, suppressImport);
+        loadFromStream("<string template>", null, "String", input, suppressImport);
     }
 
     public String getOutputStringValue() {

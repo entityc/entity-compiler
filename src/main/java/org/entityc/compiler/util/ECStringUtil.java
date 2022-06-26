@@ -8,6 +8,7 @@ package org.entityc.compiler.util;
 
 import org.atteo.evo.inflector.English;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -338,5 +339,36 @@ public class ECStringUtil {
             return false;
         }
         return Character.isAlphabetic(text.charAt(0)) && !Character.isUpperCase(text.charAt(0));
+    }
+
+    public static String RepeatString(String str, int times) {
+        StringBuilder sb = new StringBuilder();
+        for (int i=0;i<times;i++) {
+            sb.append(str);
+        }
+        return sb.toString();
+    }
+
+    public static String DirectoryPath(String fullPathWithFile) {
+        String directoryPath = null;
+        if (fullPathWithFile.contains(File.separator)) {
+            directoryPath = fullPathWithFile.substring(0, fullPathWithFile.lastIndexOf(File.separator));
+        }
+        return directoryPath;
+    }
+
+    public static String FilenameFromPath(String fullPathWithFile) {
+        String filename = fullPathWithFile;
+        if (fullPathWithFile.contains(File.separator)) {
+            filename = fullPathWithFile.substring(fullPathWithFile.lastIndexOf(File.separator) + 1);
+        }
+        return filename;
+    }
+
+    public static String PathWithSeparator(String path) {
+        if (path == null || path.length() == 0) {
+            return "";
+        }
+        return path + File.separator;
     }
 }

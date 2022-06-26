@@ -120,7 +120,7 @@ public class TemplateTransform extends MTBaseTransform {
         }
     }
 
-    protected void loadFromStream(String templateName, String filename, CharStream input, boolean suppressImport) {
+    protected void loadFromStream(String templateName, String directoryName, String filename, CharStream input, boolean suppressImport) {
         ECANTLRErrorListener errorListener = new ECANTLRErrorListener(filename);
         TemplateLexer        lexer         = new TemplateLexer(input);
         CommonTokenStream    tokens        = new CommonTokenStream(lexer);
@@ -141,6 +141,7 @@ public class TemplateTransform extends MTBaseTransform {
         TemplateASTVisitor visitor = new TemplateASTVisitor(templateName, getConfiguration(), root.getSpace().getRepositoryByName(sourceRepositoryName), suppressImport);
         template = (FTTemplate) visitor.visit(templateContext);
         template.setName(getName());
+        template.setDirectoryPath(directoryName);
         template.processIndents(true);
     }
 }

@@ -422,9 +422,9 @@ The following properties and methods are available for this class:
 
 <hr/>
 
-#### `String` **`directoryName`**
+#### `String` **`directoryPath`**
 
-Returns the directory name if available. Otherwise returns `null`
+Returns the directory path if available. Otherwise returns `null`
 
 <hr/>
 
