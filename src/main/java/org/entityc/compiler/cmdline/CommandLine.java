@@ -16,6 +16,7 @@ import org.entityc.compiler.cmdline.command.CLBuild;
 import org.entityc.compiler.cmdline.command.CLCommand;
 import org.entityc.compiler.cmdline.command.CLFormat;
 import org.entityc.compiler.cmdline.command.CLHelp;
+import org.entityc.compiler.cmdline.command.CLInfo;
 import org.entityc.compiler.cmdline.command.CLInit;
 import org.entityc.compiler.cmdline.command.CLSchema;
 import org.entityc.compiler.cmdline.command.CLSetup;
@@ -58,6 +59,7 @@ public class CommandLine {
         addCommand(new CLSetup(this));
         addCommand(new CLFormat(this));
         addCommand(new CLStatus(this));
+        addCommand(new CLInfo(this));
     }
 
     private void addCommand(CLCommand command) {
@@ -127,46 +129,6 @@ public class CommandLine {
                     "   " + cmd.getName() + ECStringUtil.RepeatString(" ", maxLen + 3 - cmd.getName().length())
                     + cmd.getSummary());
         }
-
-        /*
-        System.out.println("-c configName  The name of the configuration to use.");
-        System.out.println(
-                "-asv           Advances the current schema version the next time a new schema version is generated.");
-        System.out.println("-sdelete       Deletes all the schema files.");
-        System.out.println("-tp path:...   Specifies colon delimited search path for templates.");
-        System.out.println("-rt name       Runs only the specified template.");
-        System.out.println("-tf name       Formats template file.");
-        System.out.println("-tfin path     Formats template file specifying its file path.");
-        System.out.println(
-                "-tfout path    Sends the formatted file to the specified file path (default is same as -tfin path).");
-        System.out.println("-D name=value  Defines a variable to a value - they can be accessed via templates.");
-        System.out.println("-setup uri     Creates a new project using the specified setup URI, where the URI is:");
-        System.out.println("       site:organization/reponame:tag/setupName");
-        System.out.println("               site         - only github is currently supported.");
-        System.out.println("               organization - The github organization for the setup repo.");
-        System.out.println("               reponame     - The name of the repo.");
-        System.out.println("               tag          - The tag from which to pull the setup files.");
-        System.out.println(
-                "               setupName    - Path and name of setup file to run (e.g. setups/BasicWebAppSetup).");
-        System.out.println(
-                "       This option requires that you use the -D option to define the following variable names:");
-        System.out.println(
-                "               appIdentifier      - A unique name for your app (e.g., basic-app). This will be the name");
-        System.out.println(
-                "                                    of the created project directory. This would likely be its github");
-        System.out.println(
-                "                                    repository name as well if it where to be uploaded there.");
-        System.out.println("               appName            - A name for your app (e.g., BasicApp).");
-        System.out.println(
-                "               apiPrefixNamespace - Represents a URL path prefix for all endpoints of the app. This");
-        System.out.println(
-                "                                    variable should use a \".\" as a delimiter (e.g., api.basicapp");
-        System.out.println(
-                "                                    which would result in api/basicapp/ as a url path prefix.");
-        System.out.println(
-                "               appBasePackage     - This is the base Java package to use for all generated code for the app.");
-
-         */
     }
 
     public final CLCommand getCommandByName(String name) {

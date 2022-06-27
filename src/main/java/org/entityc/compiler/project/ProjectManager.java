@@ -16,6 +16,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
+import org.apache.commons.io.FileUtils;
 import org.entityc.compiler.util.ECLog;
 
 import java.io.File;
@@ -27,11 +28,13 @@ import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ProjectManager {
 
@@ -42,57 +45,54 @@ public class ProjectManager {
     private              List<GeneratedFile>         generatedFiles        = new ArrayList<>();
     private              Set<String>                 configurationNames    = null;
     private              Set<String>                 templateUris          = null;
-    private              String                      projectBaseDirPath; // the directory with the .ec directory in it
+    private              File                        projectDirectory; // the directory with the .ec directory in it
     private              File                        ecDirectory;
     private              File                        ecSessionsDirectory;
 
     private ProjectManager() {
     }
 
-    public static ProjectManager getInstance() {
-        return instance;
-    }
-
-    public String getProjectBaseDirPath() {
-        return projectBaseDirPath;
-    }
-
-    public void setProjectBaseDirPath(String projectBaseDirPath) {
-        this.projectBaseDirPath = projectBaseDirPath;
-    }
-
     public void start() {
-        if (projectBaseDirPath == null) {
+        if (projectDirectory == null) {
             try {
-                String invocationDirectory = new File(".").getCanonicalPath();
-                projectBaseDirPath = findECDirectory(invocationDirectory);
-                if (projectBaseDirPath == null) {
-                    projectBaseDirPath = invocationDirectory;
+                String invocationDirectory  = new File(".").getCanonicalPath();
+                String projectDirectoryPath = findECDirectory(invocationDirectory);
+                if (projectDirectoryPath == null) {
+                    projectDirectoryPath = invocationDirectory;
                 }
+                projectDirectory = new File(projectDirectoryPath);
             } catch (IOException e) {
                 ECLog.logFatal("Unable to locate current working directory");
             }
         }
 
-        ecDirectory         = new File(projectBaseDirPath + File.separator + ECDirectoryName);
+        ecDirectory         = new File(projectDirectory.getAbsolutePath() + File.separator + ECDirectoryName);
         ecSessionsDirectory = new File(ecDirectory.getPath() + File.separator + SessionsDirectoryName);
         ecSessionsDirectory.mkdirs();
     }
 
     public void loadProjectFiles() {
+        validate();
         File generatedFile = new File(ecDirectory.getPath() + File.separator + "generated.json");
         if (generatedFile.exists()) {
             Gson gson = new Gson();
             try {
                 FileInputStream fis    = new FileInputStream(generatedFile);
                 JsonReader      reader = new JsonReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
-                this.generatedFiles = gson.fromJson(reader, new TypeToken<ArrayList<GeneratedFile>>() {}.getType());
+                this.generatedFiles = gson.fromJson(reader, new TypeToken<ArrayList<GeneratedFile>>() {
+                }.getType());
                 reader.close();
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (IOException e) {
                 e.printStackTrace();
             }
+        }
+    }
+
+    public void validate() {
+        if (!ecDirectory.exists()) {
+            ECLog.logFatal("No project directory found.");
         }
     }
 
@@ -191,5 +191,55 @@ public class ProjectManager {
             }
         }
         return files;
+    }
+
+    public Set<String> getSourceFiles() {
+        List<String> sourceFilenames = new ArrayList<>();
+        Collection<File> sourceFiles = FileUtils.listFiles(
+                new File(ProjectManager.getInstance().getProjectBaseDirPath()),
+                new String[]{"eml", "edl"}, true);
+        String   cwdPath  = (new File(".")).getAbsolutePath();
+        String[] cwdParts = cwdPath.split(File.separator);
+        for (File sourceFile : sourceFiles) {
+            String   absolutePath = sourceFile.getAbsolutePath();
+            String[] sourceParts  = absolutePath.split(File.separator);
+
+            int lastMatchingIndex = -1;
+            for (int i = 0; i < cwdParts.length; i++) {
+                if (i + 1 == sourceParts.length) {
+                    break;
+                }
+                if (!cwdParts[i].equals(sourceParts[i])) {
+                    break;
+                }
+                lastMatchingIndex = i;
+            }
+            int           numBackDirs = cwdParts.length - 1 - (lastMatchingIndex + 1);
+            StringBuilder sb          = new StringBuilder();
+            for (int i = 0; i < numBackDirs; i++) {
+                sb.append("..");
+                sb.append(File.separator);
+            }
+            for (int i = lastMatchingIndex + 1; i < sourceParts.length; i++) {
+                sb.append(sourceParts[i]);
+                if (i != (sourceParts.length) - 1) {
+                    sb.append(File.separator);
+                }
+            }
+            sourceFilenames.add(sb.toString());
+        }
+        return sourceFilenames.stream().sorted().collect(Collectors.toSet());
+    }
+
+    public String getProjectBaseDirPath() {
+        return projectDirectory.getAbsolutePath();
+    }
+
+    public static ProjectManager getInstance() {
+        return instance;
+    }
+
+    public void setProjectBaseDirPath(String projectDirectoryPath) {
+        this.projectDirectory = new File(projectDirectoryPath);
     }
 }
