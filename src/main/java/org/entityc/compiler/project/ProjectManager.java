@@ -17,6 +17,7 @@ import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import org.apache.commons.io.FileUtils;
+import org.entityc.compiler.cmdline.command.CLCommand;
 import org.entityc.compiler.util.ECLog;
 
 import java.io.File;
@@ -34,7 +35,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class ProjectManager {
 
@@ -42,14 +42,19 @@ public class ProjectManager {
     private static final String                      SessionsDirectoryName = "sessions";
     private static final ProjectManager              instance              = new ProjectManager();
     private final        Map<String, ECSessionFiles> sessionsByName        = new HashMap<>();
+    private final        String[]                    cwdParts;
     private              List<GeneratedFile>         generatedFiles        = new ArrayList<>();
-    private              Set<String>                 configurationNames    = null;
-    private              Set<String>                 templateUris          = null;
+    private              Set<String>                 configurationNames;
+    private              Set<String>                 templateUris;
     private              File                        projectDirectory; // the directory with the .ec directory in it
     private              File                        ecDirectory;
     private              File                        ecSessionsDirectory;
+    private              List<GeneratedFile>         activeConfigurationPreviouslyGeneratedFiles;
+    private              String                      activeConfigurationName;
 
     private ProjectManager() {
+        String cwdPath = (new File(".")).getAbsolutePath();
+        cwdParts = cwdPath.split(File.separator);
     }
 
     public void start() {
@@ -69,9 +74,11 @@ public class ProjectManager {
         ecDirectory         = new File(projectDirectory.getAbsolutePath() + File.separator + ECDirectoryName);
         ecSessionsDirectory = new File(ecDirectory.getPath() + File.separator + SessionsDirectoryName);
         ecSessionsDirectory.mkdirs();
+        loadProjectFiles();
     }
 
     public void loadProjectFiles() {
+        final String errorMessage = "Unable to load project files.";
         validate();
         File generatedFile = new File(ecDirectory.getPath() + File.separator + "generated.json");
         if (generatedFile.exists()) {
@@ -83,9 +90,9 @@ public class ProjectManager {
                 }.getType());
                 reader.close();
             } catch (FileNotFoundException e) {
-                e.printStackTrace();
+                ECLog.logFatal(errorMessage);
             } catch (IOException e) {
-                e.printStackTrace();
+                ECLog.logFatal(errorMessage);
             }
         }
     }
@@ -94,6 +101,92 @@ public class ProjectManager {
         if (!ecDirectory.exists()) {
             ECLog.logFatal("No project directory found.");
         }
+    }
+
+    public void beginConfiguration(String configurationName) {
+        this.activeConfigurationName                     = configurationName;
+        this.activeConfigurationPreviouslyGeneratedFiles = extractGeneratedFilesForConfiguration(configurationName,
+                                                                                                 true, true);
+    }
+
+    public List<GeneratedFile> extractGeneratedFilesForConfiguration(String configurationName, boolean onlyTiedToThisConfiguration, boolean remove) {
+        List<GeneratedFile> singleConfigurationGeneratedFiles = new ArrayList<>();
+        for (GeneratedFile generatedFile : generatedFiles) {
+            boolean onlyThisConfig = generatedFile.hasSingleConfigurationOrigin(configurationName);
+            if (generatedFile.hasConfigurationOrigin(configurationName)) {
+                GeneratedFile singleConfigurationGeneratedFile = generatedFile.extractForConfiguration(
+                        configurationName, remove);
+                if (onlyTiedToThisConfiguration && onlyThisConfig) {
+                    singleConfigurationGeneratedFiles.add(singleConfigurationGeneratedFile);
+                }
+            }
+        }
+        return singleConfigurationGeneratedFiles;
+    }
+
+    public void endActiveConfiguration() {
+        List<GeneratedFile> activeConfigurationGeneratedFiles = extractGeneratedFilesForConfiguration(
+                activeConfigurationName, true, false);
+        Set<GeneratedFile> prevConfigurationOnlyGeneratedFiles = new HashSet<>();
+        for (GeneratedFile previouslyGeneratedFile : this.activeConfigurationPreviouslyGeneratedFiles) {
+            boolean found = false;
+            // TODO: make sure we only remove generated files that belong only to this configuration
+            for (GeneratedFile generatedFile : activeConfigurationGeneratedFiles) {
+                if (previouslyGeneratedFile.getFilepath().equals(generatedFile.getFilepath())) {
+                    found = true;
+                }
+            }
+            if (!found) {
+                prevConfigurationOnlyGeneratedFiles.add(previouslyGeneratedFile);
+            }
+        }
+        ECLog.log("Number of files generated: " + activeConfigurationGeneratedFiles.size());
+        if (prevConfigurationOnlyGeneratedFiles.size() == 0) {
+            //ECLog.log("No files need to be removed.");
+        } else {
+            Set<String> removedFilenames = new HashSet<>();
+            for (GeneratedFile fileToRemove : prevConfigurationOnlyGeneratedFiles) {
+                File file = new File(fileToRemove.getFilepath());
+                if (file.exists()) {
+                    file.delete();
+                    removedFilenames.add(getRelativePath(file));
+                }
+            }
+            CLCommand.displayItems(
+                    "The following files were previously generated but are now no longer part of "
+                    + "the project and so were deleted.",
+                    removedFilenames, CLCommand.StdoutColor.RedForeground);
+        }
+    }
+
+    public String getRelativePath(File sourceFile) {
+        String   absolutePath = sourceFile.getAbsolutePath();
+        String[] sourceParts  = absolutePath.split(File.separator);
+
+        int lastMatchingIndex = -1;
+        for (int i = 0; i < cwdParts.length; i++) {
+            if (i + 1 == sourceParts.length) {
+                break;
+            }
+            if (!cwdParts[i].equals(sourceParts[i])) {
+                break;
+            }
+            lastMatchingIndex = i;
+        }
+        int           numBackDirs = cwdParts.length - 1 - (lastMatchingIndex + 1);
+        StringBuilder sb          = new StringBuilder();
+        for (int i = 0; i < numBackDirs; i++) {
+            sb.append("..");
+            sb.append(File.separator);
+        }
+        for (int i = lastMatchingIndex + 1; i < sourceParts.length; i++) {
+            sb.append(sourceParts[i]);
+            if (i != (sourceParts.length) - 1) {
+                sb.append(File.separator);
+            }
+        }
+        String relativePath = sb.toString();
+        return relativePath;
     }
 
     public String findECDirectory(String fromHerePath) {
@@ -193,42 +286,20 @@ public class ProjectManager {
         return files;
     }
 
+    public final List<GeneratedFile> getGeneratedFiles() {
+        return generatedFiles;
+    }
+
     public Set<String> getSourceFiles() {
-        List<String> sourceFilenames = new ArrayList<>();
+        Set<String> sourceFilenames = new HashSet<>();
         Collection<File> sourceFiles = FileUtils.listFiles(
                 new File(ProjectManager.getInstance().getProjectBaseDirPath()),
                 new String[]{"eml", "edl"}, true);
-        String   cwdPath  = (new File(".")).getAbsolutePath();
-        String[] cwdParts = cwdPath.split(File.separator);
         for (File sourceFile : sourceFiles) {
-            String   absolutePath = sourceFile.getAbsolutePath();
-            String[] sourceParts  = absolutePath.split(File.separator);
-
-            int lastMatchingIndex = -1;
-            for (int i = 0; i < cwdParts.length; i++) {
-                if (i + 1 == sourceParts.length) {
-                    break;
-                }
-                if (!cwdParts[i].equals(sourceParts[i])) {
-                    break;
-                }
-                lastMatchingIndex = i;
-            }
-            int           numBackDirs = cwdParts.length - 1 - (lastMatchingIndex + 1);
-            StringBuilder sb          = new StringBuilder();
-            for (int i = 0; i < numBackDirs; i++) {
-                sb.append("..");
-                sb.append(File.separator);
-            }
-            for (int i = lastMatchingIndex + 1; i < sourceParts.length; i++) {
-                sb.append(sourceParts[i]);
-                if (i != (sourceParts.length) - 1) {
-                    sb.append(File.separator);
-                }
-            }
-            sourceFilenames.add(sb.toString());
+            String relativePath = getRelativePath(sourceFile);
+            sourceFilenames.add(relativePath);
         }
-        return sourceFilenames.stream().sorted().collect(Collectors.toSet());
+        return sourceFilenames;
     }
 
     public String getProjectBaseDirPath() {

@@ -66,8 +66,11 @@ public class CLBuild extends CLCommand {
             ECLog.logFatal("Unable to find a configuration named \"" + configurationName + "\" in the setup file.");
         }
 
+        ProjectManager.getInstance().beginConfiguration(configurationName);
         // Run the compiler for our configuration
         EntityCompiler.RunConfiguration(configuration);
+
+        ProjectManager.getInstance().endActiveConfiguration();
 
         // close out our session
         ProjectManager.getInstance().close();

@@ -178,7 +178,7 @@ public class CLSetup extends CLCommand {
                 String indent = "      ";
                 ECLog.log(indent + setup.title);
                 ECLog.log("");
-                String wrappedDescription = ECStringUtil.WrapString(setup.description, indent, HELP_LINE_WIDTH);
+                String wrappedDescription = ECStringUtil.WrapString(setup.description, indent, DISPLAY_LINE_WIDTH);
                 ECLog.log(indent + wrappedDescription);
                 ECLog.log("");
                 ECLog.log(indent + setup.uri);

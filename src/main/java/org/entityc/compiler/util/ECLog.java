@@ -6,9 +6,10 @@
 
 package org.entityc.compiler.util;
 
+import org.antlr.v4.runtime.ParserRuleContext;
+import org.entityc.compiler.cmdline.command.CLCommand;
 import org.entityc.compiler.model.MTNode;
 import org.entityc.compiler.transform.template.tree.FTNode;
-import org.antlr.v4.runtime.ParserRuleContext;
 
 import java.io.File;
 
@@ -29,7 +30,7 @@ public class ECLog {
     }
 
     public static void logInfo(ParserRuleContext ctx, String message) {
-        log("INFO", ctx, message, false);
+        log(INFO, ctx, message, false);
     }
 
     private static void log(String level, ParserRuleContext ctx, String message, boolean fatal) {
@@ -94,11 +95,20 @@ public class ECLog {
         if (level.isEmpty()) {
             System.out.println(message);
         } else {
-            System.out.println(level + ": " + message);
+            System.out.println(colorizedLevel(level) + ": " + message);
         }
         if (fatal) {
             exit(1);
         }
+    }
+
+    private static String colorizedLevel(String level) {
+        if (level.equals(WARNING)) {
+            level = CLCommand.StdoutColor.YellowForeground.getStringValue() + level;
+        } else if (level.equals(ERROR) || level.equals(FATAL)) {
+            level = CLCommand.StdoutColor.RedForeground.getStringValue() + level;
+        }
+        return level;
     }
 
     public static void logWarning(FTNode node, String message) {
@@ -124,7 +134,8 @@ public class ECLog {
         }
         String filename = filenameFromFullPath(node.getSourceName());
         System.out.println(
-                level + ": " + filename + "(" + node.getStartLineNumber() + "," + node.getStartCharPosition() + ") "
+                colorizedLevel(level) + ": " + filename + "(" + node.getStartLineNumber() + ","
+                + node.getStartCharPosition() + ") "
                 + message);
         if (fatal) {
             exit(1);

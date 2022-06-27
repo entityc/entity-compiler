@@ -27,6 +27,10 @@ public class GeneratedFile {
         this.origins.add(new GenerationOrigin(configurationName, templateUri));
     }
 
+    public GeneratedFile(String filepath) {
+        this.filepath = filepath;
+    }
+
     public String getFilepath() {
         return filepath;
     }
@@ -49,6 +53,18 @@ public class GeneratedFile {
         return false;
     }
 
+    public boolean hasSingleConfigurationOrigin(String configurationName) {
+        if (origins.size() > 1) {
+            return false;
+        }
+        for (GenerationOrigin origin : origins) {
+            if (origin.getConfigurationName().equals(configurationName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public Set<String> getConfigurationNames() {
         HashSet<String> configurationNames = new HashSet<>();
         for (GenerationOrigin origin : origins) {
@@ -63,5 +79,18 @@ public class GeneratedFile {
             templateUris.add(origin.getTemplateUri());
         }
         return templateUris;
+    }
+
+    public GeneratedFile extractForConfiguration(String configurationName, boolean remove) {
+        GeneratedFile singleConfigurationGeneratedFile = new GeneratedFile(this.filepath);
+        for (GenerationOrigin origin : origins) {
+            if (origin.getConfigurationName().equals(configurationName)) {
+                singleConfigurationGeneratedFile.origins.add(origin);
+            }
+        }
+        if (remove) {
+            origins.removeAll(singleConfigurationGeneratedFile.origins);
+        }
+        return singleConfigurationGeneratedFile;
     }
 }

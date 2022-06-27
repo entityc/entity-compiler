@@ -20,23 +20,41 @@ import org.entityc.compiler.util.ECStringUtil;
 import java.io.File;
 import java.io.FileFilter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.lang.System.exit;
 
 public abstract class CLCommand {
 
-    protected final CommandLine commandLine;
-    protected final int         HELP_LINE_WIDTH = 80;
-    private final   String      name;
-    private final   String      summary;
-    private final   String      description;
+    protected final static int         DISPLAY_LINE_WIDTH = 80;
+    protected final        CommandLine commandLine;
+    private final          String      name;
+    private final          String      summary;
+    private final          String      description;
 
     CLCommand(CommandLine commandLine, String name, String summary, String description) {
         this.commandLine = commandLine;
         this.name        = name;
         this.summary     = summary;
         this.description = description;
+    }
+
+    public static void displayItems(String message, Set<String> listOfItems) {
+        displayItems(message, listOfItems, StdoutColor.Default);
+    }
+
+    public static void displayItems(String message, Set<String> listOfItems, StdoutColor itemColor) {
+        ECLog.log("");
+        ECLog.log(ECStringUtil.WrapString(message + ":", "", DISPLAY_LINE_WIDTH));
+        Collection<String> sortedNames = listOfItems.stream().sorted().collect(Collectors.toList());
+        for (String name : sortedNames) {
+            ECLog.log("    " + (itemColor != null ?
+                                itemColor.stringValue :
+                                "") + name);
+        }
     }
 
     public String getName() {
@@ -60,7 +78,7 @@ public abstract class CLCommand {
         final String prefix       = "usage: ec " + name;
         final String spacing      = " ";
         final String indent       = ECStringUtil.RepeatString(" ", prefix.length() + spacing.length());
-        String       wrappedUsage = ECStringUtil.WrapString(arguments, indent, HELP_LINE_WIDTH);
+        String       wrappedUsage = ECStringUtil.WrapString(arguments, indent, DISPLAY_LINE_WIDTH);
         ECLog.log(prefix + spacing + wrappedUsage);
         ECLog.log("");
     }
@@ -70,7 +88,7 @@ public abstract class CLCommand {
         final String prefix       = name;
         final String spacing      = " -- ";
         final String indent       = ECStringUtil.RepeatString(" ", prefix.length() + spacing.length());
-        String       wrappedUsage = ECStringUtil.WrapString(description, indent, HELP_LINE_WIDTH);
+        String       wrappedUsage = ECStringUtil.WrapString(description, indent, DISPLAY_LINE_WIDTH);
         System.out.print(prefix + spacing);
         System.out.println(wrappedUsage);
         ECLog.log("");
@@ -103,5 +121,45 @@ public abstract class CLCommand {
             sourceFileNames.add(dirpath + File.separator + file.getName());
         }
         return sourceFileNames;
+    }
+
+    public enum StdoutColor {
+        Default(0),
+        Brighter(1),
+        Underlined(4),
+        Flashing(5),
+        BlackForeground(30),
+        RedForeground(31),
+        GreenForeground(32),
+        YellowForeground(33),
+        BlueForeground(34),
+        PurpleForeground(35),
+        CyanForeground(36),
+        WhiteForeground(37),
+        BlackBackground(40),
+        RedBackground(41),
+        GreenBackground(42),
+        YellowBackground(43),
+        BlueBackground(44),
+        PurpleBackground(45),
+        CyanBackground(46),
+        WhiteBackground(47),
+        ;
+
+        final int    ansiCode;
+        final String stringValue;
+
+        StdoutColor(int ansiCode) {
+            this.ansiCode    = ansiCode;
+            this.stringValue = "\033[1;" + ansiCode + "m";
+        }
+
+        public int getAnsiCode() {
+            return ansiCode;
+        }
+
+        public String getStringValue() {
+            return stringValue;
+        }
     }
 }

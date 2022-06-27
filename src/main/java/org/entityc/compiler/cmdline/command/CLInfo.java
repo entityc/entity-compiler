@@ -12,16 +12,14 @@
 
 package org.entityc.compiler.cmdline.command;
 
-import org.apache.commons.io.FileUtils;
 import org.entityc.compiler.cmdline.CommandLine;
+import org.entityc.compiler.project.GeneratedFile;
 import org.entityc.compiler.project.ProjectManager;
-import org.entityc.compiler.util.ECLog;
 
 import java.io.File;
-import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 public class CLInfo extends CLCommand {
 
@@ -34,46 +32,68 @@ public class CLInfo extends CLCommand {
 
     @Override
     public void printUsage() {
-        super.printUsageWithArguments("[-c,--configs][-t,--templates]");
+        super.printUsageWithArguments("[-s,--sources][-c,--configs][-t,--templates][-g,--generated][-a,--all]");
     }
 
     @Override
     public void run(String[] args) {
 
         ProjectManager projectManager = ProjectManager.getInstance();
-
         projectManager.start();
 
-        boolean showConfigs = false;
-        boolean showTemplates = false;
-        for (int i=0; i<args.length;i++) {
+        boolean showSources = false;
+        boolean showConfigs        = false;
+        boolean showTemplates      = false;
+        boolean showGeneratedFiles = false;
+        for (int i = 0; i < args.length; i++) {
             String arg = args[i];
             if (arg.equals("-c") || arg.equals("--configs")) {
                 showConfigs = true;
+            } else if (arg.equals("-s") || arg.equals("--sources")) {
+                showSources = true;
             } else if (arg.equals("-t") || arg.equals("--templates")) {
                 showTemplates = true;
+            } else if (arg.equals("-g") || arg.equals("--generated")) {
+                showGeneratedFiles = true;
+            } else if (arg.equals("-a") || arg.equals("--all")) {
+                showConfigs = true;
+                showSources = true;
+                showTemplates = true;
+                showGeneratedFiles = true;
             }
         }
-        boolean showSources = true;
+
+        if (!showConfigs && !showTemplates && !showGeneratedFiles) {
+            showSources = true;
+        }
 
         projectManager.loadProjectFiles();
+
         if (showSources) {
             displayItems("Source Files", projectManager.getSourceFiles());
         }
-        if (showConfigs) {
-            displayItems("Configurations", projectManager.getConfigurationNames());
-        }
-        if (showTemplates) {
-            displayItems("Templates", projectManager.getTemplateUris());
-        }
-    }
 
-    private void displayItems(String message, Set<String> listOfItems) {
-        ECLog.log("");
-        ECLog.log(message + ":");
-        Collection<String> sortedNames = listOfItems.stream().sorted().collect(Collectors.toList());
-        for (String name : sortedNames) {
-            ECLog.log("    " + name);
+        if (showGeneratedFiles) {
+            final List<GeneratedFile> files     = projectManager.getGeneratedFiles();
+            Set<String>               filenames = new HashSet<>();
+            for (GeneratedFile file : files) {
+                StringBuilder sb = new StringBuilder();
+                sb.append(ProjectManager.getInstance().getRelativePath(new File(file.getFilepath())));
+                Set<String> configurationNames = file.getConfigurationNames();
+                if (configurationNames.size() > 1) {
+                    sb.append(" (" + configurationNames.size() + " configurations)");
+                }
+                filenames.add(sb.toString());
+            }
+            displayItems("Generated Files", filenames, StdoutColor.GreenForeground);
+        }
+
+        if (showConfigs) {
+            displayItems("Configurations", projectManager.getConfigurationNames(), StdoutColor.CyanForeground);
+        }
+
+        if (showTemplates) {
+            displayItems("Templates", projectManager.getTemplateUris(), StdoutColor.BlueForeground);
         }
     }
 }
