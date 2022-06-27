@@ -38,17 +38,15 @@ import java.util.Set;
 
 public class ProjectManager {
 
-    private static final String                      ECDirectoryName       = ".ec";
-    private static final String                      SessionsDirectoryName = "sessions";
-    private static final ProjectManager              instance              = new ProjectManager();
-    private final        Map<String, ECSessionFiles> sessionsByName        = new HashMap<>();
+    private static final String                      ECDirectoryName   = ".ec";
+    private static final String                      GeneratedFilename = "generated.json";
+    private static final ProjectManager              instance          = new ProjectManager();
     private final        String[]                    cwdParts;
-    private              List<GeneratedFile>         generatedFiles        = new ArrayList<>();
+    private              List<GeneratedFile>         generatedFiles    = new ArrayList<>();
     private              Set<String>                 configurationNames;
     private              Set<String>                 templateUris;
     private              File                        projectDirectory; // the directory with the .ec directory in it
     private              File                        ecDirectory;
-    private              File                        ecSessionsDirectory;
     private              List<GeneratedFile>         activeConfigurationPreviouslyGeneratedFiles;
     private              String                      activeConfigurationName;
 
@@ -71,16 +69,15 @@ public class ProjectManager {
             }
         }
 
-        ecDirectory         = new File(projectDirectory.getAbsolutePath() + File.separator + ECDirectoryName);
-        ecSessionsDirectory = new File(ecDirectory.getPath() + File.separator + SessionsDirectoryName);
-        ecSessionsDirectory.mkdirs();
+        ecDirectory = new File(projectDirectory.getAbsolutePath() + File.separator + ECDirectoryName);
+        ecDirectory.mkdirs();
         loadProjectFiles();
     }
 
     public void loadProjectFiles() {
         final String errorMessage = "Unable to load project files.";
         validate();
-        File generatedFile = new File(ecDirectory.getPath() + File.separator + "generated.json");
+        File generatedFile = new File(ecDirectory.getPath() + File.separator + GeneratedFilename);
         if (generatedFile.exists()) {
             Gson gson = new Gson();
             try {
@@ -205,15 +202,6 @@ public class ProjectManager {
         }
     }
 
-    public ECSessionFiles getSessionFiles(String sessionName) {
-        //we need to make sure all paths added to this session are relative to the found single project base path
-
-        if (!sessionsByName.containsKey(sessionName)) {
-            sessionsByName.put(sessionName, new ECSessionFiles(sessionName, ecSessionsDirectory.getAbsolutePath()));
-        }
-        return sessionsByName.get(sessionName);
-    }
-
     public void addGeneratedFile(String path, String configurationName, String templateUri) {
         generatedFiles.add(new GeneratedFile(path, configurationName, templateUri));
         configurationNames = null;
@@ -222,13 +210,8 @@ public class ProjectManager {
 
     public void close() {
 
-        for (ECSessionFiles sessionFiles : sessionsByName.values()) {
-            sessionFiles.removeOldFiles();
-            sessionFiles.save();
-        }
-
         Gson   gson     = new Gson();
-        String filepath = ecDirectory.getPath() + File.separator + "generated.json";
+        String filepath = ecDirectory.getPath() + File.separator + GeneratedFilename;
         try {
             FileOutputStream fos    = new FileOutputStream(filepath);
             JsonWriter       writer = new JsonWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));

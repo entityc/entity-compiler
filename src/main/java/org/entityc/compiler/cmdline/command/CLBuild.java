@@ -74,6 +74,7 @@ public class CLBuild extends CLCommand {
 
         // close out our session
         ProjectManager.getInstance().close();
+        ECLog.log(StdoutColor.GreenForeground.getStringValue() + "Success");
     }
 
     @Override

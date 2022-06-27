@@ -18,7 +18,6 @@ import org.entityc.compiler.model.entity.MTAttribute;
 import org.entityc.compiler.model.entity.MTEntity;
 import org.entityc.compiler.model.entity.MTRelationship;
 import org.entityc.compiler.model.language.MTLanguage;
-import org.entityc.compiler.project.ECSessionFiles;
 import org.entityc.compiler.project.ProjectManager;
 import org.entityc.compiler.protobuf.PBASTVisitor;
 import org.entityc.compiler.protobuf.PBLoaderExtractor;
@@ -42,7 +41,6 @@ public class FTTransformSession {
     private final        Stack<Scope>           scopeStack     = new Stack<>();
     private final        Stack<FTBodyBlock>     bodyBlockStack = new Stack<>();
     private final        Map<String, FTReceive> receiveMap     = new HashMap<>();
-    private final        ECSessionFiles         sessionFiles;
     private final        Map<String, Scope>     authorScopeMap = new HashMap<>();
     private              FTTemplate             template;
     private              MTTransform            templateTransform;
@@ -81,7 +79,6 @@ public class FTTransformSession {
         }
         addReadonlyNamedValue("true", Boolean.TRUE);
         addReadonlyNamedValue("false", Boolean.FALSE);
-        sessionFiles = ProjectManager.getInstance().getSessionFiles(template.getName());
     }
 
     private void pushScope(Scope scope) {
@@ -129,7 +126,6 @@ public class FTTransformSession {
     not going to execute its generating template code because it has the ifnotexist set.
      */
     public void registerFileBlock(FTFile fileBlock) {
-        sessionFiles.addFilePath(fileBlock.getFullFilePath());
         ProjectManager.getInstance().addGeneratedFile(fileBlock.getFullFilePath(), configuration.getName(),
                                                       this.template.getUri()
                                                      );
@@ -138,7 +134,6 @@ public class FTTransformSession {
     public void pushFileBlock(FTFile fileBlock) {
         fileBlock.getBody().clear();
         bodyBlockStack.push(fileBlock);
-        sessionFiles.addFilePath(fileBlock.getFullFilePath());
         ProjectManager.getInstance().addGeneratedFile(fileBlock.getFullFilePath(), configuration.getName(),
                                                       this.template.getUri()
                                                      );
