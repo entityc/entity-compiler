@@ -36,19 +36,15 @@ public class CommandLine {
 
     private final Map<String, CLCommand> commands = new HashMap<>();
 
-    public        boolean             help                 = false;
-    public        boolean             version              = false;
-    public        boolean             verbose              = false;
-    public        List<String>        sourceFileNames      = new ArrayList<>();
-    public        boolean             advanceSchemaVersion = false;
-    public        boolean             deleteSchema         = false;
-    public        String              configurationName;
-    public        List<String>        templateSearchPaths  = new ArrayList<>();
-    public        String              templateToRun;
-    public        String              templateToFormat;
-    public        String              templateToFormatInPath;
-    public        String              templateToFormatOutPath;
-    public        String              setupUri;
+    public  boolean      help                 = false;
+    public  boolean      version              = false;
+    public  boolean      verbose              = false;
+    public  List<String> sourceFileNames      = new ArrayList<>();
+    public  boolean      advanceSchemaVersion = false;
+    public  boolean      deleteSchema         = false;
+    public  String       configurationName;
+    public  String       templateToRun;
+    private static List<String> templateSearchPaths  = new ArrayList<>();
 
     public CommandLine() {
         addCommand(new CLHelp(this));
@@ -65,11 +61,21 @@ public class CommandLine {
         commands.put(command.getName(), command);
     }
 
+    public static void AddToTemplateSearchPath(String path) {
+        templateSearchPaths.add(path);
+    }
+
+    public static final List<String> GetTemplateSearchPaths() {
+        return templateSearchPaths;
+    }
+
     public void run(String[] args) {
         if (args.length == 0) {
             printUsage();
             exit(0);
         }
+
+        reset(); // in case it is executed multiple times in a single java vm
 
         String commandName = args[0];
 
@@ -128,5 +134,9 @@ public class CommandLine {
 
     public final CLCommand getCommandByName(String name) {
         return commands.get(name);
+    }
+
+    private static void reset() {
+        templateSearchPaths.clear();
     }
 }

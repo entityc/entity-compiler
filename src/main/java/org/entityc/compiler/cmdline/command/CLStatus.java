@@ -34,7 +34,7 @@ public class CLStatus extends CLCommand {
     public void run(String[] args) {
 
         ProjectManager projectManager = ProjectManager.getInstance();
-        projectManager.start();
+        projectManager.start(false);
         ECLog.log("Project directory: " +  ProjectManager.getInstance().getProjectBaseDirPath());
     }
 }

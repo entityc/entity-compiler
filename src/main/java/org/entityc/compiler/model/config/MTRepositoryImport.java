@@ -21,7 +21,7 @@ public class MTRepositoryImport extends MTNode {
     private String  filename;
     private String  repositoryName;
     private boolean includeOnly;
-    private boolean quitely;
+    private boolean quietly;
 
     private String directoryPath;
 
@@ -78,12 +78,12 @@ public class MTRepositoryImport extends MTNode {
         this.repositoryName = repositoryName;
     }
 
-    public boolean isQuitely() {
-        return quitely;
+    public boolean isQuietly() {
+        return quietly;
     }
 
-    public void setQuitely(boolean quitely) {
-        this.quitely = quitely;
+    public void setQuietly(boolean quietly) {
+        this.quietly = quietly;
     }
 
     @Override

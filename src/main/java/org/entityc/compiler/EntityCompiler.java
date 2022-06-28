@@ -31,6 +31,7 @@ import org.entityc.compiler.transform.template.TemplateTransform;
 import org.entityc.compiler.util.ECANTLRErrorListener;
 import org.entityc.compiler.util.ECLog;
 import org.entityc.compiler.util.ECStringUtil;
+import org.entityc.compiler.util.LogHandler;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -38,105 +39,31 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Handler;
-import java.util.logging.Level;
+import java.util.Set;
 import java.util.logging.LogManager;
-import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.stream.Stream;
 
 import static java.lang.System.exit;
 
-class LogHandler extends Handler {
-
-    @Override
-    public void publish(LogRecord record) {
-        String   fullClassPath = record.getSourceClassName();
-        String[] parts         = fullClassPath.split("\\.");
-        String   justClassName = parts[parts.length - 1];
-
-        StringBuilder sb = new StringBuilder();
-        sb.append(record.getLevel().getName());
-        sb.append(": ");
-        sb.append(justClassName);
-        sb.append(".");
-        sb.append(record.getSourceMethodName());
-        sb.append("()| ");
-        sb.append(record.getMessage());
-        if (record.getLevel() == Level.SEVERE) {
-            System.err.println(sb);
-        } else {
-            System.out.println(sb);
-        }
-    }
-
-    @Override
-    public void flush() {
-
-    }
-
-    @Override
-    public void close() throws SecurityException {
-
-    }
-}
-
 public class EntityCompiler {
 
-    public static final  String              COMPILER_VERSION = "0.13.0";
-    public static final  String              LANGUAGE_VERSION = "0.12.3";
-    private static final Map<String, String> defineValues     = new HashMap<>();
-    private static       CommandLine         cmdLineParser;
-
-    public static final List<String> GetTemplateSearchPaths() {
-        return cmdLineParser.templateSearchPaths;
-    }
-
-    public static final String GetDefineValue(String name, String defaultValue) {
-        String value = GetDefineValue(name);
-        if (value == null) {
-            value = defaultValue;
-        }
-        return value;
-    }
-
-    public static String GetDefineValue(String name) {
-        return defineValues.get(name);
-    }
-
-    public static void SetDefineValue(String name, String value) {
-        defineValues.put(name, value);
-    }
-
-    public static final boolean ShouldAdvanceSchemaVersion() {
-        return cmdLineParser.advanceSchemaVersion;
-    }
-
-    private static String readLineByLineJava8(String filePath) {
-        StringBuilder contentBuilder = new StringBuilder();
-
-        try (Stream<String> stream = Files.lines(Paths.get(filePath), StandardCharsets.UTF_8)) {
-            stream.forEach(s -> contentBuilder.append(s).append("\n"));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        return contentBuilder.toString();
-    }
+    public static final  String              COMPILER_VERSION   = "0.13.0";
+    public static final  String              LANGUAGE_VERSION   = "0.12.3";
+    private static final Map<String, String> defineValues       = new HashMap<>();
+    private static final Set<String>         templateSearchPath = new HashSet<>();
+    private static       CommandLine         commandLine;
 
     public static void main(String[] args) {
 
         setupLogger();
 
-        cmdLineParser = new CommandLine();
-        cmdLineParser.run(args);
+        commandLine = new CommandLine();
+        commandLine.run(args);
     }
 
     private static void setupLogger() {
@@ -162,13 +89,13 @@ public class EntityCompiler {
         for (MTTransform transformSpec : configuration.getTransforms()) {
             if (transformSpec.isTemplate()) {
                 MTTemplate template = (MTTemplate) transformSpec;
-                if (cmdLineParser.templateToRun != null && !template.getName().equals(cmdLineParser.templateToRun)) {
+                if (commandLine.templateToRun != null && !template.getName().equals(commandLine.templateToRun)) {
                     continue;
                 }
                 RepositoryFile repositoryFile;
                 String         templateFilename;
                 if (template.getRepositoryImport() != null) {
-                    if (cmdLineParser.verbose) {
+                    if (commandLine.verbose) {
                         ECLog.logInfo("Getting template " + template.getName() + " from repository: "
                                       + template.getRepositoryImport().getRepositoryName());
                     }
@@ -213,7 +140,7 @@ public class EntityCompiler {
             if (transform instanceof FileTemplateTransform) {
                 continue; // skip templates for now
             }
-            if (cmdLineParser.verbose) {
+            if (commandLine.verbose) {
                 System.out.println("Running " + "transform" + " " + transform.getName());
             }
             transform.start();
@@ -223,7 +150,6 @@ public class EntityCompiler {
         root.getSpace().checkValidReferences();
 
         ArrayList<FileTemplateTransform> fileTemplatesToRun = new ArrayList<>();
-        // Non-Contextual Templates
         for (MTTransform transformSpec : configuration.getTransforms()) {
             if (transformSpec instanceof MTTemplate) {
                 if (((MTTemplate) transformSpec).isContextual()) {
@@ -233,12 +159,12 @@ public class EntityCompiler {
                 if (transform instanceof FileTemplateTransform) {
                     TemplateTransform templateTransform = (TemplateTransform) transform;
                     templateTransform.setConfig(transformSpec.getConfig());
-                    if (cmdLineParser.verbose) {
+                    if (commandLine.verbose) {
                         System.out.println("Loading template " + templateTransform.getName());
                     }
                     templateTransform.load();
                     fileTemplatesToRun.add((FileTemplateTransform) templateTransform);
-                    if (cmdLineParser.verbose) {
+                    if (commandLine.verbose) {
                         System.out.println("Finished Loading template " + templateTransform.getName());
                     }
                 }
@@ -489,7 +415,7 @@ public class EntityCompiler {
     }
 
     public static final boolean isVerbose() {
-        return cmdLineParser != null && cmdLineParser.verbose;
+        return commandLine != null && commandLine.verbose;
     }
 
     public static boolean ensureDirectory(File dir) {
@@ -503,6 +429,26 @@ public class EntityCompiler {
     public static boolean ensureDirectory(String directoryPath) {
         File dir = new File(directoryPath);
         return ensureDirectory(dir);
+    }
+
+    public static final String GetDefineValue(String name, String defaultValue) {
+        String value = GetDefineValue(name);
+        if (value == null) {
+            value = defaultValue;
+        }
+        return value;
+    }
+
+    public static String GetDefineValue(String name) {
+        return defineValues.get(name);
+    }
+
+    public static void SetDefineValue(String name, String value) {
+        defineValues.put(name, value);
+    }
+
+    public static final boolean ShouldAdvanceSchemaVersion() {
+        return commandLine.advanceSchemaVersion;
     }
 
     public static void parseSourceFiles(MTRoot root, MTSpace space, List<RepositoryFile> repositoryFiles, boolean ignoreSpaceRequirement) {

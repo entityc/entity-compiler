@@ -49,7 +49,7 @@ public class CLInit extends CLCommand {
                 if (force) {
                     ProjectManager.getInstance().setProjectBaseDirPath(invocationDirectory);
                 }
-                ProjectManager.getInstance().start();
+                ProjectManager.getInstance().start(false);
                 ProjectManager.getInstance().close();
                 ECLog.log("This directory (" + invocationDirectory + ") is now an Entity Compiler project directory.");
             } else {

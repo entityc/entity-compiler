@@ -7,6 +7,7 @@
 package org.entityc.compiler.transform;
 
 import org.entityc.compiler.EntityCompiler;
+import org.entityc.compiler.cmdline.CommandLine;
 import org.entityc.compiler.model.MTRoot;
 
 import java.io.File;
@@ -50,7 +51,7 @@ public class TransformManager {
     }
 
     public static File FindTemplateFile(String templateFilename) {
-        for (String searchPath : EntityCompiler.GetTemplateSearchPaths()) {
+        for (String searchPath : CommandLine.GetTemplateSearchPaths()) {
             File dir       = new File(searchPath);
             File foundFile = SearchForTemplateFile(dir, templateFilename);
             if (foundFile != null) {

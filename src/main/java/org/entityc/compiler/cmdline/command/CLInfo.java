@@ -39,7 +39,7 @@ public class CLInfo extends CLCommand {
     public void run(String[] args) {
 
         ProjectManager projectManager = ProjectManager.getInstance();
-        projectManager.start();
+        projectManager.start(false);
 
         boolean showSources = false;
         boolean showConfigs        = false;

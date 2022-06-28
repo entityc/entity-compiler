@@ -43,6 +43,7 @@ public class CLBuild extends CLCommand {
 
         String       configurationName = args[0];
         List<String> defines           = new ArrayList<>();
+        boolean quietMode = false;
 
         // Gather the source file names
         ArrayList<String> sourceFilenames = new ArrayList<>();
@@ -58,6 +59,17 @@ public class CLBuild extends CLCommand {
                 defines.add(args[++i]);
             } else if (arg.startsWith("-D")) {
                 defines.add(arg.substring(2));
+            } else if (arg.equals("-q") || arg.equals("--quiet")) {
+                quietMode = true;
+            } else if (arg.equals("-tp")) {
+                if (i == args.length-1) {
+                    ECLog.logFatal("Missing template path.");
+                }
+                String paths = args[++i];
+                for (String path : paths.split(":")) {
+                    commandLine.AddToTemplateSearchPath(path);
+                }
+
             }
         }
 
@@ -71,7 +83,7 @@ public class CLBuild extends CLCommand {
         }
 
         // startup our project
-        ProjectManager.getInstance().start();
+        ProjectManager.getInstance().start(quietMode);
 
         // Convert them to repository imports
         ArrayList<RepositoryFile> repositoryFiles = new ArrayList<>();
@@ -100,11 +112,13 @@ public class CLBuild extends CLCommand {
 
         // close out our session
         ProjectManager.getInstance().close();
-        ECLog.log(StdoutColor.GreenForeground.getStringValue() + "Success");
+        if (!quietMode) {
+            ECLog.log(StdoutColor.GreenForeground.getStringValue() + "Success");
+        }
     }
 
     @Override
     public void printUsage() {
-        super.printUsageWithArguments("<config-name> [<file> ...] [-D<name>=<value> ...]");
+        super.printUsageWithArguments("<config-name> [<file> ...] [-tp <path>][-q,--quiet][-D<name>=<value> ...]");
     }
 }

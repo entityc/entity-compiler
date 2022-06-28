@@ -30,10 +30,8 @@ import java.io.OutputStreamWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 public class ProjectManager {
@@ -50,12 +48,15 @@ public class ProjectManager {
     private              List<GeneratedFile>         activeConfigurationPreviouslyGeneratedFiles;
     private              String                      activeConfigurationName;
 
+    private boolean quietMode = false;
+
     private ProjectManager() {
         String cwdPath = (new File(".")).getAbsolutePath();
         cwdParts = cwdPath.split(File.separator);
     }
 
-    public void start() {
+    public void start(boolean quietMode) {
+        this.quietMode = quietMode;
         if (projectDirectory == null) {
             try {
                 String invocationDirectory  = new File(".").getCanonicalPath();
@@ -137,7 +138,9 @@ public class ProjectManager {
                 prevConfigurationOnlyGeneratedFiles.add(previouslyGeneratedFile);
             }
         }
-        ECLog.log("Number of files generated: " + activeConfigurationGeneratedFiles.size());
+        if (!quietMode) {
+            ECLog.log("Number of files generated: " + activeConfigurationGeneratedFiles.size());
+        }
         if (prevConfigurationOnlyGeneratedFiles.size() == 0) {
             //ECLog.log("No files need to be removed.");
         } else {
@@ -296,4 +299,12 @@ public class ProjectManager {
     public void setProjectBaseDirPath(String projectDirectoryPath) {
         this.projectDirectory = new File(projectDirectoryPath);
     }
+    public boolean isQuietMode() {
+        return quietMode;
+    }
+
+    public void setQuietMode(boolean quietMode) {
+        this.quietMode = quietMode;
+    }
+
 }

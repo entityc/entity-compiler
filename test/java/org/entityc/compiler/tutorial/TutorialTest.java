@@ -2,6 +2,7 @@ package org.entityc.compiler.tutorial;
 
 import org.entityc.compiler.EntityCompiler;
 import org.apache.commons.io.FileUtils;
+import org.entityc.compiler.util.ECLog;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
@@ -32,16 +33,17 @@ public class TutorialTest {
         System.setOut(new PrintStream(actualFile));
 
         List<String> cmdLine = new ArrayList<>();
+        cmdLine.add("build");
+        cmdLine.add("Tutorial");
+        cmdLine.add("--quiet");
+
+        cmdLine.add("-tp");
+        cmdLine.add(TestResourceDir);
 
         for (String filename : files) {
             cmdLine.add(TestResourceDir + File.separator + filename);
         }
-        cmdLine.add("-c");
-        cmdLine.add("Tutorial");
-        cmdLine.add("-tp");
-        cmdLine.add(TestResourceDir);
-        cmdLine.add("-D");
-        cmdLine.add("TEMP_DIR=" + strTmp);
+        cmdLine.add("-DTEMP_DIR=" + strTmp);
 
         EntityCompiler.main(cmdLine.toArray(new String[0]));
 

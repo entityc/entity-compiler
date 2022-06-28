@@ -52,7 +52,7 @@ public class GitHubRepositoryImporter implements RepositoryImporter {
                            + repository.getRepoName());
         }
         try {
-            if (!repositoryImport.isQuitely()) {
+            if (!repositoryImport.isQuietly()) {
                 ECLog.logInfo("Downloading file: " + gitRepoPath + " " + repository.getTag());
             }
             GHContent fileContent = repo.getFileContent(gitRepoPath, repository.getTag());

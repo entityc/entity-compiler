@@ -94,7 +94,7 @@ public class CLSetup extends CLCommand {
         EntityCompiler.ensureDirectory(directoryName);
 
         ProjectManager.getInstance().setProjectBaseDirPath(directoryName);
-        ProjectManager.getInstance().start();
+        ProjectManager.getInstance().start(false);
 
         configureSetupRepo(setupUri);
 
@@ -187,11 +187,11 @@ public class CLSetup extends CLCommand {
         }
     }
 
-    private RepositoryFile getFileFromRepositoryUri(String uri, String extension, boolean quitely) {
+    private RepositoryFile getFileFromRepositoryUri(String uri, String extension, boolean quietly) {
         MTRepository repository = new MTRepository(uri);
         repository.setName("SetupRepo");
         MTRepositoryImport repositoryImport = new MTRepositoryImport(null, false);
-        repositoryImport.setQuitely(quitely);
+        repositoryImport.setQuietly(quietly);
         MTSpace space = new MTSpace(null, "Setup");
         MTRoot  root  = new MTRoot(null);
         root.setSpace(space);
@@ -209,7 +209,7 @@ public class CLSetup extends CLCommand {
         this.setupRepository = new MTRepository(uri);
         this.setupRepository.setName("SetupRepo");
         MTRepositoryImport repositoryImport = new MTRepositoryImport(null, false);
-        repositoryImport.setQuitely(true);
+        repositoryImport.setQuietly(true);
         this.space = new MTSpace(null, "Setup");
         this.root  = new MTRoot(null);
         root.setSpace(space);
