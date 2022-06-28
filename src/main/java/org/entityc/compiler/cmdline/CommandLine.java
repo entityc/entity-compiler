@@ -36,7 +36,6 @@ public class CommandLine {
 
     private final Map<String, CLCommand> commands = new HashMap<>();
 
-    private final Map<String, String> defineValues         = new HashMap<>();
     public        boolean             help                 = false;
     public        boolean             version              = false;
     public        boolean             verbose              = false;
@@ -64,10 +63,6 @@ public class CommandLine {
 
     private void addCommand(CLCommand command) {
         commands.put(command.getName(), command);
-    }
-
-    public String getDefineValue(String name) {
-        return defineValues.get(name);
     }
 
     public void run(String[] args) {

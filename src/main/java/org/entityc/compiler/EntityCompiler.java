@@ -25,6 +25,7 @@ import org.entityc.compiler.model.domain.MTDEntity;
 import org.entityc.compiler.model.domain.MTDModule;
 import org.entityc.compiler.model.domain.MTDomain;
 import org.entityc.compiler.model.entity.MTEntity;
+import org.entityc.compiler.project.ProjectManager;
 import org.entityc.compiler.protobuf.PBLoaderExtractor;
 import org.entityc.compiler.repository.RepositoryCache;
 import org.entityc.compiler.repository.RepositoryFile;
@@ -37,7 +38,6 @@ import org.entityc.compiler.transform.template.TemplatePublishing;
 import org.entityc.compiler.transform.template.TemplateTransform;
 import org.entityc.compiler.util.ECANTLRErrorListener;
 import org.entityc.compiler.util.ECLog;
-import org.entityc.compiler.project.ProjectManager;
 import org.entityc.compiler.util.ECStringUtil;
 
 import java.io.File;
@@ -50,7 +50,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -96,28 +98,33 @@ class LogHandler extends Handler {
 
 public class EntityCompiler {
 
-    public static final String      COMPILER_VERSION = "0.12.7";
-    public static final String      LANGUAGE_VERSION = "0.12.3";
-    private static      CommandLine cmdLineParser;
+    public static final  String              COMPILER_VERSION = "0.12.7";
+    public static final  String              LANGUAGE_VERSION = "0.12.3";
+    private static final Map<String, String> defineValues     = new HashMap<>();
+    private static       CommandLine         cmdLineParser;
 
     public static final List<String> GetTemplateSearchPaths() {
         return cmdLineParser.templateSearchPaths;
     }
 
     public static final String GetDefineValue(String name, String defaultValue) {
-        String value = cmdLineParser.getDefineValue(name);
+        String value = GetDefineValue(name);
         if (value == null) {
             value = defaultValue;
         }
         return value;
     }
 
-    public static final boolean ShouldAdvanceSchemaVersion() {
-        return cmdLineParser.advanceSchemaVersion;
+    public static void SetDefineValue(String name, String value) {
+        defineValues.put(name, value);
     }
 
-    public static final boolean isVerbose() {
-        return cmdLineParser != null && cmdLineParser.verbose;
+    public static String GetDefineValue(String name) {
+        return defineValues.get(name);
+    }
+
+    public static final boolean ShouldAdvanceSchemaVersion() {
+        return cmdLineParser.advanceSchemaVersion;
     }
 
     private static String readLineByLineJava8(String filePath) {
@@ -197,7 +204,7 @@ public class EntityCompiler {
             outputDirectory = configuration.getOutputByName("ProjectTopDir");
             if (outputDirectory != null) {
                 outputDirectory.setPath(
-                        cmdLineParser.getDefineValue("appIdentifier") + "/" + outputDirectory.getPath());
+                        GetDefineValue("appIdentifier") + "/" + outputDirectory.getPath());
             }
         }
 
@@ -267,6 +274,121 @@ public class EntityCompiler {
         }
         RunProtoc(root, configuration);
         ProjectManager.getInstance().close();
+    }
+
+    public static void RunConfiguration(MTConfiguration configuration) {
+        MTRoot root = configuration.getRoot();
+        EntityCompiler.LoadTransforms(root, configuration);
+        EntityCompiler.RunTransforms(root, configuration);
+        EntityCompiler.RunProtoc(root, configuration);
+    }
+
+    public static void LoadTransforms(MTRoot root, MTConfiguration configuration) {
+        String configurationName = configuration.getName();
+        // Load any built in transforms (such as the postgres one)
+        TransformManager.LoadBuiltins(root, configurationName);
+
+        // templates
+        boolean failedToLoadTransform = false;
+        for (MTTransform transformSpec : configuration.getTransforms()) {
+            if (transformSpec.isTemplate()) {
+                MTTemplate template = (MTTemplate) transformSpec;
+                if (cmdLineParser.templateToRun != null && !template.getName().equals(cmdLineParser.templateToRun)) {
+                    continue;
+                }
+                RepositoryFile repositoryFile;
+                String         templateFilename;
+                if (template.getRepositoryImport() != null) {
+                    if (cmdLineParser.verbose) {
+                        ECLog.logInfo("Getting template " + template.getName() + " from repository: "
+                                      + template.getRepositoryImport().getRepositoryName());
+                    }
+                    RepositoryImportManager importManager = new RepositoryImportManager(
+                            RepositoryCache.CacheStructure.UserCache);
+                    repositoryFile = importManager.importFromRepository(root.getSpace(), template.getRepositoryImport(),
+                                                                        "eml", false);
+                    if (repositoryFile == null) {
+                        ECLog.logFatal("Unable to import template: " + template.getName());
+                    }
+                    templateFilename = repositoryFile.getFilepath();
+                } else {
+                    templateFilename = transformSpec.getName() + ".eml";
+                }
+                FileTemplateTransform templateTransform = new FileTemplateTransform(root, configurationName, template,
+                                                                                    templateFilename);
+                TransformManager.AddTransform(templateTransform);
+            }
+            MTBaseTransform transform = TransformManager.GetTransformByName(transformSpec.getName());
+            if (transform == null) {
+                ECLog.logError("Unable to find builtin transform named: " + transformSpec.getName());
+                failedToLoadTransform = true;
+            } else if (!transform.canStart()) {
+                ECLog.logError("Cannot start transform named: " + transformSpec.getName());
+                failedToLoadTransform = true;
+            }
+        }
+        if (failedToLoadTransform) {
+            exit(1);
+        }
+    }
+
+    public static void RunTransforms(MTRoot root, MTConfiguration configuration) {
+        root.resolveReferences(false);
+        //model.processAssetAttributes();
+        root.getSpace().checkValidReferences();
+
+        TransformManager.GetTransformByName("Implicit").start();
+
+        for (MTTransform transformSpec : configuration.getTransforms()) {
+            MTBaseTransform transform = TransformManager.GetTransformByName(transformSpec.getName());
+            if (transform instanceof FileTemplateTransform) {
+                continue; // skip templates for now
+            }
+            if (cmdLineParser.verbose) {
+                System.out.println("Running " + "transform" + " " + transform.getName());
+            }
+            transform.start();
+        }
+
+        root.resolveReferences(true);
+        root.getSpace().checkValidReferences();
+
+        ArrayList<FileTemplateTransform> fileTemplatesToRun = new ArrayList<>();
+        // Non-Contextual Templates
+        for (MTTransform transformSpec : configuration.getTransforms()) {
+            if (transformSpec instanceof MTTemplate) {
+                if (((MTTemplate) transformSpec).isContextual()) {
+                    continue; // don't automatically run these
+                }
+                MTBaseTransform transform = TransformManager.GetTransformByName(transformSpec.getName());
+                if (transform instanceof FileTemplateTransform) {
+                    TemplateTransform templateTransform = (TemplateTransform) transform;
+                    templateTransform.setConfig(transformSpec.getConfig());
+                    if (cmdLineParser.verbose) {
+                        System.out.println("Loading template " + templateTransform.getName());
+                    }
+                    templateTransform.load();
+                    fileTemplatesToRun.add((FileTemplateTransform) templateTransform);
+                    if (cmdLineParser.verbose) {
+                        System.out.println("Finished Loading template " + templateTransform.getName());
+                    }
+                }
+            }
+        }
+        // Now that they are all parsed we can try to connect publish submissions to outlets.
+
+        TemplatePublishing publishingHouse = new TemplatePublishing();
+
+        for (FileTemplateTransform transform : fileTemplatesToRun) {
+            transform.getTemplate().processPublishing(publishingHouse, TemplatePublishing.Mode.IndexPublishers);
+        }
+        for (FileTemplateTransform transform : fileTemplatesToRun) {
+            transform.getTemplate().processPublishing(publishingHouse, TemplatePublishing.Mode.PairAuthorsToOutlets);
+        }
+
+        for (FileTemplateTransform transform : fileTemplatesToRun) {
+            transform.run();
+        }
     }
 
     public static void RunProtoc(MTRoot root, MTConfiguration configuration) {
@@ -497,119 +619,21 @@ public class EntityCompiler {
         }
     }
 
-    public static void RunTransforms(MTRoot root, MTConfiguration configuration) {
-        root.resolveReferences(false);
-        //model.processAssetAttributes();
-        root.getSpace().checkValidReferences();
-
-        TransformManager.GetTransformByName("Implicit").start();
-
-        for (MTTransform transformSpec : configuration.getTransforms()) {
-            MTBaseTransform transform = TransformManager.GetTransformByName(transformSpec.getName());
-            if (transform instanceof FileTemplateTransform) {
-                continue; // skip templates for now
-            }
-            if (cmdLineParser.verbose) {
-                System.out.println("Running " + "transform" + " " + transform.getName());
-            }
-            transform.start();
-        }
-
-        root.resolveReferences(true);
-        root.getSpace().checkValidReferences();
-
-        ArrayList<FileTemplateTransform> fileTemplatesToRun = new ArrayList<>();
-        // Non-Contextual Templates
-        for (MTTransform transformSpec : configuration.getTransforms()) {
-            if (transformSpec instanceof MTTemplate) {
-                if (((MTTemplate) transformSpec).isContextual()) {
-                    continue; // don't automatically run these
-                }
-                MTBaseTransform transform = TransformManager.GetTransformByName(transformSpec.getName());
-                if (transform instanceof FileTemplateTransform) {
-                    TemplateTransform templateTransform = (TemplateTransform) transform;
-                    templateTransform.setConfig(transformSpec.getConfig());
-                    if (cmdLineParser.verbose) {
-                        System.out.println("Loading template " + templateTransform.getName());
-                    }
-                    templateTransform.load();
-                    fileTemplatesToRun.add((FileTemplateTransform) templateTransform);
-                    if (cmdLineParser.verbose) {
-                        System.out.println("Finished Loading template " + templateTransform.getName());
-                    }
-                }
-            }
-        }
-        // Now that they are all parsed we can try to connect publish submissions to outlets.
-
-        TemplatePublishing publishingHouse = new TemplatePublishing();
-
-        for (FileTemplateTransform transform : fileTemplatesToRun) {
-            transform.getTemplate().processPublishing(publishingHouse, TemplatePublishing.Mode.IndexPublishers);
-        }
-        for (FileTemplateTransform transform : fileTemplatesToRun) {
-            transform.getTemplate().processPublishing(publishingHouse, TemplatePublishing.Mode.PairAuthorsToOutlets);
-        }
-
-        for (FileTemplateTransform transform : fileTemplatesToRun) {
-            transform.run();
-        }
+    public static final boolean isVerbose() {
+        return cmdLineParser != null && cmdLineParser.verbose;
     }
 
-    public static void RunConfiguration(MTConfiguration configuration) {
-        MTRoot root = configuration.getRoot();
-        EntityCompiler.LoadTransforms(root, configuration);
-        EntityCompiler.RunTransforms(root, configuration);
-        EntityCompiler.RunProtoc(root, configuration);
+    public static boolean ensureDirectory(File dir) {
+        if (!dir.exists()) {
+            boolean created = dir.mkdirs();
+            return created && dir.exists();
+        }
+        return true;
     }
 
-    public static void LoadTransforms(MTRoot root, MTConfiguration configuration) {
-        String configurationName = configuration.getName();
-        // Load any built in transforms (such as the postgres one)
-        TransformManager.LoadBuiltins(root, configurationName);
-
-        // templates
-        boolean failedToLoadTransform = false;
-        for (MTTransform transformSpec : configuration.getTransforms()) {
-            if (transformSpec.isTemplate()) {
-                MTTemplate template = (MTTemplate) transformSpec;
-                if (cmdLineParser.templateToRun != null && !template.getName().equals(cmdLineParser.templateToRun)) {
-                    continue;
-                }
-                RepositoryFile repositoryFile;
-                String         templateFilename;
-                if (template.getRepositoryImport() != null) {
-                    if (cmdLineParser.verbose) {
-                        ECLog.logInfo("Getting template " + template.getName() + " from repository: "
-                                      + template.getRepositoryImport().getRepositoryName());
-                    }
-                    RepositoryImportManager importManager = new RepositoryImportManager(
-                            RepositoryCache.CacheStructure.UserCache);
-                    repositoryFile = importManager.importFromRepository(root.getSpace(), template.getRepositoryImport(),
-                                                                        "eml", false);
-                    if (repositoryFile == null) {
-                        ECLog.logFatal("Unable to import template: " + template.getName());
-                    }
-                    templateFilename = repositoryFile.getFilepath();
-                } else {
-                    templateFilename = transformSpec.getName() + ".eml";
-                }
-                FileTemplateTransform templateTransform = new FileTemplateTransform(root, configurationName, template,
-                                                                                    templateFilename);
-                TransformManager.AddTransform(templateTransform);
-            }
-            MTBaseTransform transform = TransformManager.GetTransformByName(transformSpec.getName());
-            if (transform == null) {
-                ECLog.logError("Unable to find builtin transform named: " + transformSpec.getName());
-                failedToLoadTransform = true;
-            } else if (!transform.canStart()) {
-                ECLog.logError("Cannot start transform named: " + transformSpec.getName());
-                failedToLoadTransform = true;
-            }
-        }
-        if (failedToLoadTransform) {
-            exit(1);
-        }
+    public static boolean ensureDirectory(String directoryPath) {
+        File dir = new File(directoryPath);
+        return ensureDirectory(dir);
     }
 
     public static void parseSourceFiles(MTRoot root, MTSpace space, List<RepositoryFile> repositoryFiles, boolean ignoreSpaceRequirement) {
@@ -680,19 +704,6 @@ public class EntityCompiler {
         ASTVisitor visitor = new ASTVisitor();
         visitor.visitRoot(rootContext, root, space);
         return visitor.getFoundSpace();
-    }
-
-    public static boolean ensureDirectory(File dir) {
-        if (!dir.exists()) {
-            boolean created = dir.mkdirs();
-            return created && dir.exists();
-        }
-        return true;
-    }
-
-    public static boolean ensureDirectory(String directoryPath) {
-        File dir = new File(directoryPath);
-        return ensureDirectory(dir);
     }
 }
 

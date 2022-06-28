@@ -29,8 +29,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static java.lang.System.exit;
-
 public class CLFormat extends CLCommand {
 
     public CLFormat(CommandLine commandLine) {
@@ -47,6 +45,8 @@ public class CLFormat extends CLCommand {
 
     @Override
     public void run(String[] args) {
+
+        // process arguments
         List<String> filenames       = new ArrayList<>();
         String       outputDirectory = null;
         for (int i = 0; i < args.length; i++) {
@@ -64,13 +64,16 @@ public class CLFormat extends CLCommand {
                 }
             }
         }
+
+        // setup root node, space and configuration
         MTRoot  root  = new MTRoot(null);
         MTSpace space = new MTSpace(null, "formatterSpace");
         root.setSpace(space);
         MTConfiguration config = new MTConfiguration(null, root, "formatter");
         root.addConfiguration(config);
-        MTFile file = null;
 
+        // process each file specified
+        MTFile file = null;
         for (String filename : filenames) {
             File f = new File(filename);
             if (f.exists()) {
@@ -80,6 +83,7 @@ public class CLFormat extends CLCommand {
                                + filename);
             }
 
+            // setup, parse and load template into memory
             MTTemplate mtTemplate = new MTTemplate(null, config, file);
             TransformManager.AddTransform(new FileTemplateTransform(config, mtTemplate, file.getPath()));
             FTTemplate ftTemplate = mtTemplate.parse((FTTransformSession) null, true);
@@ -89,6 +93,8 @@ public class CLFormat extends CLCommand {
             } else {
                 outFile = new File(file.getPath());
             }
+
+            // Use the default code format and perform the formatting
             MTCodeFormat codeFormat = root.getCodeFormat("Default");
             ftTemplate.formatCodeToFile(outFile, codeFormat);
         }

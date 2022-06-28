@@ -21,6 +21,7 @@ import org.entityc.compiler.repository.RepositoryFile;
 import org.entityc.compiler.util.ECLog;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class CLBuild extends CLCommand {
 
@@ -33,23 +34,43 @@ public class CLBuild extends CLCommand {
 
     @Override
     public void run(String[] args) {
+        
+        // must have at least one argument
         if (args.length == 0) {
             printUsage();
             return;
         }
 
-        String configurationName = args[0];
+        String       configurationName = args[0];
+        List<String> defines           = new ArrayList<>();
 
-        // Gather up the source file names
+        // Gather the source file names
         ArrayList<String> sourceFilenames = new ArrayList<>();
         for (int i = 1; i < args.length; i++) {
             String arg = args[i];
-            if (arg.contains("*")) {
-                sourceFilenames.addAll(super.processWildcardArg(arg));
-            } else {
-                sourceFilenames.add(arg);
+            if (!arg.startsWith("-")) {
+                if (arg.contains("*")) {
+                    sourceFilenames.addAll(super.processWildcardArg(arg));
+                } else {
+                    sourceFilenames.add(arg);
+                }
+            } else if (arg.equals("-D")) {
+                defines.add(args[++i]);
+            } else if (arg.startsWith("-D")) {
+                defines.add(arg.substring(2));
             }
         }
+
+        // set the global name/value pairs from command line
+        for (String defineStatement : defines) {
+            String[] nameValue = defineStatement.split("=");
+            if (nameValue.length != 2) {
+                ECLog.logFatal("-D option must be of the form <name>=<value>.");
+            }
+            EntityCompiler.SetDefineValue(nameValue[0], nameValue[1]);
+        }
+
+        // startup our project
         ProjectManager.getInstance().start();
 
         // Convert them to repository imports
@@ -57,19 +78,21 @@ public class CLBuild extends CLCommand {
         for (String sourceFilename : sourceFilenames) {
             repositoryFiles.add(new RepositoryFile(sourceFilename, false));
         }
+
+        // create the root node and run the parser
         MTRoot root = new MTRoot(null);
         EntityCompiler.parseSourceFiles(root, null, repositoryFiles, false);
 
+        // Get the configuration that was requested and make sure it is there
         MTConfiguration configuration = root.getConfiguration(configurationName);
-
         if (configuration == null) {
-            ECLog.logFatal("Unable to find a configuration named \"" + configurationName + "\" in the setup file.");
+            ECLog.logFatal(
+                    "Unable to find a configuration named \"" + configurationName + "\" in the specified files.");
         }
 
-        ProjectManager.getInstance().beginConfiguration(configurationName);
         // Run the compiler for our configuration
+        ProjectManager.getInstance().beginConfiguration(configurationName);
         EntityCompiler.RunConfiguration(configuration);
-
         ProjectManager.getInstance().endActiveConfiguration();
 
         // close out our session
@@ -79,6 +102,6 @@ public class CLBuild extends CLCommand {
 
     @Override
     public void printUsage() {
-        super.printUsageWithArguments("<config-name> [<file>]");
+        super.printUsageWithArguments("<config-name> [<file> ...] [-D<name>=<value> ...]");
     }
 }
