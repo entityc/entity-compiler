@@ -20,7 +20,7 @@ public class ECANTLRErrorListener extends BaseErrorListener {
 
     @Override
     public void syntaxError(Recognizer<?, ?> recognizer, Object offendingSymbol, int line, int charPositionInLine, String msg, RecognitionException e) {
-        System.err.println(filename + ":" + line + "," + charPositionInLine + " " + msg);
+        ECLog.logFatal(filename + ":" + line + "," + charPositionInLine + " " + msg);
 //        super.syntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
     }
 }

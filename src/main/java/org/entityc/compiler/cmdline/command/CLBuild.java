@@ -34,7 +34,7 @@ public class CLBuild extends CLCommand {
 
     @Override
     public void run(String[] args) {
-        
+
         // must have at least one argument
         if (args.length == 0) {
             printUsage();
@@ -94,6 +94,9 @@ public class CLBuild extends CLCommand {
         ProjectManager.getInstance().beginConfiguration(configurationName);
         EntityCompiler.RunConfiguration(configuration);
         ProjectManager.getInstance().endActiveConfiguration();
+
+        // If the configuration include a protoc block
+        EntityCompiler.RunProtoc(root, configuration);
 
         // close out our session
         ProjectManager.getInstance().close();

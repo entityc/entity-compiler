@@ -11,26 +11,18 @@ import org.antlr.v4.runtime.CharStreams;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.apache.commons.io.IOUtils;
 import org.entityc.compiler.cmdline.CommandLine;
-import org.entityc.compiler.model.MTModule;
 import org.entityc.compiler.model.MTRoot;
 import org.entityc.compiler.model.config.MTConfiguration;
-import org.entityc.compiler.model.config.MTDirectory;
 import org.entityc.compiler.model.config.MTProtoc;
 import org.entityc.compiler.model.config.MTRepositoryImport;
 import org.entityc.compiler.model.config.MTSpace;
 import org.entityc.compiler.model.config.MTSpaceInclude;
 import org.entityc.compiler.model.config.MTTemplate;
 import org.entityc.compiler.model.config.MTTransform;
-import org.entityc.compiler.model.domain.MTDEntity;
-import org.entityc.compiler.model.domain.MTDModule;
-import org.entityc.compiler.model.domain.MTDomain;
-import org.entityc.compiler.model.entity.MTEntity;
-import org.entityc.compiler.project.ProjectManager;
 import org.entityc.compiler.protobuf.PBLoaderExtractor;
 import org.entityc.compiler.repository.RepositoryCache;
 import org.entityc.compiler.repository.RepositoryFile;
 import org.entityc.compiler.repository.RepositoryImportManager;
-import org.entityc.compiler.structure.sql.SSSchemaVersioning;
 import org.entityc.compiler.transform.MTBaseTransform;
 import org.entityc.compiler.transform.TransformManager;
 import org.entityc.compiler.transform.template.FileTemplateTransform;
@@ -98,7 +90,7 @@ class LogHandler extends Handler {
 
 public class EntityCompiler {
 
-    public static final  String              COMPILER_VERSION = "0.12.7";
+    public static final  String              COMPILER_VERSION = "0.13.0";
     public static final  String              LANGUAGE_VERSION = "0.12.3";
     private static final Map<String, String> defineValues     = new HashMap<>();
     private static       CommandLine         cmdLineParser;
@@ -115,12 +107,12 @@ public class EntityCompiler {
         return value;
     }
 
-    public static void SetDefineValue(String name, String value) {
-        defineValues.put(name, value);
-    }
-
     public static String GetDefineValue(String name) {
         return defineValues.get(name);
+    }
+
+    public static void SetDefineValue(String name, String value) {
+        defineValues.put(name, value);
     }
 
     public static final boolean ShouldAdvanceSchemaVersion() {
@@ -145,135 +137,12 @@ public class EntityCompiler {
 
         cmdLineParser = new CommandLine();
         cmdLineParser.run(args);
+    }
 
-        System.exit(0);
-
-        boolean setupMode = cmdLineParser.setupUri != null;
-
-        boolean codeFormattingOnly = !setupMode && (cmdLineParser.templateToFormat != null
-                                                    || cmdLineParser.templateToFormatInPath != null);
-        if (cmdLineParser.sourceFileNames.size() < 1) {
-            if (cmdLineParser.deleteSchema) {
-                SSSchemaVersioning.DeleteEntireSchema();
-                exit(0);
-            }
-            if (!codeFormattingOnly && !setupMode) {
-                System.err.println("ERROR: Must specify at least one source file.");
-                exit(1);
-            }
-        }
-
-        // root node for all things read in during this execution session
-        MTRoot root = new MTRoot(null);
-
-        List<String> sourceFilenames   = new ArrayList<>();
-        String       configurationName = cmdLineParser.configurationName;
-
-        ProjectManager.getInstance().start();
-
-        // get all filenames passed on command line and parse those files
-        ArrayList<RepositoryFile> repositoryFiles = new ArrayList<>();
-        for (String sourceFilename : sourceFilenames) {
-            repositoryFiles.add(new RepositoryFile(sourceFilename, false));
-        }
-        parseSourceFiles(root, null, repositoryFiles, codeFormattingOnly);
-
-        // Get configuration name from command line - this is used to only execute a configuration
-        // by that name from the files read in.
-        if (configurationName == null) {
-            if (root.getConfigurationNames().size() == 1) {
-                configurationName = root.getConfigurationNames().get(0);
-            }
-        }
-
-        MTConfiguration configuration = configurationName != null ?
-                                        root.getConfiguration(configurationName) :
-                                        null;
-
-        if (configuration == null) {
-            ECLog.logFatal("Need to specify a configuration.");
-        }
-        if (setupMode) {
-            // add the project directory we created above to the start of the output path
-            MTDirectory outputDirectory = configuration.getOutputByName("SetupTargetDir");
-            if (outputDirectory == null) {
-                ECLog.logFatal("Setup needs an output defined by the name of \"SetupTargetDir\".");
-            }
-            outputDirectory.setPath("" + "/" + outputDirectory.getPath());
-
-            outputDirectory = configuration.getOutputByName("ProjectTopDir");
-            if (outputDirectory != null) {
-                outputDirectory.setPath(
-                        GetDefineValue("appIdentifier") + "/" + outputDirectory.getPath());
-            }
-        }
-
-        if (cmdLineParser.deleteSchema) {
-            SSSchemaVersioning.DeleteEntireSchema();
-        }
-
-        LoadTransforms(root, configuration);
-
-        if (cmdLineParser.verbose) {
-            ECLog.logInfo("RESOLVING REFERENCES...");
-        }
-        RunTransforms(root, configuration);
-
-        // Contextual Templates
-        for (MTTransform transformSpec : configuration.getTransforms()) {
-            if (transformSpec instanceof MTTemplate) {
-                if (!((MTTemplate) transformSpec).isContextual()) {
-                    continue;
-                }
-
-                MTBaseTransform transform = TransformManager.GetTransformByName(transformSpec.getName());
-                if (!(transform instanceof TemplateTransform)) {
-                    continue;
-                }
-
-                String templateName = transformSpec.getName();
-
-                for (MTDomain domain : root.getSpace().getDomains()) {
-                    for (MTEntity entity : root.getSpace().getEntities()) {
-                        MTDEntity domainEntity = domain.getDomainEntity(entity, true);
-                        if (domainEntity.getApplyTemplate() != null
-                            && domainEntity.getApplyTemplate().getTemplateName().equals(templateName)) {
-                            if (EntityCompiler.isVerbose()) {
-                                ECLog.logInfo(
-                                        "Running entity contextual template " + transform.getName() + " for domain "
-                                        + domain.getName() + " on entity " + entity.getName());
-                            }
-                            ((TemplateTransform) transform).start(domainEntity.getApplyTemplate(), entity);
-                        } else {
-                            MTModule module = entity.getModule();
-                            MTDModule domainModule = module != null ?
-                                                     domain.getDomainModule(module, true) :
-                                                     null;
-                            if (domainModule != null && domainModule.getApplyTemplate() != null
-                                && domainModule.getApplyTemplate().getTemplateName().equals(templateName)) {
-                                if (EntityCompiler.isVerbose()) {
-                                    ECLog.logInfo(
-                                            "Running module contextual template " + transform.getName() + " for domain "
-                                            + domain.getName() + " in module " + module.getName() + " on entity "
-                                            + entity.getName());
-                                }
-                                ((TemplateTransform) transform).start(domainModule.getApplyTemplate(), entity);
-                            } else if (domain.getApplyTemplate() != null
-                                       && domain.getApplyTemplate().getTemplateName().equals(templateName)) {
-                                if (EntityCompiler.isVerbose()) {
-                                    ECLog.logInfo(
-                                            "Running domain contextual template " + transform.getName() + " for domain "
-                                            + domain.getName() + " on entity " + entity.getName());
-                                }
-                                ((TemplateTransform) transform).start(domain.getApplyTemplate(), entity);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        RunProtoc(root, configuration);
-        ProjectManager.getInstance().close();
+    private static void setupLogger() {
+        LogManager.getLogManager().reset();
+        Logger rootLogger = LogManager.getLogManager().getLogger("");
+        rootLogger.addHandler(new LogHandler());
     }
 
     public static void RunConfiguration(MTConfiguration configuration) {
@@ -646,8 +515,7 @@ public class EntityCompiler {
             try {
                 input = CharStreams.fromFileName(repositoryFile.getFilepath());
             } catch (IOException e) {
-                System.err.println("ERROR: Unable to open source file: " + repositoryFile.getFilepath());
-                exit(1);
+                ECLog.logFatal("Unable to open source file: " + repositoryFile.getFilepath());
             }
 
             boolean firstInput = root.getSpace() == null;
@@ -684,12 +552,6 @@ public class EntityCompiler {
                 importManager.close();
             }
         }
-    }
-
-    private static void setupLogger() {
-        LogManager.getLogManager().reset();
-        Logger rootLogger = LogManager.getLogManager().getLogger("");
-        rootLogger.addHandler(new LogHandler());
     }
 
     private static MTSpace parseInput(String filename, CharStream input, MTRoot root, MTSpace space) {

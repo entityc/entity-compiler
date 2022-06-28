@@ -13,6 +13,7 @@
 package org.entityc.compiler.cmdline.command;
 
 import org.entityc.compiler.cmdline.CommandLine;
+import org.entityc.compiler.structure.sql.SSSchemaVersioning;
 
 public class CLSchema extends CLCommand {
 
@@ -31,5 +32,6 @@ public class CLSchema extends CLCommand {
     @Override
     public void run(String[] args) {
 
+        // TODO: SSSchemaVersioning.DeleteEntireSchema();
     }
 }
