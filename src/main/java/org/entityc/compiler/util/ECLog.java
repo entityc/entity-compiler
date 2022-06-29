@@ -35,11 +35,11 @@ public class ECLog {
 
     private static void log(String level, ParserRuleContext ctx, String message, boolean fatal) {
         if (ctx == null) {
-            System.out.println(level + ": " + message);
+            log(level, message, fatal);
         } else {
             String filename = filenameFromFullPath(ctx.getStart().getTokenSource().getSourceName());
             System.out.println(level + ": " + filename + "(" + ctx.getStart().getLine() + "," + (
-                    ctx.getStart().getCharPositionInLine() + 1) + ") " + message);
+                    ctx.getStart().getCharPositionInLine() + 1) + ") " + message + endColorization());
         }
         if (fatal) {
             if (exitOnFatal) {
@@ -47,6 +47,17 @@ public class ECLog {
             } else {
                 throw new RuntimeException(message);
             }
+        }
+    }
+
+    private static void log(String level, String message, boolean fatal) {
+        if (level.isEmpty()) {
+            System.out.println(message);
+        } else {
+            System.out.println(colorizedLevel(level) + ": " + message + endColorization());
+        }
+        if (fatal) {
+            exit(1);
         }
     }
 
@@ -59,6 +70,19 @@ public class ECLog {
             return fullPath;
         }
         return fullPath.substring(lastSlash + 1);
+    }
+
+    private static String endColorization() {
+        return CLCommand.StdoutColor.Default.getStringValue();
+    }
+
+    private static String colorizedLevel(String level) {
+        if (level.equals(WARNING)) {
+            level = CLCommand.StdoutColor.YellowForeground.getStringValue() + level;
+        } else if (level.equals(ERROR) || level.equals(FATAL)) {
+            level = CLCommand.StdoutColor.RedForeground.getStringValue() + level;
+        }
+        return level;
     }
 
     public static void logWarning(ParserRuleContext ctx, String message) {
@@ -85,30 +109,10 @@ public class ECLog {
         String filename = filenameFromFullPath(node.getSourceName());
         System.out.println(
                 level + ": " + filename + "(" + node.getStartLineNumber() + "," + node.getStartCharPosition() + ") "
-                + message);
+                + message + endColorization());
         if (fatal) {
             exit(1);
         }
-    }
-
-    private static void log(String level, String message, boolean fatal) {
-        if (level.isEmpty()) {
-            System.out.println(message);
-        } else {
-            System.out.println(colorizedLevel(level) + ": " + message);
-        }
-        if (fatal) {
-            exit(1);
-        }
-    }
-
-    private static String colorizedLevel(String level) {
-        if (level.equals(WARNING)) {
-            level = CLCommand.StdoutColor.YellowForeground.getStringValue() + level;
-        } else if (level.equals(ERROR) || level.equals(FATAL)) {
-            level = CLCommand.StdoutColor.RedForeground.getStringValue() + level;
-        }
-        return level;
     }
 
     public static void logWarning(FTNode node, String message) {
@@ -136,7 +140,7 @@ public class ECLog {
         System.out.println(
                 colorizedLevel(level) + ": " + filename + "(" + node.getStartLineNumber() + ","
                 + node.getStartCharPosition() + ") "
-                + message);
+                + message + endColorization());
         if (fatal) {
             exit(1);
         }

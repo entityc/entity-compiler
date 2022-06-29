@@ -36,17 +36,19 @@ import java.util.Set;
 
 public class ProjectManager {
 
-    private static final String                      ECDirectoryName   = ".ec";
-    private static final String                      GeneratedFilename = "generated.json";
-    private static final ProjectManager              instance          = new ProjectManager();
-    private final        String[]                    cwdParts;
-    private              List<GeneratedFile>         generatedFiles    = new ArrayList<>();
-    private              Set<String>                 configurationNames;
-    private              Set<String>                 templateUris;
-    private              File                        projectDirectory; // the directory with the .ec directory in it
-    private              File                        ecDirectory;
-    private              List<GeneratedFile>         activeConfigurationPreviouslyGeneratedFiles;
-    private              String                      activeConfigurationName;
+    private static final String              ECDirectoryName   = ".ec";
+    private static final String              GeneratedFilename = "generated.json";
+    private static final String              SchemaFilename    = "schema.json";
+    private static final ProjectManager      instance          = new ProjectManager();
+    private final        String[]            cwdParts;
+    private              List<GeneratedFile> generatedFiles    = new ArrayList<>();
+    private              Set<String>         configurationNames;
+    private              Set<String>         templateUris;
+    private              File                projectDirectory; // the directory with the .ec directory in it
+    private              File                ecDirectory;
+    private              List<GeneratedFile> activeConfigurationPreviouslyGeneratedFiles;
+    private              String              activeConfigurationName;
+    private              Set<String>         schemaDirectories = new HashSet<>();
 
     private boolean quietMode = false;
 
@@ -76,16 +78,23 @@ public class ProjectManager {
     }
 
     public void loadProjectFiles() {
-        final String errorMessage = "Unable to load project files.";
         validate();
-        File generatedFile = new File(ecDirectory.getPath() + File.separator + GeneratedFilename);
-        if (generatedFile.exists()) {
+        this.generatedFiles    = loadFile(GeneratedFilename, new TypeToken<ArrayList<GeneratedFile>>() {
+        }.getType(), new ArrayList<>());
+        this.schemaDirectories = loadFile(SchemaFilename, new TypeToken<Set<String>>() {
+        }.getType(), new HashSet<>());
+    }
+
+    private <T> T loadFile(String filename, java.lang.reflect.Type type, T defaultValue) {
+        T            object       = defaultValue;
+        final String errorMessage = "Unable to load project file: " + filename;
+        File         projectFile  = new File(ecDirectory.getPath() + File.separator + filename);
+        if (projectFile.exists()) {
             Gson gson = new Gson();
             try {
-                FileInputStream fis    = new FileInputStream(generatedFile);
+                FileInputStream fis    = new FileInputStream(projectFile);
                 JsonReader      reader = new JsonReader(new InputStreamReader(fis, StandardCharsets.UTF_8));
-                this.generatedFiles = gson.fromJson(reader, new TypeToken<ArrayList<GeneratedFile>>() {
-                }.getType());
+                object = gson.fromJson(reader, type);
                 reader.close();
             } catch (FileNotFoundException e) {
                 ECLog.logFatal(errorMessage);
@@ -93,6 +102,7 @@ public class ProjectManager {
                 ECLog.logFatal(errorMessage);
             }
         }
+        return object;
     }
 
     public void validate() {
@@ -212,13 +222,17 @@ public class ProjectManager {
     }
 
     public void close() {
+        saveFile(GeneratedFilename, generatedFiles);
+        saveFile(SchemaFilename, schemaDirectories);
+    }
 
+    private <T> void saveFile(String filename, T object) {
         Gson   gson     = new Gson();
-        String filepath = ecDirectory.getPath() + File.separator + GeneratedFilename;
+        String filepath = ecDirectory.getPath() + File.separator + filename;
         try {
             FileOutputStream fos    = new FileOutputStream(filepath);
             JsonWriter       writer = new JsonWriter(new OutputStreamWriter(fos, StandardCharsets.UTF_8));
-            gson.toJson(generatedFiles, ArrayList.class, writer);
+            gson.toJson(object, ArrayList.class, writer);
             writer.flush();
             fos.close();
         } catch (FileNotFoundException e) {
@@ -299,6 +313,7 @@ public class ProjectManager {
     public void setProjectBaseDirPath(String projectDirectoryPath) {
         this.projectDirectory = new File(projectDirectoryPath);
     }
+
     public boolean isQuietMode() {
         return quietMode;
     }
@@ -307,4 +322,11 @@ public class ProjectManager {
         this.quietMode = quietMode;
     }
 
+    public void registerSchemaDirectory(String path) {
+        schemaDirectories.add(path);
+    }
+
+    public Set<String> getSchemaDirectories() {
+        return schemaDirectories;
+    }
 }

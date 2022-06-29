@@ -117,8 +117,10 @@ public class SSSchemaVersioning {
                 return pathname.getName().startsWith("v") && pathname.getName().endsWith("_schema.json");
             }
         });
-        for (File f : schemaFiles) {
-            f.delete();
+        if (schemaFiles != null) {
+            for (File f : schemaFiles) {
+                f.delete();
+            }
         }
         File f = new File(schemaDirectoryPath + File.separator + "readVersion.json");
         f.delete();
@@ -134,8 +136,10 @@ public class SSSchemaVersioning {
                     return pathname.getName().startsWith("V") && pathname.getName().endsWith("__model.sql");
                 }
             });
-            for (File fd : modelFiles) {
-                fd.delete();
+            if (modelFiles != null) {
+                for (File fd : modelFiles) {
+                    fd.delete();
+                }
             }
         }
     }

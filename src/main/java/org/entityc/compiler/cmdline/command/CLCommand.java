@@ -123,6 +123,10 @@ public abstract class CLCommand {
         return sourceFileNames;
     }
 
+    protected String colorize(String text, StdoutColor color) {
+        return color.getStringValue() + text + StdoutColor.Default.getStringValue();
+    }
+
     public enum StdoutColor {
         Default(0),
         Brighter(1),
