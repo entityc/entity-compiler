@@ -99,10 +99,13 @@ public class RepositoryCache {
         }
         String fullPath = getBaseCacheDirectory().getAbsolutePath() + File.separator + getRepositoryCachePath(
                 repository);
-        try {
-            FileUtils.cleanDirectory(new File(fullPath));
-        } catch (IOException e) {
-            ECLog.logWarning("Unable to remove cache directory: " + fullPath);
+        File file = new File(fullPath);
+        if (file.exists()) {
+            try {
+                FileUtils.cleanDirectory(file);
+            } catch (IOException e) {
+                ECLog.logWarning("Unable to remove cache directory: " + fullPath);
+            }
         }
     }
 
