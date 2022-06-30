@@ -113,7 +113,7 @@ public class CLBuild extends CLCommand {
         // close out our session
         ProjectManager.getInstance().close();
         if (!quietMode) {
-            ECLog.log(StdoutColor.GreenForeground.getStringValue() + "Success");
+            ECLog.log(colorize("Success", StdoutColor.GreenForeground));
         }
     }
 

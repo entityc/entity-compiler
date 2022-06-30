@@ -51,9 +51,7 @@ public abstract class CLCommand {
         ECLog.log(ECStringUtil.WrapString(message + ":", "", DISPLAY_LINE_WIDTH));
         Collection<String> sortedNames = listOfItems.stream().sorted().collect(Collectors.toList());
         for (String name : sortedNames) {
-            ECLog.log("    " + (itemColor != null ?
-                                itemColor.stringValue :
-                                "") + name);
+            ECLog.log("    " + colorize(name, itemColor));
         }
     }
 
@@ -123,7 +121,7 @@ public abstract class CLCommand {
         return sourceFileNames;
     }
 
-    protected String colorize(String text, StdoutColor color) {
+    protected static String colorize(String text, StdoutColor color) {
         return color.getStringValue() + text + StdoutColor.Default.getStringValue();
     }
 

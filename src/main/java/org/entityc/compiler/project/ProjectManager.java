@@ -323,6 +323,9 @@ public class ProjectManager {
     }
 
     public void registerSchemaDirectory(String path) {
+        if (schemaDirectories == null) {
+            schemaDirectories = new HashSet<>();
+        }
         schemaDirectories.add(path);
     }
 
