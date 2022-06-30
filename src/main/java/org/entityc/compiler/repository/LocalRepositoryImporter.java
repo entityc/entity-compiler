@@ -53,6 +53,11 @@ public class LocalRepositoryImporter implements RepositoryImporter {
     }
 
     @Override
+    public void updateRepositoryCommitSHA1(MTRepository repository) {
+        // nothing to do for this type of repository
+    }
+
+    @Override
     public void close() {
     }
 }

@@ -47,6 +47,11 @@ public class RepositoryImportManager {
         return repositoryFilesByIdentifier.get(identifier);
     }
 
+    public void updateRepositoryCommitSHA1(MTRepository repository) {
+        RepositoryImporter repositoryImporter = importersByType.get(repository.getType());
+        repositoryImporter.updateRepositoryCommitSHA1(repository);
+    }
+
     public RepositoryFile importFromRepository(MTSpace space, MTRepositoryImport repositoryImport,
                                                String extension, boolean asInclude) {
 
@@ -67,15 +72,20 @@ public class RepositoryImportManager {
                                            && type == MTRepositoryType.LOCAL;
 
         MTRepository sourceRepository = repository;
-        String alternatePath = null;
+        String       alternatePath    = null;
         if (shouldUseSpaceRepository) {
             sourceRepository = space.getRepositoryThatImportedThisSpace();
-            alternatePath = repository.getPath();
+            alternatePath    = repository.getPath();
         }
 
         RepositoryImporter repositoryImporter = importersByType.get(sourceRepository.getType());
-        RepositoryFile cacheRepositoryFile = repositoryCache.getRepositoryFile(sourceRepository, filename, asInclude);
-        if (sourceRepository.getType() != MTRepositoryType.LOCAL && cacheRepositoryFile.exists()) { // check if it exists in the cache already
+        repositoryImporter.updateRepositoryCommitSHA1(
+                sourceRepository); // if it has one, fetch it so the cache will know if it needs to invalidate itself
+        repositoryCache.validateRepositoryInCache(sourceRepository);
+        RepositoryFile cacheRepositoryFile = repositoryCache.getRepositoryFile(sourceRepository, filename,
+                                                                               asInclude);
+        if (sourceRepository.getType() != MTRepositoryType.LOCAL
+            && cacheRepositoryFile.exists()) { // check if it exists in the cache already
             if (EntityCompiler.isVerbose()) {
                 ECLog.logInfo("Found file already in cache: " + cacheRepositoryFile.getFilepath());
             }
@@ -84,7 +94,7 @@ public class RepositoryImportManager {
         }
 
         RepositoryFile file = repositoryImporter.importFromRepository(sourceRepository, repositoryImport,
-                                                                             cacheRepositoryFile, extension, alternatePath);
+                                                                      cacheRepositoryFile, extension, alternatePath);
         if (file == null || !file.exists()) {
             String nameOrPath = repository.getType() == MTRepositoryType.LOCAL ?
                                 repository.getPath() :

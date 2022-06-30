@@ -30,6 +30,7 @@ public class MTRepository extends MTNode {
     private       String              repoName;
     private       boolean             indexedTemplates = false;
     private       String              setupFilename;
+    private       String              commitSHA1;
 
     public MTRepository(ParserRuleContext ctx, String name) {
         super(ctx);
@@ -68,7 +69,7 @@ public class MTRepository extends MTNode {
         Integer lastPathDelimIndex = path.lastIndexOf("/");
         if (lastPathDelimIndex == -1) {
             setupFilename = path;
-            path = "";
+            path          = "";
         } else {
             setupFilename = path.substring(lastPathDelimIndex + 1);
             path          = path.substring(0, lastPathDelimIndex);
@@ -207,5 +208,13 @@ public class MTRepository extends MTNode {
             builder.append(path);
         }
         return builder.toString();
+    }
+
+    public String getCommitSHA1() {
+        return commitSHA1;
+    }
+
+    public void setCommitSHA1(String commitSHA1) {
+        this.commitSHA1 = commitSHA1;
     }
 }

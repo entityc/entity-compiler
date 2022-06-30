@@ -32,7 +32,7 @@ public class CLInfo extends CLCommand {
 
     @Override
     public void printUsage() {
-        super.printUsageWithArguments("[-s,--sources][-c,--configs][-t,--templates][-g,--generated][-a,--all]");
+        super.printUsageWithArguments("[-s,--sources] [-c,--configs] [-t,--templates] [-g,--generated] [-a,--all]");
     }
 
     @Override
