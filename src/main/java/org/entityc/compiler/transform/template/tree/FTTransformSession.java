@@ -18,11 +18,10 @@ import org.entityc.compiler.model.entity.MTAttribute;
 import org.entityc.compiler.model.entity.MTEntity;
 import org.entityc.compiler.model.entity.MTRelationship;
 import org.entityc.compiler.model.language.MTLanguage;
+import org.entityc.compiler.project.ProjectManager;
 import org.entityc.compiler.protobuf.PBASTVisitor;
 import org.entityc.compiler.protobuf.PBLoaderExtractor;
 import org.entityc.compiler.util.ECLog;
-import org.entityc.compiler.util.ECSessionFiles;
-import org.entityc.compiler.util.ECSessionManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -42,7 +41,6 @@ public class FTTransformSession {
     private final        Stack<Scope>           scopeStack     = new Stack<>();
     private final        Stack<FTBodyBlock>     bodyBlockStack = new Stack<>();
     private final        Map<String, FTReceive> receiveMap     = new HashMap<>();
-    private final        ECSessionFiles         sessionFiles;
     private final        Map<String, Scope>     authorScopeMap = new HashMap<>();
     private              FTTemplate             template;
     private              MTTransform            templateTransform;
@@ -56,15 +54,15 @@ public class FTTransformSession {
     private              boolean                debugMode;
 
     public FTTransformSession(MTRoot root, MTConfiguration configuration, FTTemplate template) {
-        this.space = root.getSpace();
+        this.space         = root.getSpace();
         this.configuration = configuration;
-        this.template = template;
+        this.template      = template;
         if (EntityCompiler.isVerbose()) {
             ECLog.logInfo("============= CREATED SCOPE FOR template: " + template.getName() + " ==================");
         }
         pushScope(new Scope());
         if (configuration != null) {
-            this.configuration = configuration;
+            this.configuration     = configuration;
             this.templateTransform = configuration.getTransformByName(template.getName());
             this.templateTransform.setVersion(this.template.getVersion());
             String outputName = this.templateTransform.getOutputNameByLocalName("primary");
@@ -81,7 +79,13 @@ public class FTTransformSession {
         }
         addReadonlyNamedValue("true", Boolean.TRUE);
         addReadonlyNamedValue("false", Boolean.FALSE);
-        sessionFiles = ECSessionManager.getInstance().getSessionFiles(template.getName());
+    }
+
+    private void pushScope(Scope scope) {
+        if (false && EntityCompiler.isVerbose()) {
+            ECLog.logInfo("++++++ PUSHED SCOPE");
+        }
+        scopeStack.push(scope);
     }
 
     public void addReadonlyNamedValue(String name, Object value) {
@@ -122,12 +126,17 @@ public class FTTransformSession {
     not going to execute its generating template code because it has the ifnotexist set.
      */
     public void registerFileBlock(FTFile fileBlock) {
-        sessionFiles.addFilePath(fileBlock.getFullFilePath());
+        ProjectManager.getInstance().addGeneratedFile(fileBlock.getFullFilePath(), configuration.getName(),
+                                                      this.template.getUri()
+                                                     );
     }
+
     public void pushFileBlock(FTFile fileBlock) {
         fileBlock.getBody().clear();
         bodyBlockStack.push(fileBlock);
-        sessionFiles.addFilePath(fileBlock.getFullFilePath());
+        ProjectManager.getInstance().addGeneratedFile(fileBlock.getFullFilePath(), configuration.getName(),
+                                                      this.template.getUri()
+                                                     );
     }
 
     public void popFileBlock() {
@@ -250,13 +259,15 @@ public class FTTransformSession {
         String     commentStart = "//";
         String     commentEnd   = null;
         if (language == null) {
-            ECLog.logError(session.getTemplate(), "Cannot find language \"" + session.getTemplate().getLanguage() + "\" so defaulting line comment to //");
+            ECLog.logError(session.getTemplate(), "Cannot find language \"" + session.getTemplate().getLanguage()
+                                                  + "\" so defaulting line comment to //");
         } else if (language.getLineComment() == null) {
             if (language.getBlockCommentStart() != null && language.getBlockCommentEnd() != null) {
                 commentStart = language.getBlockCommentStart();
-                commentEnd = language.getBlockCommentEnd();
+                commentEnd   = language.getBlockCommentEnd();
             } else {
-                ECLog.logError("Cannot find declaration of line or block comment for language \"" + session.getTemplate().getLanguage() + "\" so defaulting line comment to //");
+                ECLog.logError("Cannot find declaration of line or block comment for language \""
+                               + session.getTemplate().getLanguage() + "\" so defaulting line comment to //");
             }
         } else {
             commentStart = language.getLineComment();
@@ -277,7 +288,9 @@ public class FTTransformSession {
         Optional<String> extractedTextOptional = fileBlock.extract(startMarker, endMarker);
         if (!extractedTextOptional.isPresent() && preserve.getDeprecatedNames().size() > 0) {
             for (String deprecatedName : preserve.getDeprecatedNames()) {
-                extractedTextOptional = fileBlock.extract(preserve.getStartMarker(commentStart, commentEnd, deprecatedName), preserve.getEndMarker(commentStart, commentEnd, deprecatedName));
+                extractedTextOptional = fileBlock.extract(
+                        preserve.getStartMarker(commentStart, commentEnd, deprecatedName),
+                        preserve.getEndMarker(commentStart, commentEnd, deprecatedName));
                 if (extractedTextOptional.isPresent()) {
                     break;
                 }
@@ -378,9 +391,11 @@ public class FTTransformSession {
 //        if (debugMode) {
 //            ECLog.logInfo("DEBUG>> Getting value for \"" + variableName + "\" => " + scopeStack.peek().namedValues.get(variableName));
 //        }
-        Scope currentScope = scopeStack.peek();
+        Scope   currentScope       = scopeStack.peek();
         boolean isInternalVariable = variableName.startsWith("__");
-        for (Scope scope = currentScope; scope != null; scope = isInternalVariable ? scope.parentScopeForInternalVariables : scope.parentScope) {
+        for (Scope scope = currentScope; scope != null; scope = isInternalVariable ?
+                                                                scope.parentScopeForInternalVariables :
+                                                                scope.parentScope) {
             Object value = scope.namedValues.get(variableName);
             if (value != null) {
 //                if (scope.name != null) {
@@ -451,7 +466,9 @@ public class FTTransformSession {
 
     public void pushFunctionScope(FTFunction function) {
         Scope newScope = new Scope();
-        newScope.parentScopeForInternalVariables = scopeStack.size() > 0 ? scopeStack.peek() : null;
+        newScope.parentScopeForInternalVariables = scopeStack.size() > 0 ?
+                                                   scopeStack.peek() :
+                                                   null;
         //ECLog.logInfo("------------- Pushing Function Scope: " + function.getName());
         pushScope(newScope);
     }
@@ -460,34 +477,30 @@ public class FTTransformSession {
         popScope();
     }
 
-    public void pushAuthorScope(FTAuthor author) {
-        String publisherId = author.getTopAuthor().getUniqueId();
-        Scope  scopeToUse  = null;
-        if (!authorScopeMap.containsKey(publisherId)) {
-            scopeToUse = new Scope();
-            scopeToUse.name = publisherId;
-            authorScopeMap.put(publisherId, scopeToUse);
-        } else {
-            scopeToUse = authorScopeMap.get(publisherId);
-        }
-        scopeToUse.parentScope = scopeStack.size() > 0 ? scopeStack.peek() : null;
-        scopeToUse.parentScopeForInternalVariables = scopeToUse.parentScope;
-        pushScope(scopeToUse);
-    }
-
-    private void pushScope(Scope scope) {
-        if (false && EntityCompiler.isVerbose()) {
-            ECLog.logInfo("++++++ PUSHED SCOPE");
-        }
-        scopeStack.push(scope);
-    }
-
     private void popScope() {
         if (false && EntityCompiler.isVerbose()) {
             ECLog.logInfo("------ POPPED SCOPE");
         }
         scopeStack.pop();
     }
+
+    public void pushAuthorScope(FTAuthor author) {
+        String publisherId = author.getTopAuthor().getUniqueId();
+        Scope  scopeToUse  = null;
+        if (!authorScopeMap.containsKey(publisherId)) {
+            scopeToUse      = new Scope();
+            scopeToUse.name = publisherId;
+            authorScopeMap.put(publisherId, scopeToUse);
+        } else {
+            scopeToUse = authorScopeMap.get(publisherId);
+        }
+        scopeToUse.parentScope                     = scopeStack.size() > 0 ?
+                                                     scopeStack.peek() :
+                                                     null;
+        scopeToUse.parentScopeForInternalVariables = scopeToUse.parentScope;
+        pushScope(scopeToUse);
+    }
+
     public void popAuthorScope() {
         popScope(); // its removed from the stack but not from the map
     }

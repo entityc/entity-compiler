@@ -23,6 +23,7 @@ import org.entityc.compiler.model.language.MTLanguage;
 import org.entityc.compiler.transform.template.TemplateDocExtractor;
 import org.entityc.compiler.transform.template.TemplatePublishing;
 import org.entityc.compiler.transform.template.formatter.TemplateFormatController;
+import org.entityc.compiler.util.ECStringUtil;
 import org.entityc.compiler.util.ECVersion;
 
 import java.io.File;
@@ -43,10 +44,12 @@ import static org.entityc.compiler.transform.template.formatter.ConfigurableElem
         description = "Represents an actual template containing code to execute.")
 public class FTTemplate extends FTContainerNode implements MTNamed {
 
+    private static DocumentationManager     documentationManager    = new DocumentationManager();
     private final  List<FTFunction>         calledExternalFunctions = new ArrayList<>();
     private final  Map<String, FTPublisher> publishers              = new HashMap<>();
     private final  List<FTAuthor>           authors                 = new ArrayList<>();
     private        String                   name;
+    private        String                   directoryPath;
     private        ECVersion                version;
     private        String                   language;
     private        String                   defaultDomainName;
@@ -55,9 +58,8 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
     private        Map<String, FTFunction>  functionsByName         = new HashMap<>();
     private        List<String>             referencedTags          = new ArrayList<>();
     private        Set<FTTemplate>          importedTemplates       = new HashSet<>();
-    private        boolean              hasOnlyFunctions        = false;
-    private        MTRepository         repository;
-    private static DocumentationManager documentationManager    = new DocumentationManager();
+    private        boolean                  hasOnlyFunctions        = false;
+    private        MTRepository             repository;
 
     public FTTemplate(ParserRuleContext ctx) {
         super(ctx, null);
@@ -187,17 +189,6 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
             session.setTemplate(prevTemplate);
             session.addReadonlyNamedValue("__template", prevTemplate);
         }
-    }
-
-    @Override
-    @ModelMethod(category = ModelMethodCategory.TEMPLATE,
-            description = "Returns the name of this template.")
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public ECVersion getVersion() {
@@ -352,18 +343,37 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
         return 0;
     }
 
-    public void setRepository(MTRepository repository) {
-        this.repository = repository;
-    }
-
     public MTRepository getRepository() {
         return repository;
     }
 
+    public void setRepository(MTRepository repository) {
+        this.repository = repository;
+    }
+
     public String getUri() {
         if (repository != null) {
-            return repository.getUri() + "/" + getName();
+            return repository.getUri() + File.separator + ECStringUtil.PathWithSeparator(directoryPath) + getName();
         }
         return getName();
+    }
+
+    @Override
+    @ModelMethod(category = ModelMethodCategory.TEMPLATE,
+            description = "Returns the name of this template.")
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getDirectoryPath() {
+        return directoryPath;
+    }
+
+    public void setDirectoryPath(String directoryPath) {
+        this.directoryPath = directoryPath;
     }
 }

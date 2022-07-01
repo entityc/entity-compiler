@@ -12,6 +12,7 @@ import org.entityc.compiler.model.config.MTRepositoryImport;
 public interface RepositoryImporter {
 
     RepositoryFile importFromRepository(MTRepository repository, MTRepositoryImport repositoryImport, RepositoryFile cachedRepositoryFile, String extension, String alternatePath);
+    void updateRepositoryCommitSHA1(MTRepository repository);
 
     void close();
 }

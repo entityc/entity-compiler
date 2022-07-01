@@ -27,6 +27,7 @@ import org.entityc.compiler.transform.template.formatter.TemplateFormatControlle
 import org.entityc.compiler.transform.template.tree.expression.FTConstant;
 import org.entityc.compiler.transform.template.tree.expression.FTExpression;
 import org.entityc.compiler.util.ECLog;
+import org.entityc.compiler.util.ECStringUtil;
 
 import java.io.File;
 import java.io.IOException;
@@ -35,18 +36,18 @@ import static org.entityc.compiler.transform.template.formatter.ConfigurableElem
 import static org.entityc.compiler.transform.template.formatter.ConfigurableElement.RequiredSpace;
 
 @TemplateInstruction(category = TemplateInstructionCategory.FILE_IO,
-    name = "install",
-    usage = "`install `[`copy`]` `*sourceExpression*` `*destExpression*",
-    summary = "Provides an easy way to install files into your local project.",
-    description = "When setting up a project using files from a library, this instruction makes it easy "
-                  + "to install files from that library into the project directory structure. The files being installed "
-                  + "have their native file extension (not the one we use for templates) so they are easily "
-                  + "viewable and edited (using the code highlighter appropriate for them). You can also include "
-                  + "template code in them and the template code will execute during the install process. "
-                  + "Of course, the presence of the template code may interfere with the code highlighter and "
-                  + "as well, the template code will not be appropriately highlighted but when the amount of "
-                  + "template code is relatively small it can be very advantageous to use this install method over "
-                  + "just making it a template and running the template.")
+        name = "install",
+        usage = "`install `[`copy`]` `*sourceExpression*` `*destExpression*",
+        summary = "Provides an easy way to install files into your local project.",
+        description = "When setting up a project using files from a library, this instruction makes it easy "
+                      + "to install files from that library into the project directory structure. The files being installed "
+                      + "have their native file extension (not the one we use for templates) so they are easily "
+                      + "viewable and edited (using the code highlighter appropriate for them). You can also include "
+                      + "template code in them and the template code will execute during the install process. "
+                      + "Of course, the presence of the template code may interfere with the code highlighter and "
+                      + "as well, the template code will not be appropriately highlighted but when the amount of "
+                      + "template code is relatively small it can be very advantageous to use this install method over "
+                      + "just making it a template and running the template.")
 public class FTInstall extends FTNode {
 
     private final FTExpression sourceExpression;
@@ -56,16 +57,16 @@ public class FTInstall extends FTNode {
 
     public FTInstall(ParserRuleContext ctx,
                      @TemplateInstructionArgument(optional = true, keyword = true,
-                         description = "If specified, the file will be copied verbatim without trying to execute "
-                                       + "any template code.")
-                         Boolean copy,
+                             description = "If specified, the file will be copied verbatim without trying to execute "
+                                           + "any template code.")
+                     Boolean copy,
                      @TemplateInstructionArgument(
-                         description = "Defines the path and filename with extension of the source file. The path "
-                                       + "is relative to the directory in which the template was configured.")
-                         FTExpression sourceExpression,
+                             description = "Defines the path and filename with extension of the source file. The path "
+                                           + "is relative to the directory in which the template was configured.")
+                     FTExpression sourceExpression,
                      @TemplateInstructionArgument(
-                         description = "Defines the destination path and directory name to copy the file into. "
-                                       + "The path is relative to the directory in which the template was configured.")
+                             description = "Defines the destination path and directory name to copy the file into. "
+                                           + "The path is relative to the directory in which the template was configured.")
                      FTExpression destExpression) {
         super(ctx);
         this.copyOnly                = copy;
@@ -97,10 +98,7 @@ public class FTInstall extends FTNode {
         String destFilepath   = (String) destFilepathObject;
         String sourceFilePath = ((FTConstant) sourceExpression).getStringValue();
 
-        String filename = sourceFilePath;
-        if (filename.contains("/")) {
-            filename = filename.substring(filename.lastIndexOf('/') + 1);
-        }
+        String directoryPath = ECStringUtil.DirectoryPath(sourceFilePath);
 
         if (sourceRepositoryName == null) {
             ECLog.logFatal(this, "Cannot install files without an associated Repository.");
@@ -124,15 +122,14 @@ public class FTInstall extends FTNode {
                 sourceFilePath      = sourceFilePath.substring(0, lastExtensionIndex);
                 if (lastPathSeparatorIndex != -1) {
                     sourceFilename = sourceFilePath.substring(lastPathSeparatorIndex + 1);
-                }
-                else {
+                } else {
                     sourceFilename = sourceFilePath;
                 }
             }
         }
 
         RepositoryImportManager importManager = new RepositoryImportManager(
-            RepositoryCache.CacheStructure.UserCache);
+                RepositoryCache.CacheStructure.UserCache);
         MTRepositoryImport repositoryImport = new MTRepositoryImport(null, false);
         repositoryImport.setRepositoryName(sourceRepositoryName);
         repositoryImport.setFilename(sourceFilePath);
@@ -153,20 +150,12 @@ public class FTInstall extends FTNode {
             ECLog.logFatal(this, e.getMessage());
         }
 
-        FTTemplate template = new FTTemplate(null);
-        template.setName(sourceFilename + "." + sourceFileExtension);
-        if (domain != null) {
-            template.setDefaultDomainName(domain.getName());
-        }
-        if (language != null) {
-            template.setLanguage(language.getName());
-        }
-
         MTDirectory directoryOfTemplateFile = new MTDirectory(null, "something");
         directoryOfTemplateFile.setPath(destFilepath);
         MTFile templateFile = new MTFile(directoryOfTemplateFile, fileToInstall);
 
-        MTTemplate         mtTemplate         = new MTTemplate(null, session.getConfiguration(), templateFile);
+        MTTemplate mtTemplate = new MTTemplate(null, session.getConfiguration(), templateFile);
+        mtTemplate.setDirectoryPath(directoryPath);
         MTRepositoryImport mtRepositoryImport = new MTRepositoryImport(null, false);
         mtRepositoryImport.setRepositoryName(repository.getName());
         mtTemplate.setRepositoryImport(mtRepositoryImport);
@@ -190,6 +179,7 @@ public class FTInstall extends FTNode {
             }
             return;
         }
+        ftTemplate.setDirectoryPath(directoryPath);
         ftTemplate.insertTopContainer(ftFile);
         ftTemplate.transform(session); // run it with this session
     }

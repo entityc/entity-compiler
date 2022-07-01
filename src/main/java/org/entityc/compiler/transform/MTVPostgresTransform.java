@@ -26,6 +26,7 @@ import org.entityc.compiler.model.entity.MTPrimaryKey;
 import org.entityc.compiler.model.entity.MTRelationship;
 import org.entityc.compiler.model.entity.MTType;
 import org.entityc.compiler.model.entity.MTUniqueness;
+import org.entityc.compiler.project.ProjectManager;
 import org.entityc.compiler.structure.sql.SSColumn;
 import org.entityc.compiler.structure.sql.SSComment;
 import org.entityc.compiler.structure.sql.SSForeignKey;
@@ -65,12 +66,13 @@ public class MTVPostgresTransform extends MTBaseTransform {
 
         super.start();
 
-        MTTransform config           = getConfiguration().getTransformByName(getName());
-        String      outputName       = config.getOutputNameByLocalName("primary");
+        MTTransform transform        = getConfiguration().getTransformByName(getName());
+        String      outputName       = transform.getOutputNameByLocalName("primary");
         MTDirectory output           = getConfiguration().getOutputByName(outputName);
-        String      schemaOutputName = config.getOutputNameByLocalName("schema");
+        String      schemaOutputName = transform.getOutputNameByLocalName("schema");
         MTDirectory schemaOutput     = getConfiguration().getOutputByName(schemaOutputName);
         SSSchemaVersioning.setBasePath(schemaOutput.getPath());
+        ProjectManager.getInstance().registerSchemaDirectory(schemaOutput.getPath());
 
         boolean requestToAdvance = SSSchemaVersioning.LoadAdvanceRequest();
         advanceSchemaVersion = EntityCompiler.ShouldAdvanceSchemaVersion();

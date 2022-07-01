@@ -23,7 +23,7 @@ public class MTTemplate extends MTTransform {
 
     private boolean            contextual;
     private MTRepositoryImport repositoryImport;
-    private String             directoryName;
+    private String             directoryPath;
     private MTFile             file;
 
     public MTTemplate(ParserRuleContext ctx, MTConfiguration configuration, String name) {
@@ -40,24 +40,24 @@ public class MTTemplate extends MTTransform {
     }
 
     @ModelMethod(category = ModelMethodCategory.CONFIGURATION,
-        description = "Returns the filename of the template which is preceded by a directory name if available.")
+            description = "Returns the filename of the template which is preceded by a directory name if available.")
     public String getFilename() {
         String filename = "";
-        if (this.getDirectoryName() != null) {
-            filename = this.getDirectoryName() + "/";
+        if (this.getDirectoryPath() != null) {
+            filename = this.getDirectoryPath() + "/";
         }
         filename += this.getName();
         return filename;
     }
 
     @ModelMethod(category = ModelMethodCategory.CONFIGURATION,
-        description = "Returns the directory name if available. Otherwise returns `null`")
-    public String getDirectoryName() {
-        return directoryName;
+            description = "Returns the directory path if available. Otherwise returns `null`")
+    public String getDirectoryPath() {
+        return directoryPath;
     }
 
-    public void setDirectoryName(String directoryName) {
-        this.directoryName = directoryName;
+    public void setDirectoryPath(String directoryPath) {
+        this.directoryPath = directoryPath;
     }
 
     public boolean isNotDeclared() {
@@ -65,7 +65,7 @@ public class MTTemplate extends MTTransform {
     }
 
     @ModelMethod(category = ModelMethodCategory.CONFIGURATION,
-        description = "Returns an object that defines how the template will be imported.")
+            description = "Returns an object that defines how the template will be imported.")
     public MTRepositoryImport getRepositoryImport() {
         return repositoryImport;
     }
@@ -82,16 +82,19 @@ public class MTTemplate extends MTTransform {
     @Deprecated
     public void setContextual(boolean contextual) {
         this.contextual = contextual;
+        if (contextual) {
+            ECLog.logWarning("Contextual templates have been deprecated.");
+        }
     }
 
     @ModelMethod(category = ModelMethodCategory.CONFIGURATION,
-        description = "Returns the output directory considered to be the primary output for the template.")
+            description = "Returns the output directory considered to be the primary output for the template.")
     public MTDirectory getPrimaryOutputDirectory() {
-        String directoryName = getOutputNameByLocalName("primary");
-        if (directoryName == null) {
+        String outputName = getOutputNameByLocalName("primary");
+        if (outputName == null) {
             return null;
         }
-        return this.configuration.getOutputByName(directoryName);
+        return this.configuration.getOutputByName(outputName);
     }
 
     public FTTemplate parse(FTTransformSession session, boolean suppressImport) {

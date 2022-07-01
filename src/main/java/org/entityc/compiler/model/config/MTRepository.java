@@ -30,6 +30,7 @@ public class MTRepository extends MTNode {
     private       String              repoName;
     private       boolean             indexedTemplates = false;
     private       String              setupFilename;
+    private       String              commitSHA1;
 
     public MTRepository(ParserRuleContext ctx, String name) {
         super(ctx);
@@ -48,7 +49,7 @@ public class MTRepository extends MTNode {
         type = MTRepositoryType.GITHUB;
         Integer firstPathDelimIndex = setupUri.indexOf("/");
         if (firstPathDelimIndex == -1) {
-            ECLog.logFatal("Invalid setup URI - nothing after organization name");
+            ECLog.logFatal("Invalid setup URI - nothing after organization name.");
         }
         organization = setupUri.substring(colonIndex + 1, firstPathDelimIndex);
         Integer tagDelimIndex = setupUri.indexOf(":", colonIndex + 1);
@@ -57,20 +58,21 @@ public class MTRepository extends MTNode {
         }
         Integer secondPathDelimIndex = setupUri.indexOf("/", firstPathDelimIndex + 1);
         boolean hasNoPath            = secondPathDelimIndex == -1;
+        if (hasNoPath) {
+            ECLog.logFatal("Invalid setup URI - it requires a path to a setup file.");
+        }
         tag      = setupUri.substring(tagDelimIndex + 1, hasNoPath ?
                                                          setupUri.length() :
                                                          secondPathDelimIndex);
         repoName = setupUri.substring(firstPathDelimIndex + 1, tagDelimIndex);
-        path     = "";
-        if (!hasNoPath) {
-            path = setupUri.substring(secondPathDelimIndex + 1);
-            Integer lastPathDelimIndex = path.lastIndexOf("/");
-            if (lastPathDelimIndex == -1) {
-                setupFilename = "Setup";
-            } else {
-                setupFilename = path.substring(lastPathDelimIndex + 1);
-                path          = path.substring(0, lastPathDelimIndex);
-            }
+        path     = setupUri.substring(secondPathDelimIndex + 1);
+        Integer lastPathDelimIndex = path.lastIndexOf("/");
+        if (lastPathDelimIndex == -1) {
+            setupFilename = path;
+            path          = "";
+        } else {
+            setupFilename = path.substring(lastPathDelimIndex + 1);
+            path          = path.substring(0, lastPathDelimIndex);
         }
     }
 
@@ -188,9 +190,6 @@ public class MTRepository extends MTNode {
 
     public String getUri() {
         StringBuilder builder = new StringBuilder();
-        builder.append("[");
-        builder.append(name);
-        builder.append("]");
         builder.append(type.getName());
         builder.append(":");
         if (organization != null) {
@@ -199,15 +198,23 @@ public class MTRepository extends MTNode {
         }
         if (repoName != null) {
             builder.append(repoName);
-            builder.append("/");
-        }
-        if (path != null) {
-            builder.append(path);
         }
         if (tag != null) {
-            builder.append("#");
+            builder.append(":");
             builder.append(tag);
         }
+        if (path != null && path.length() > 0) {
+            builder.append("/");
+            builder.append(path);
+        }
         return builder.toString();
+    }
+
+    public String getCommitSHA1() {
+        return commitSHA1;
+    }
+
+    public void setCommitSHA1(String commitSHA1) {
+        this.commitSHA1 = commitSHA1;
     }
 }

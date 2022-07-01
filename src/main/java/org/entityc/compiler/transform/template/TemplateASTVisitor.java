@@ -402,10 +402,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         if (this.suppressImport) {
             return null;
         }
-        String templateName = templatePath;
-        if (templateName.contains("/")) {
-            templateName = templateName.substring(templateName.lastIndexOf('/') + 1);
-        }
+        String templateName = ECStringUtil.FilenameFromPath(templatePath);
         if (false && EntityCompiler.isVerbose()) {
             ECLog.logInfo(ctx, "Found Import of template: " + templatePath + " from repository " + fromRepositoryName);
             if (fromRepositoryName == null) {
@@ -433,6 +430,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             }
             FTTemplate importedTemplate = configuration.parseTemplate(null, new MTFile(null, templateFile),
                                                                       fromRepositoryName);
+            importedTemplate.setDirectoryPath(ECStringUtil.DirectoryPath(templatePath));
             importedTemplate.setImported(true);
             currentContainer(ctx).addChild(importedTemplate);
             currentContainer(ctx).resolveFunctionCalls(importedTemplate);

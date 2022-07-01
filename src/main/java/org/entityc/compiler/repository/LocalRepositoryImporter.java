@@ -11,6 +11,7 @@ import org.entityc.compiler.EntityCompiler;
 import org.entityc.compiler.model.config.MTRepository;
 import org.entityc.compiler.model.config.MTRepositoryImport;
 import org.entityc.compiler.util.ECLog;
+import org.entityc.compiler.util.ECStringUtil;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -23,14 +24,11 @@ public class LocalRepositoryImporter implements RepositoryImporter {
     public RepositoryFile importFromRepository(MTRepository repository, MTRepositoryImport repositoryImport, RepositoryFile cachedRepositoryFile, String extension, String alternatePath) {
         String outputFilepath = cachedRepositoryFile.getFilepath();
         // in case the filename has sub directories, make sure they are created
-        if (outputFilepath.contains(File.separator)) {
 
-            int index = outputFilepath.lastIndexOf(File.separatorChar);
-            if (index > 0) {
-                String dirPath = outputFilepath.substring(0, index);
-                if (!EntityCompiler.ensureDirectory(dirPath)) {
-                    ECLog.logFatal("Not able to create directory for template file: " + outputFilepath);
-                }
+        String directoryPath = ECStringUtil.DirectoryPath(outputFilepath);
+        if (directoryPath != null) {
+            if (!EntityCompiler.ensureDirectory(directoryPath)) {
+                ECLog.logFatal("Not able to create directory for template file: " + outputFilepath);
             }
         }
 
@@ -52,6 +50,11 @@ public class LocalRepositoryImporter implements RepositoryImporter {
             }
         }
         return cachedRepositoryFile;
+    }
+
+    @Override
+    public void updateRepositoryCommitSHA1(MTRepository repository) {
+        // nothing to do for this type of repository
     }
 
     @Override

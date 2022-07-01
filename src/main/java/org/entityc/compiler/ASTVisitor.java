@@ -2264,6 +2264,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                 MTRepositoryImport thisImport = new MTRepositoryImport(ctx.templatesBody().templatesImport(), false);
                 thisImport.setRepositoryName(repositoryImport.getRepositoryName());
                 thisImport.setFilename(template.getFilename());
+                thisImport.setDirectoryPath(template.getDirectoryPath());
                 template.setRepositoryImport(thisImport);
             }
         }
@@ -2283,7 +2284,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         MTTemplate template = new MTTemplate(ctx, currentConfiguration, ctx.id().getText());
 
         if (ctx.STRING() != null) {
-            template.setDirectoryName(ECStringUtil.ProcessParserString(ctx.STRING().getText()));
+            template.setDirectoryPath(ECStringUtil.ProcessParserString(ctx.STRING().getText()));
         }
         EntityLanguageParser.TemplateBodyContext body = ctx.templateBody();
         if (body == null) {

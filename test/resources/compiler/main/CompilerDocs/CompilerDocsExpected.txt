@@ -469,8 +469,8 @@ These methods relate to a part of application configuration.
 
 | Method/Property |
 |---|
-| `String` **`directoryName`** |
-| Returns the directory name if available. Otherwise returns `null` |
+| `String` **`directoryPath`** |
+| Returns the directory path if available. Otherwise returns `null` |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `String` **`filename`** |
 | Returns the filename of the template which is preceded by a directory name if available. |
@@ -943,6 +943,9 @@ These methods relate to relationships.
 | `boolean` **`hasParentRelationship`** |
 | Indicates whether it has a least one relationship declared as parent. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasParentRelationshipToEntity(MTEntity parentEntity)`**](#class_MTEntity_hasParentRelationshipToEntity) |
+| Indicates whether it has a least one relationship declared as parent to the specified entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`hasPrimaryParentRelationship`** |
 | Indicates whether this entity has a primary parent relationship. A primary parent relationship is one which is declared `parent` and **not** declared `optional`. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
@@ -1024,6 +1027,16 @@ Given an entity object, this method will try to find and return a relationship o
 |`MTEntity entity` | The entity of which to search. |
 
 
+
+<a name="class_MTEntity_hasParentRelationshipToEntity">
+#### Method `boolean hasParentRelationshipToEntity(MTEntity parentEntity)`
+</a>
+
+Indicates whether it has a least one relationship declared as parent to the specified entity.
+
+| Parameter | Description |
+|-----|-----|
+|`MTEntity parentEntity` | *no description* |
 
 
 
@@ -1632,6 +1645,9 @@ These methods relate to data types.
 | `MTEnum` **`enumType`** |
 | If this type is an enum type then it returns the enum type object. Otherwise it returns `null`. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isBooleanType`** |
+| Indicates whether this type is one of the integer data types. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`isByteArrayType`** |
 | Indicates whether this type is both an array type and also `byte` data type. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
@@ -1658,6 +1674,7 @@ These methods relate to data types.
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`isUUIDType`** |
 | Indicates whether this type is a UUID. |
+
 
 
 
@@ -3010,7 +3027,7 @@ These methods relate to an outlet.
 | Indicates whether this author has child authors that connect to an outlet. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`hasChildOutletsWithIntermediateParents`** |
-| Indicates whether this author has children authors that connect to an outlet and there are intermediate parent authors (that is authors that don't connect to an outlet). |
+| Indicates whether this author has children authors that connect to an outlet and there are intermediate parent authors (that is, authors that don't connect to an outlet). |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`isOutletAuthor`** |
 | Indicates whether this author connects to an outlet. |

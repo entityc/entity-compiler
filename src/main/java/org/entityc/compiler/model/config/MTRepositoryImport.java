@@ -15,12 +15,15 @@ import org.entityc.compiler.model.MTNode;
 import org.entityc.compiler.model.visitor.MTVisitor;
 
 @ModelClass(type = ModelClassType.CONFIGURATION,
-    description = "Contains configuration for importing files from a repository.")
+        description = "Contains configuration for importing files from a repository.")
 public class MTRepositoryImport extends MTNode {
 
     private String  filename;
     private String  repositoryName;
     private boolean includeOnly;
+    private boolean quietly;
+
+    private String directoryPath;
 
     public MTRepositoryImport(ParserRuleContext ctx, boolean includeOnly) {
         super(ctx);
@@ -28,11 +31,11 @@ public class MTRepositoryImport extends MTNode {
     }
 
     @ModelMethod(category = ModelMethodCategory.CONFIGURATION,
-        description =
-            "Indicates whether this import should only use the file as like a header file or where everything in "
-            + "the imported source file is essentially declared as extern. This would be used in the case of "
-            + "entities where you don't intend to implement them in code directly but need to "
-            + "know how they are defined so code knows how to interface with them in some way.")
+            description =
+                    "Indicates whether this import should only use the file as like a header file or where everything in "
+                    + "the imported source file is essentially declared as extern. This would be used in the case of "
+                    + "entities where you don't intend to implement them in code directly but need to "
+                    + "know how they are defined so code knows how to interface with them in some way.")
     public boolean isIncludeOnly() {
         return includeOnly;
     }
@@ -50,21 +53,37 @@ public class MTRepositoryImport extends MTNode {
         this.filename = filename;
     }
 
+    public String getDirectoryPath() {
+        return directoryPath;
+    }
+
+    public void setDirectoryPath(String directoryPath) {
+        this.directoryPath = directoryPath;
+    }
+
     @ModelMethod(category = ModelMethodCategory.CONFIGURATION,
-        description = "Returns an identifer which is basically the *repository name*`.`*filename*.")
+            description = "Returns an identifer which is basically the *repository name*`.`*filename*.")
     public String getIdentifier() {
         return repositoryName + "." + filename;
     }
 
     @ModelMethod(category = ModelMethodCategory.CONFIGURATION,
-        description = "Returns the declared name of the repository object that this import operation will use as "
-                      + "its source repository.")
+            description = "Returns the declared name of the repository object that this import operation will use as "
+                          + "its source repository.")
     public String getRepositoryName() {
         return repositoryName;
     }
 
     public void setRepositoryName(String repositoryName) {
         this.repositoryName = repositoryName;
+    }
+
+    public boolean isQuietly() {
+        return quietly;
+    }
+
+    public void setQuietly(boolean quietly) {
+        this.quietly = quietly;
     }
 
     @Override

@@ -28,7 +28,7 @@ class EntityCompilerTest {
         final String TestResourceDir = BASE_RESOURCE_DIR + "/" + testName;
         String       strTmp          = System.getProperty("java.io.tmpdir");
         String       sourceFile      = TestResourceDir + "/" + testName + ".edl";
-        EntityCompiler.main(new String[]{sourceFile, "-c", "Config", "-tp", TestResourceDir, "-D", "TEMP_DIR=" + strTmp});
+        EntityCompiler.main(new String[]{"build", "Config", sourceFile, "-tp", TestResourceDir, "-D", "TEMP_DIR=" + strTmp});
         String actual   = FileUtils.readFileToString(new File(strTmp + File.separator + testName + ".txt"));
         String expected = FileUtils.readFileToString(new File(TestResourceDir + "/" + testName + "Expected.txt"));
         assertEquals(expected, actual);
@@ -56,7 +56,7 @@ class EntityCompilerTest {
         final String TestResourceDir = BASE_RESOURCE_DIR + "/" + testName;
         String       strTmp          = System.getProperty("java.io.tmpdir");
         String       sourceFile      = TestResourceDir + "/" + testName + ".edl";
-        EntityCompiler.main(new String[]{sourceFile, "-c", "Config", "-tp", TestResourceDir, "-D", "TEMP_DIR=" + strTmp});
+        EntityCompiler.main(new String[]{"build", "Config", sourceFile, "-tp", TestResourceDir, "-D", "TEMP_DIR=" + strTmp});
         String actual   = FileUtils.readFileToString(new File(strTmp + File.separator + "V1__Space.sql"));
         String expected = FileUtils.readFileToString(new File(TestResourceDir + "/" + testName + "Expected.sql"));
         assertEquals(expected, actual);
