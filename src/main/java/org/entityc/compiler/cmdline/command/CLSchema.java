@@ -96,11 +96,11 @@ public class CLSchema extends CLCommand {
         }
         for (String schemaDirectory : directories) {
             SSSchemaVersioning.setBasePath(schemaDirectory);
-            int readVersion = LoadSchemaVersion(SSSchemaVersioning.SchemaPointer.Read);
+            Integer readVersion = LoadSchemaVersion(SSSchemaVersioning.SchemaPointer.Read);
             ECLog.log("");
             ECLog.log("Schema Directory: " + schemaDirectory);
-            ECLog.log("    Previous version:          " + ((readVersion > 1) ?
-                                                           readVersion :
+            ECLog.log("    Previous version:          " + ((readVersion > 0) ?
+                                                           ("" + readVersion) :
                                                            "(none)"));
             ECLog.log("    Current version:           " + LoadSchemaVersion(SSSchemaVersioning.SchemaPointer.Write));
             ECLog.log("    Version advance directive: " + (SSSchemaVersioning.LoadAdvanceRequest() ?

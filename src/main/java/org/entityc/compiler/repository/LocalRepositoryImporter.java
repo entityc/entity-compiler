@@ -39,7 +39,7 @@ public class LocalRepositoryImporter implements RepositoryImporter {
             try {
                 FileInputStream fis = new FileInputStream(inputFilepath);
 
-                ECLog.logInfo("Copying file " + inputFilepath + " to " + outputFilepath);
+//                ECLog.logInfo("Copying file " + inputFilepath + " to " + outputFilepath);
                 File             outputFile = new File(outputFilepath);
                 FileOutputStream fos        = new FileOutputStream(outputFile);
                 IOUtils.copy(fis, fos);
