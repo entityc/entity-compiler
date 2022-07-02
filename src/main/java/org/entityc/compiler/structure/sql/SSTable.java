@@ -23,7 +23,7 @@ public class SSTable extends SSNode {
     private       SSComment                 comment;
 
     public SSTable(String tableName, String entityName) {
-        this.name = tableName;
+        this.name       = tableName;
         this.entityName = entityName;
     }
 

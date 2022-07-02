@@ -107,9 +107,6 @@ public class CLBuild extends CLCommand {
         EntityCompiler.RunConfiguration(configuration);
         ProjectManager.getInstance().endActiveConfiguration();
 
-        // If the configuration include a protoc block
-        EntityCompiler.RunProtoc(root, configuration);
-
         // close out our session
         ProjectManager.getInstance().close();
         if (!quietMode) {

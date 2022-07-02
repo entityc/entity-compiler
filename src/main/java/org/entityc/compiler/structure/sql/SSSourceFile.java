@@ -7,7 +7,6 @@
 package org.entityc.compiler.structure.sql;
 
 import com.google.gson.annotations.Expose;
-import org.entityc.compiler.EntityCompiler;
 import org.entityc.compiler.util.ECLog;
 
 import java.io.Serializable;
@@ -32,6 +31,7 @@ public class SSSourceFile extends SSNode implements Serializable {
     @Expose
     private final List<SSTable>        tablesInOrder      = new ArrayList<>();
 
+    @Expose
     private final Map<String, SSIndex> indexesByName = new HashMap<>();
 
     @Expose
@@ -50,13 +50,9 @@ public class SSSourceFile extends SSNode implements Serializable {
     }
 
     public void addTable(SSTable table) {
-        if (table.getName().endsWith("_many")) {
-            if (EntityCompiler.isVerbose()) {
-                ECLog.logInfo("ADDING TABLE: " + table.getName());
-            }
-            if (tablesByName.containsKey(table.getName())) {
-                //ECLog.logFatal("HEY! You can't add the same table multiple times!");
-            }
+        if (tablesByName.containsKey(table.getName())) {
+            ECLog.logWarning("Tried to add table multiple times: " + table.getName());
+            return;
         }
         tablesByName.put(table.getName(), table);
         tablesByEntityName.put(table.getEntityName(), table);
@@ -107,6 +103,7 @@ public class SSSourceFile extends SSNode implements Serializable {
     public Collection<SSSequence> getSequences() {
         return sequences;
     }
+
     public String getFilename() {
         return getName() + "." + getExtension();
     }
@@ -207,7 +204,6 @@ public class SSSourceFile extends SSNode implements Serializable {
             }
         }
         for (SSAlteredTable alteredTable : newAlteredTables) {
-            this.addTable(alteredTable);
             tablesInOrder.add(alteredTable);
         }
     }

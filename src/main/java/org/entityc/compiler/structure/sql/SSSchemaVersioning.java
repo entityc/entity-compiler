@@ -7,6 +7,7 @@
 package org.entityc.compiler.structure.sql;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.stream.JsonReader;
 import com.google.gson.stream.JsonWriter;
 import org.entityc.compiler.EntityCompiler;
@@ -31,7 +32,9 @@ public class SSSchemaVersioning {
                                  "readVersion" :
                                  "writeVersion";
         String filepath        = basePath + File.separator + pointerFilename + ".json";
-        Gson   gson            = new Gson();
+        Gson gson = new GsonBuilder()
+                .excludeFieldsWithoutExposeAnnotation()
+                .create();
         try {
             ensureBasePathDirectoryExists();
             FileOutputStream fos    = new FileOutputStream(filepath);
