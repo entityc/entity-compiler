@@ -203,7 +203,7 @@ public class EntityCompiler {
             if (protoc.getLanguageName().equals("cpp")) {
                 languageOption = "--cpp_out=" + baseDirectoryPath;
             } else if (protoc.getLanguageName().equals("java")) {
-                languageOption = "--java_out=" + baseDirectoryPath;
+                languageOption = "--java_out=lite:" + baseDirectoryPath;
             }
 
             if (languageOption == null) {
