@@ -101,6 +101,22 @@ public class ECStringUtil {
         return finalString;
     }
 
+    /**
+     * When reading in text with double quotes, before they can be written out they need to first
+     * be double escaped so the end result is a single escaped double quote - just like the very original
+     * input text that was parsed.
+     * @param inputString The input string with double quotes.
+     * @return Double escaped double quoted string.
+     */
+    public static String DoubleEscapeDoubleQuotes(String inputString) {
+        String finalString = inputString;
+        if (finalString.length() > 0) {
+
+            finalString = finalString.replace("\"", "\\\\\"");
+        }
+        return finalString;
+    }
+
     public static String StripLineEnd(String input) {
         int len = input.length();
         while (input.endsWith("\n")) {

@@ -32,6 +32,10 @@ class ECStringUtilTest {
     }
 
     @Test
+    void doubleEscapeDoubleQuotes() {
+        assertEquals("\\\\\"DoubleQuotes\\\\\"", ECStringUtil.DoubleEscapeDoubleQuotes("\"DoubleQuotes\""));
+    }
+    @Test
     void stripLineEnd() {
         assertEquals(ECStringUtil.StripLineEnd("WithoutCR\n"), "WithoutCR");
         assertEquals(ECStringUtil.StripLineEnd("WithoutCR"), "WithoutCR");

@@ -10,6 +10,7 @@ import org.entityc.compiler.transform.template.TemplateLexer;
 import org.entityc.compiler.transform.template.formatter.ConfigurableElement;
 import org.entityc.compiler.transform.template.formatter.TemplateFormatController;
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.entityc.compiler.util.ECStringUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -68,7 +69,7 @@ public class FTDescription extends FTNode {
                 first = false;
             }
         }
-        formatController.addInstructionInside(DescriptionString, "\"" + descriptionText + "\"",
+        formatController.addInstructionInside(DescriptionString, "\"" + ECStringUtil.DoubleEscapeDoubleQuotes(descriptionText) + "\"",
                                               -1);
     }
 
