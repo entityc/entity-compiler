@@ -13,3 +13,4 @@ server/clubs
 *.idea
 .ec
 *.iml
+gen

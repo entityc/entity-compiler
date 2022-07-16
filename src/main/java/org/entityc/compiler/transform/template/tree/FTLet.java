@@ -13,32 +13,52 @@ import org.entityc.compiler.doc.annotation.TemplateInstructionCategory;
 import org.entityc.compiler.transform.template.TemplateLexer;
 import org.entityc.compiler.transform.template.formatter.TemplateFormatController;
 import org.entityc.compiler.transform.template.tree.expression.FTExpression;
+import org.entityc.compiler.transform.template.tree.expression.FTOperand;
 import org.entityc.compiler.transform.template.tree.expression.FTOperation;
+
+import java.util.ArrayList;
 
 import static org.entityc.compiler.transform.template.formatter.ConfigurableElement.ExpressionOperand;
 
 @TemplateInstruction(category = TemplateInstructionCategory.ASSIGNMENT,
-    name = "let",
-    usage = "`let `*variable*` = `*expression*",
-    summary = "This is a straight forward way to assign values to a variable.",
-    description = "Assigns the resulting value after evaluating the provided *expression* to the provided *variable*.")
+        name = "let",
+        usage = "`let `*variable*` = `*expression*",
+        summary = "This is a straight forward way to assign values to a variable.",
+        description = "Assigns the resulting value after evaluating the provided *expression* to the provided *variable*.")
 public class FTLet extends FTNode {
 
-    private final String       leftVariableName;
-    private final FTExpression rightExpression;
+    private final String               leftVariableName;
+    private final FTExpression         rightExpression;
+    private final FTOperation.Operator assignmentOperator;
+    private final int                  assignmentOperatorSymbolType;
 
     public FTLet(ParserRuleContext ctx,
                  @TemplateInstructionArgument(
-                     description = "The variable to receive the assigned value."
+                         description = "The variable to receive the assigned value."
                  )
                  String variable,
                  @TemplateInstructionArgument(
-                     description = "The expression that will be evaluated."
+                         description = "The operator (if any) used with the = sign (e.g. += would supply "
+                                       + "the + operator here)."
+                 )
+                 FTOperation.Operator assignmentOperator,
+                 @TemplateInstructionArgument(
+                         description = "This is the template parser's grammar ID essentially of the +=, -=, etc. operator."
+                 )
+                 int assignmentOperatorSymbolType,
+                 @TemplateInstructionArgument(
+                         description = "The expression that will be evaluated."
                  )
                  FTExpression expression) {
         super(ctx);
-        this.leftVariableName = variable;
-        this.rightExpression  = expression;
+        this.leftVariableName             = variable;
+        this.assignmentOperator           = assignmentOperator;
+        this.assignmentOperatorSymbolType = assignmentOperatorSymbolType;
+        this.rightExpression              = expression;
+    }
+
+    public FTOperation.Operator getAssignmentOperator() {
+        return assignmentOperator;
     }
 
     public String getLeftVariableName() {
@@ -47,8 +67,18 @@ public class FTLet extends FTNode {
 
     @Override
     public void transform(FTTransformSession session) {
-        Object value = this.rightExpression != null ?
-                       this.rightExpression.getValue(session) :
+        FTExpression finalExpression = rightExpression;
+        if (finalExpression != null) {
+            if (assignmentOperator != FTOperation.Operator.EQUALS) {
+                FTOperand               leftOperand = new FTOperand(null, leftVariableName);
+                ArrayList<FTExpression> operands    = new ArrayList<>();
+                operands.add(leftOperand);
+                operands.add(rightExpression);
+                finalExpression = new FTOperation(null, assignmentOperator, operands);
+            }
+        }
+        Object value = finalExpression != null ?
+                       finalExpression.getValue(session) :
                        null;
         session.setValue(leftVariableName, value);
     }
@@ -70,8 +100,8 @@ public class FTLet extends FTNode {
 
         formatController.addInstructionStart(indentLevel, this);
         formatController.addExpressionElement(ExpressionOperand, leftVariableName, this.getStartLineNumber());
-        formatController.addExpressionOperator(FTOperation.Operator.EQUALS,
-                                               GetInstructionNameOfLexerSymbol(TemplateLexer.EQUALS),
+        formatController.addExpressionOperator(assignmentOperator,
+                                               GetInstructionNameOfLexerSymbol(assignmentOperatorSymbolType),
                                                this.getStartLineNumber());
         if (!rightExpression.format(formatController, indentLevel)) {
             success = false;

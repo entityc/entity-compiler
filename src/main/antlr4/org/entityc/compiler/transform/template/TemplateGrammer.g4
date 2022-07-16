@@ -249,7 +249,7 @@ promptTag
   ;
 
 letTag
-  : Let identifier EQUALS expression
+  : Let identifier (EQUALS|PlusEquals|MinusEquals|MultiplyEquals|DivideEquals) expression
   ;
 
 doTag
