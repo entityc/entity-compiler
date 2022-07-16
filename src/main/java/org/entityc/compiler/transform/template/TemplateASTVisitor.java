@@ -965,7 +965,7 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         String       leftVariableName = ECStringUtil.ProcessParserString(ctx.identifier().getText());
         FTExpression rightExpression  = visitExpression(ctx.expression());
         FTOperation.Operator operator = FTOperation.Operator.EQUALS;
-        int operatorSymbolType = ctx.EQUALS().getSymbol().getType();
+        int operatorSymbolType = TemplateGrammer.EQUALS;
         if (ctx.EQUALS() == null) {
             if (ctx.PlusEquals() != null) {
                 operator = FTOperation.Operator.PLUS;
