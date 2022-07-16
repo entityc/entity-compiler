@@ -28,13 +28,13 @@ Returns the name of this configuration.
 
 <hr/>
 
-#### `MTDirectory outputByName(String arg0)`
+#### `MTDirectory outputByName(String name)`
 
 With the name of an output, this returns the directory object representing the output that a template can be configured to use.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The name of the output as it is defined inside the `config {}` block of your model. |
+|`String name` | The name of the output as it is defined inside the `config {}` block of your model. |
 
 <hr/>
 
@@ -113,13 +113,13 @@ These methods relate to a module.
 
 <hr/>
 
-#### `MTModule moduleWithName(String arg0)`
+#### `MTModule moduleWithName(String name)`
 
 Returns a module by its name.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The name of the module to return. |
+|`String name` | The name of the module to return. |
 
 <hr/>
 
@@ -134,23 +134,23 @@ These methods relate to an entity.
 
 <hr/>
 
-#### `MTDomain domain(String arg0)`
+#### `MTDomain domain(String name)`
 
 Returns a domain from its name.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The name of the domain to return. |
+|`String name` | The name of the domain to return. |
 
 <hr/>
 
-#### `MTEntity entity(String arg0)`
+#### `MTEntity entity(String name)`
 
 Returns an entity from its name.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The name of the entity to return. |
+|`String name` | The name of the entity to return. |
 
 <hr/>
 
@@ -160,23 +160,23 @@ Returns a the total number of entities in this space including implicit entities
 
 <hr/>
 
-#### `MTEntityTemplate entityTemplateWithName(String arg0)`
+#### `MTEntityTemplate entityTemplateWithName(String name)`
 
 Returns an entity template by its name.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The name of the entity to return. |
+|`String name` | The name of the entity to return. |
 
 <hr/>
 
-#### `boolean hasDomain(String arg0)`
+#### `boolean hasDomain(String name)`
 
 Indicates if there is a domain by the specified name.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The name of the domain in question. |
+|`String name` | The name of the domain in question. |
 
 
 ### Enum Category
@@ -191,13 +191,13 @@ Returns a the number of enums in this space.
 
 <hr/>
 
-#### `MTEnum enumWithName(String arg0)`
+#### `MTEnum enumWithName(String name)`
 
 Returns an enum by its name.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The name of the enum to return. |
+|`String name` | The name of the enum to return. |
 
 <hr/>
 
@@ -212,14 +212,14 @@ These methods relate to typedefs.
 
 <hr/>
 
-#### `MTInterfaceOperation operationByName(MTInterface arg0, String arg1)`
+#### `MTInterfaceOperation operationByName(MTInterface mtInterface, String extendedOperationName)`
 
 Given an interface object, this will return an operation by its name.
 
 | Parameter | Description |
 |-----|-----|
-|`MTInterface arg0` | The interface object that contains the operation. |
-|`String arg1` | The name of the operation to return. |
+|`MTInterface mtInterface` | The interface object that contains the operation. |
+|`String extendedOperationName` | The name of the operation to return. |
 
 <hr/>
 
@@ -229,13 +229,13 @@ Returns the number of typedefs declared in this space.
 
 <hr/>
 
-#### `MTTypedef typedefWithName(String arg0)`
+#### `MTTypedef typedefWithName(String name)`
 
 Returns a typedef by its name.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The name of the typedef to return. |
+|`String name` | The name of the typedef to return. |
 
 <hr/>
 
@@ -250,13 +250,13 @@ These methods relate to language definitions.
 
 <hr/>
 
-#### `MTLanguage languageWithName(String arg0)`
+#### `MTLanguage languageWithName(String name)`
 
 Returns a language object by its name.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The name of the language to return. |
+|`String name` | The name of the language to return. |
 
 
 ### Tagging Category
@@ -265,73 +265,73 @@ These methods relate to the tagging.
 
 <hr/>
 
-#### `List domainsTagged(String arg0)`
+#### `List domainsTagged(String tag)`
 
 Returns all domains that are tagged with a specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The tag with which to search. |
+|`String tag` | The tag with which to search. |
 
 <hr/>
 
-#### `List entitiesTagged(String arg0)`
+#### `List entitiesTagged(String tag)`
 
 Returns all entities found with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The tag with which to search. |
+|`String tag` | The tag with which to search. |
 
 <hr/>
 
-#### `MTEntity entityTagged(String arg0)`
+#### `MTEntity entityTagged(String tag)`
 
 Returns the first entity found with the specified tag. This should only be used when it is expected that only one is tagged with the tag by nature of the entity. Use `entitiesTagged()` if you are expecting multiple entities that are found.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The tag with which to search. |
+|`String tag` | The tag with which to search. |
 
 <hr/>
 
-#### `MTEnum enumTagged(String arg0)`
+#### `MTEnum enumTagged(String tag)`
 
 Returns all enums that are tagged with a specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The tag with which to search. |
+|`String tag` | The tag with which to search. |
 
 <hr/>
 
-#### `boolean hasDomainTagged(String arg0)`
+#### `boolean hasDomainTagged(String tag)`
 
 Indicates if there is at least one domain tagged with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The tag with which to search. |
+|`String tag` | The tag with which to search. |
 
 <hr/>
 
-#### `boolean hasEntityTagged(String arg0)`
+#### `boolean hasEntityTagged(String tag)`
 
 Indicates if there is at least one entity tagged with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The tag with which to search. |
+|`String tag` | The tag with which to search. |
 
 <hr/>
 
-#### `boolean hasEnumTagged(String arg0)`
+#### `boolean hasEnumTagged(String tag)`
 
 Indicates if there is at least one enum tagged with the specified tag.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The tag with which to search. |
+|`String tag` | The tag with which to search. |
 
 
 ### Configuration Category
@@ -340,13 +340,13 @@ These methods relate to a part of application configuration.
 
 <hr/>
 
-#### `boolean hasMetadataValue(String arg0)`
+#### `boolean hasMetadataValue(String name)`
 
 Indicates whether this space has a metadata name/value for the specified name.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The name of the metadata value to return. |
+|`String name` | The name of the metadata value to return. |
 
 <hr/>
 
@@ -362,33 +362,33 @@ Returns the names of the enums that have been imported into this space.
 
 <hr/>
 
-#### `Object metadataValue(String arg0)`
+#### `Object metadataValue(String name)`
 
 Spaces can define a dictionary of name/value pairs that provide some meta data about the space and basically the application. This method allows you to get a value by its name.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The name of the meta data. |
+|`String name` | The name of the meta data. |
 
 <hr/>
 
-#### `MTRepository repository(String arg0)`
+#### `MTRepository repository(String name)`
 
 Returns the repository object by its name.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The name of the repository. |
+|`String name` | The name of the repository. |
 
 <hr/>
 
-#### `MTRepository repositoryByName(String arg0)`
+#### `MTRepository repositoryByName(String name)`
 
 Returns a repository object by its name.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The name of the repository to return. |
+|`String name` | The name of the repository to return. |
 
 
 ### Interface Category
@@ -397,13 +397,13 @@ These methods relate to an interface.
 
 <hr/>
 
-#### `MTInterface interface(String arg0)`
+#### `MTInterface interface(String name)`
 
 Returns an interface by its name.
 
 | Parameter | Description |
 |-----|-----|
-|`String arg0` | The name of the interface to return. |
+|`String name` | The name of the interface to return. |
 
 <hr/>
 

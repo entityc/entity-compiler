@@ -122,13 +122,13 @@ The following properties and methods are available for this class:
 
 <hr/>
 
-#### `MTExpression argument(int arg0)`
+#### `MTExpression argument(int i)`
 
 Returns the expression of a specified argument of the method call.
 
 | Parameter | Description |
 |-----|-----|
-|`int arg0` | The index of argument (where 0 is the first). |
+|`int i` | The index of argument (where 0 is the first). |
 
 <hr/>
 
@@ -204,13 +204,13 @@ Returns the operator of the operation. This is the actual add, subtract, multipl
 
 <hr/>
 
-#### `MTExpression operand(int arg0)`
+#### `MTExpression operand(int i)`
 
 Returns the operand expression for a specified input of the operation. An operation can have up to 3 inputs (you can use the `operandCount` property to know how many this one has).
 
 | Parameter | Description |
 |-----|-----|
-|`int arg0` | The index of the specific operand (input) of the operation you want to be returned. |
+|`int i` | The index of the specific operand (input) of the operation you want to be returned. |
 
 <hr/>
 

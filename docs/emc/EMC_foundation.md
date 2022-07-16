@@ -20,23 +20,23 @@ The following properties and methods are available for this class:
 
 <hr/>
 
-#### `MFArray add(Object arg0)`
+#### `MFArray add(Object o)`
 
 Allows you to add an object to this array. The `do` template instruction can be used to do this (e.g., `$[do array.add(obj)]`. This method returns the array itself so you can chain other array methods after this one.
 
 | Parameter | Description |
 |-----|-----|
-|`Object arg0` | The object to add to the array. |
+|`Object o` | The object to add to the array. |
 
 <hr/>
 
-#### `MFArray addAll(MFArray arg0)`
+#### `MFArray addAll(MFArray otherArray)`
 
 Allows you to add all elements of another array to this array. The `do` template instruction can be used to do  this (e.g., `$[do array.addAll(otherArray)]`. This method returns the array itself so you can chain other array methods after this one.
 
 | Parameter | Description |
 |-----|-----|
-|`MFArray arg0` | The other array to add to this array. |
+|`MFArray otherArray` | The other array to add to this array. |
 
 <hr/>
 
@@ -46,13 +46,13 @@ This method removes all items in the array.
 
 <hr/>
 
-#### `boolean contains(Object arg0)`
+#### `boolean contains(Object object)`
 
 Indicates if the array contains the specified object.
 
 | Parameter | Description |
 |-----|-----|
-|`Object arg0` | The object of which to determine its presence in the array. |
+|`Object object` | The object of which to determine its presence in the array. |
 
 <hr/>
 
@@ -74,23 +74,23 @@ Returns the first item in the array.
 
 <hr/>
 
-#### `Object get(Long arg0)`
+#### `Object get(Long index)`
 
 Returns the specified item by its index into the array.
 
 | Parameter | Description |
 |-----|-----|
-|`Long arg0` | The index into the array that points to the item to be returned. |
+|`Long index` | The index into the array that points to the item to be returned. |
 
 <hr/>
 
-#### `int indexOf(Object arg0)`
+#### `int indexOf(Object o)`
 
 Returns the index into the array associated with the specified object. If the object is not found, a -1 is returned.
 
 | Parameter | Description |
 |-----|-----|
-|`Object arg0` | The object of which to locate its index. |
+|`Object o` | The object of which to locate its index. |
 
 <hr/>
 
@@ -106,13 +106,13 @@ Returns the last item in the array.
 
 <hr/>
 
-#### `MFArray remove(Object arg0)`
+#### `MFArray remove(Object o)`
 
 Allows you to remove a specified object from the array. This method returns the array itself so you can chain other array methods after this one.
 
 | Parameter | Description |
 |-----|-----|
-|`Object arg0` | The object to remove from this array. |
+|`Object o` | The object to remove from this array. |
 
 <hr/>
 
@@ -131,13 +131,13 @@ The following properties and methods are available for this class:
 
 <hr/>
 
-#### `boolean contains(Object arg0)`
+#### `boolean contains(Object object)`
 
 Indicates if the set contains the specified object.
 
 | Parameter | Description |
 |-----|-----|
-|`Object arg0` | The object of which to determine its presence in the set. |
+|`Object object` | The object of which to determine its presence in the set. |
 
 <hr/>
 
