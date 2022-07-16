@@ -33,9 +33,11 @@ import org.entityc.compiler.model.interop.MTInterface;
 import org.entityc.compiler.model.interop.MTInterfaceOperation;
 import org.entityc.compiler.model.interop.MTRequestEndpointParam;
 import org.entityc.compiler.model.interop.MTResponseStatus;
+import org.entityc.compiler.transform.template.TemplateGrammer;
 import org.entityc.compiler.transform.template.TemplateLexer;
 import org.entityc.compiler.transform.template.formatter.TemplateFormatController;
 import org.entityc.compiler.transform.template.tree.expression.FTExpression;
+import org.entityc.compiler.transform.template.tree.expression.FTOperation;
 import org.entityc.compiler.util.ECLog;
 
 import java.util.ArrayList;
@@ -130,7 +132,7 @@ public class FTForeach extends FTContainerNode {
         if (this.conditionalFilterExpression != null) {
             // make a new list by filtering items through this expression
             ArrayList filteredList = new ArrayList();
-            FTLet     let          = new FTLet(null, "__", this.conditionalFilterExpression);
+            FTLet     let          = new FTLet(null, "__", FTOperation.Operator.EQUALS, TemplateGrammer.EQUALS, this.conditionalFilterExpression);
             for (Object item : list) {
                 session.setLoopValue(loopVariableName, item, -1, list);
                 let.transform(session);

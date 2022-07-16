@@ -320,7 +320,9 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         FTExpression sourceArg        = resolveFileArg(ctx.fileArg(0));
         FTExpression destNamespaceArg = resolveFileArg(ctx.fileArg(1));
         FTInstall    install          = new FTInstall(ctx, ctx.Copy() != null, sourceArg, destNamespaceArg);
-        install.setSourceRepositoryName(repository == null ? null : repository.getName());
+        install.setSourceRepositoryName(repository == null ?
+                                        null :
+                                        repository.getName());
         currentContainer(ctx).addChild(install);
         return install;
     }
@@ -962,7 +964,26 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
     public FTLet visitLetTag(TemplateGrammer.LetTagContext ctx) {
         String       leftVariableName = ECStringUtil.ProcessParserString(ctx.identifier().getText());
         FTExpression rightExpression  = visitExpression(ctx.expression());
-        FTLet        let              = new FTLet(ctx, leftVariableName, rightExpression);
+        FTOperation.Operator operator = FTOperation.Operator.EQUALS;
+        int operatorSymbolType = TemplateGrammer.EQUALS;
+        if (ctx.EQUALS() == null) {
+            if (ctx.PlusEquals() != null) {
+                operator = FTOperation.Operator.PLUS;
+                operatorSymbolType = ctx.PlusEquals().getSymbol().getType();
+            } else if (ctx.MinusEquals() != null) {
+                operator = FTOperation.Operator.MINUS;
+                operatorSymbolType = ctx.MinusEquals().getSymbol().getType();
+            } else if (ctx.MultiplyEquals() != null) {
+                operator = FTOperation.Operator.TIMES;
+                operatorSymbolType = ctx.MultiplyEquals().getSymbol().getType();
+            } else if (ctx.DivideEquals() != null) {
+                operatorSymbolType = ctx.DivideEquals().getSymbol().getType();
+                operator = FTOperation.Operator.DIVIDE;
+            } else {
+                ECLog.logFatal("Unknown let assignment: " + ctx.getText());
+            }
+        }
+        FTLet let = new FTLet(ctx, leftVariableName, operator, operatorSymbolType, rightExpression);
         currentContainer(ctx).addChild(let);
         return let;
     }
@@ -1027,11 +1048,13 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
     @Override
     public FTPrompt visitPromptTag(TemplateGrammer.PromptTagContext ctx) {
         String variableName = ctx.identifier() != null ?
-                           ECStringUtil.ProcessParserString(ctx.identifier().getText()) :
-                           null;
-        String typeAsString = ctx.primitiveType() == null ? "string" : ctx.primitiveType().getText();
-        MTNativeType nativeType = new MTNativeType(ctx.primitiveType(), typeAsString);
-        FTPrompt promptBlock = new FTPrompt(ctx, currentContainer(ctx), variableName, nativeType);
+                              ECStringUtil.ProcessParserString(ctx.identifier().getText()) :
+                              null;
+        String       typeAsString = ctx.primitiveType() == null ?
+                                    "string" :
+                                    ctx.primitiveType().getText();
+        MTNativeType nativeType   = new MTNativeType(ctx.primitiveType(), typeAsString);
+        FTPrompt     promptBlock  = new FTPrompt(ctx, currentContainer(ctx), variableName, nativeType);
         currentContainer(ctx).addChild(promptBlock);
         push(promptBlock);
         return promptBlock;

@@ -71,6 +71,8 @@ Assigns the resulting value after evaluating the provided *expression* to the pr
 | Argument | Type | Description |
 |----------|------|-------------|
 | *variable* | `String` | The variable to receive the assigned value. |
+| *assignmentOperator* | `Operator` | The operator (if any) used with the = sign (e.g. += would supply the + operator here). |
+| *assignmentOperatorSymbolType* | `int` | This is the template parser's grammar ID essentially of the +=, -=, etc. operator. |
 | *expression* | `FTExpression` | The expression that will be evaluated. |
 
 <a name="category_context"></a>
