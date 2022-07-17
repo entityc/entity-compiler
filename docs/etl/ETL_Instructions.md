@@ -64,15 +64,14 @@ Assigns the resulting value after evaluating the provided *expression* to the pr
 
 #### Usage
 
-> `$[let `*variable*` = `*expression*`]`
+> `$[let `*variable*` `*assignmentOperator*` `*expression*`]`
 
 #### Arguments
 
 | Argument | Type | Description |
 |----------|------|-------------|
 | *variable* | `String` | The variable to receive the assigned value. |
-| *assignmentOperator* | `Operator` | The operator (if any) used with the = sign (e.g. += would supply the + operator here). |
-| *assignmentOperatorSymbolType* | `int` | This is the template parser's grammar ID essentially of the +=, -=, etc. operator. |
+| *assignmentOperator* | `Operator` | Typically this is just `=` but also supported are `+=`, `-=`, `*=` and `/=`. The `+=` can be used with string variables to concatenate string values. |
 | *expression* | `FTExpression` | The expression that will be evaluated. |
 
 <a name="category_context"></a>

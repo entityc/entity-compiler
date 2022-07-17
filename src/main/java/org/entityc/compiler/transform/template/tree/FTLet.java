@@ -22,7 +22,7 @@ import static org.entityc.compiler.transform.template.formatter.ConfigurableElem
 
 @TemplateInstruction(category = TemplateInstructionCategory.ASSIGNMENT,
         name = "let",
-        usage = "`let `*variable*` = `*expression*",
+        usage = "`let `*variable*` `*assignmentOperator*` `*expression*",
         summary = "This is a straight forward way to assign values to a variable.",
         description = "Assigns the resulting value after evaluating the provided *expression* to the provided *variable*.")
 public class FTLet extends FTNode {
@@ -38,13 +38,10 @@ public class FTLet extends FTNode {
                  )
                  String variable,
                  @TemplateInstructionArgument(
-                         description = "The operator (if any) used with the = sign (e.g. += would supply "
-                                       + "the + operator here)."
+                         description = "Typically this is just `=` but also supported are `+=`, `-=`, `*=` and `/=`. "
+                                       + "The `+=` can be used with string variables to concatenate string values."
                  )
                  FTOperation.Operator assignmentOperator,
-                 @TemplateInstructionArgument(
-                         description = "This is the template parser's grammar ID essentially of the +=, -=, etc. operator."
-                 )
                  int assignmentOperatorSymbolType,
                  @TemplateInstructionArgument(
                          description = "The expression that will be evaluated."
