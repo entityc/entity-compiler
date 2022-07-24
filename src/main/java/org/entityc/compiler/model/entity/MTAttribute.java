@@ -31,10 +31,10 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
 
     private final List<MTBitField>            bitFields   = new ArrayList<>();
     private final List<MTAttributeConstraint> constraints = new ArrayList<>();
-    private       String entityName;
-    private final String name;
-    private final String typeName;
-    private       MTEntity entity;
+    private final String                      name;
+    private final String                      typeName;
+    private       String                      entityName;
+    private       MTEntity                    entity;
     private       MTType                      type;
     private       MTUnit                      unit;
     private       String                      unitName;
@@ -94,11 +94,9 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
 
     protected MTAttribute(String secondaryName, MTAttribute primaryAttribute) {
         super(primaryAttribute.getParserRuleContext());
-        this.name       = secondaryName;
-        this.entityName = primaryAttribute.entityName;
-        this.entity     = primaryAttribute.entity;
-        this.bitFields.addAll(primaryAttribute.bitFields);
-        this.constraints.addAll(primaryAttribute.constraints);
+        this.name                        = secondaryName;
+        this.entityName                  = primaryAttribute.entityName;
+        this.entity                      = primaryAttribute.entity;
         this.unit                        = primaryAttribute.unit;
         this.unitName                    = primaryAttribute.unitName;
         this.order                       = primaryAttribute.order;
@@ -119,6 +117,8 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
         this.defaultValue                = primaryAttribute.defaultValue;
         this.type                        = primaryAttribute.type;
         this.typeName                    = primaryAttribute.typeName;
+        this.bitFields.addAll(primaryAttribute.bitFields);
+        this.constraints.addAll(primaryAttribute.constraints);
     }
 
     static public MTAttribute Copy(MTAttribute fromAttribute, MTEntity toEntity) {
@@ -131,17 +131,17 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Returns the name of this attribute as it was declared in the model.")
+            description = "Returns the name of this attribute as it was declared in the model.")
     @Override
     public String getName() {
         return name;
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description =
-            "Returns the data type of this attribute. The type can be a native type (such as an int32, string, etc.) "
-            + "or can be a secondary entity. If you are looking for it to be a secondary entity, it would be better "
-            + "to use the `isSecondaryEntityType` property then `typeEntity` if it is a secondary entity.")
+            description =
+                    "Returns the data type of this attribute. The type can be a native type (such as an int32, string, etc.) "
+                    + "or can be a secondary entity. If you are looking for it to be a secondary entity, it would be better "
+                    + "to use the `isSecondaryEntityType` property then `typeEntity` if it is a secondary entity.")
     public MTType getType() {
         return type;
     }
@@ -168,7 +168,7 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Indicates whether the the data type of this attribute is a secondary entity.")
+            description = "Indicates whether the the data type of this attribute is a secondary entity.")
     public boolean isSecondaryEntityType() {
         if (type == null) {
             ECLog.logFatal(this, "Attribute named \"" + name + "\" has invalid type \"" + typeName + "\"");
@@ -177,9 +177,9 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description =
-            "If the data type of this attribute is a secondary entity, then it returns that secondary entity. "
-            + "Otherwise it returns `null`.")
+            description =
+                    "If the data type of this attribute is a secondary entity, then it returns that secondary entity. "
+                    + "Otherwise it returns `null`.")
     public MTEntity getTypeEntity() {
         return type.isEntityType() ?
                (MTEntity) type :
@@ -187,14 +187,15 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Indicates whether this attribute is an attribute of a secondary entity.")
+            description = "Indicates whether this attribute is an attribute of a secondary entity.")
     public boolean isSecondary() {
         return false; // this is overridden by MTSecondaryAttribute as true
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Indicates whether this attribute has been declared `virtual`. A virtual attribute is one that "
-                      + "is not persistent and is backed by code to create its value - code that a developer writes.")
+            description =
+                    "Indicates whether this attribute has been declared `virtual`. A virtual attribute is one that "
+                    + "is not persistent and is backed by code to create its value - code that a developer writes.")
     public boolean isVirtual() {
         return virtual;
     }
@@ -204,7 +205,7 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Returns an optional default value declaration of the attribute.")
+            description = "Returns an optional default value declaration of the attribute.")
     public MTConstant getDefaultValue() {
         return defaultValue;
     }
@@ -214,10 +215,11 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Indicates whether this attribute has been declared `optional`. When an attribute is declared as "
-                      + "`optional` it means that it can be null. For secondary entities, if the instantiation of "
-                      + "a secondary entity is declared as `optional` then all its attributes are nullable in that "
-                      + "context.")
+            description =
+                    "Indicates whether this attribute has been declared `optional`. When an attribute is declared as "
+                    + "`optional` it means that it can be null. For secondary entities, if the instantiation of "
+                    + "a secondary entity is declared as `optional` then all its attributes are nullable in that "
+                    + "context.")
     public boolean isNullable() {
         return nullable;
     }
@@ -227,18 +229,17 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description =
-            "Returns a string that represents the textual representation of the data type for this attribute. "
-            + "This is not intended to be used to generate code - its best to use the `getType()` method "
-            + "and send it through the `language` filter which will result in a language specific "
-            + "representation of the type (assuming you have the language definition for your target language). "
-            + "You can also use this for debug purposes.")
+            description =
+                    "Returns a string that represents the textual representation of the data type for this attribute. This is not intended to be used to generate code - its best to use the `getType()` method "
+                    + "and send it through the `language` filter which will result in a language specific "
+                    + "representation of the type (assuming you have the language definition for your target language). "
+                    + "You can also use this for debug purposes.")
     public String getTypeName() {
         return typeName;
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Returns the parent entity of this attribute.")
+            description = "Returns the parent entity of this attribute.")
     public MTEntity getEntity() {
         return entity;
     }
@@ -248,13 +249,13 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Returns the name of the parent entity of this attribute as it was declared in the model.")
+            description = "Returns the name of the parent entity of this attribute as it was declared in the model.")
     public String getEntityName() {
         return entityName;
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Returns the declared unit of this attribute as a unit object.")
+            description = "Returns the declared unit of this attribute as a unit object.")
     public MTUnit getUnit() {
         return unit;
     }
@@ -264,10 +265,10 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
-        description = "When an attribute is created for the purpose of returning the effective set of "
-                      + "attributes, attributes created due to a relationship, then this returns the relationship that "
-                      + "this attribute represents. For example, if you have a many-to-one relationship, an effective "
-                      + "attribute will be created to contain the unique ID of the other end of this relationship.")
+            description = "When an attribute is created for the purpose of returning the effective set of "
+                          + "attributes, attributes created due to a relationship, then this returns the relationship that "
+                          + "this attribute represents. For example, if you have a many-to-one relationship, an effective "
+                          + "attribute will be created to contain the unique ID of the other end of this relationship.")
     public MTRelationship getRelationship() {
         return relationship;
     }
@@ -277,10 +278,10 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description =
-            "Indicates whether this attribute was declared as `unique`. If so, the database should be configured "
-            + "or code should be synthesized so as to assure that all objects of its entity will have a unique "
-            + "value across all values of this attribute.")
+            description =
+                    "Indicates whether this attribute was declared as `unique`. If so, the database should be configured "
+                    + "or code should be synthesized so as to assure that all objects of its entity will have a unique "
+                    + "value across all values of this attribute.")
     public boolean isUnique() {
         return unique;
     }
@@ -290,8 +291,9 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Indicates whether this attribute was declared with the `creation` qualifier. This should only "
-                      + "occur with a `date` attribute that represents the creation date for objects of this entity.")
+            description =
+                    "Indicates whether this attribute was declared with the `creation` qualifier. This should only "
+                    + "occur with a `date` attribute that represents the creation date for objects of this entity.")
     public boolean isCreation() {
         return creation;
     }
@@ -301,10 +303,10 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description =
-            "Indicates whether this attribute was declared with the `modification` qualifier. This should only "
-            + "occur with a `date` attribute that represents the last modification date for objects of this "
-            + "entity.")
+            description =
+                    "Indicates whether this attribute was declared with the `modification` qualifier. This should only "
+                    + "occur with a `date` attribute that represents the last modification date for objects of this "
+                    + "entity.")
     public boolean isModification() {
         return modification;
     }
@@ -314,7 +316,7 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Indicates whether this attribute was declared using the `many` keyword.")
+            description = "Indicates whether this attribute was declared using the `many` keyword.")
     public boolean isArray() {
         return array;
     }
@@ -324,10 +326,11 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Indicates whether this attribute was declared using the `ordered` keyword. This only applies "
-                      + "to array type attributes (that is, have been declared with `many` also). Using the `ordered` "
-                      + "keyword should cause this attribute to have a field in the database to keep track of the order "
-                      + "for each item in the array of objects for this attribute.")
+            description =
+                    "Indicates whether this attribute was declared using the `ordered` keyword. This only applies "
+                    + "to array type attributes (that is, have been declared with `many` also). Using the `ordered` "
+                    + "keyword should cause this attribute to have a field in the database to keep track of the order "
+                    + "for each item in the array of objects for this attribute.")
     public boolean isOrdered() {
         return ordered;
     }
@@ -337,10 +340,11 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Indicates whether this attribute was declared using the `parent` keyword. Attributes declared "
-                      + "this way is intended to indicate that objects of this entity will likely be grouped by "
-                      + "this attribute. Its up to the templates to look at this flag and synthesize appropriate "
-                      + "code to provide the grouped representation.")
+            description =
+                    "Indicates whether this attribute was declared using the `parent` keyword. Attributes declared "
+                    + "this way is intended to indicate that objects of this entity will likely be grouped by "
+                    + "this attribute. Its up to the templates to look at this flag and synthesize appropriate "
+                    + "code to provide the grouped representation.")
     public boolean isParent() {
         return parent;
     }
@@ -350,9 +354,10 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Indicates whether this attribute was declared using the `sequential` keyword. When you use this "
-                      + "keyword it means you want this attribute to be auto incremented for each new object of its "
-                      + "entity that is created.")
+            description =
+                    "Indicates whether this attribute was declared using the `sequential` keyword. When you use this "
+                    + "keyword it means you want this attribute to be auto incremented for each new object of its "
+                    + "entity that is created.")
     public boolean isSequential() {
         return sequential;
     }
@@ -362,16 +367,17 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
-        description =
-            "For attributes that were created from relationships (effective attributes), this indicates whether "
-            + "the relationship it was created from is declared as a `parent` relationship.")
+            description =
+                    "For attributes that were created from relationships (effective attributes), this indicates whether "
+                    + "the relationship it was created from is declared as a `parent` relationship.")
     public boolean isParentRelationship() {
         return relationship != null && relationship.isParent();
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Indicates whether this attribute was declared with a default value. If so, you can obtain the "
-                      + "default value from the `defaultValue` property of this attribute.")
+            description =
+                    "Indicates whether this attribute was declared with a default value. If so, you can obtain the "
+                    + "default value from the `defaultValue` property of this attribute.")
     public boolean hasDefaultValue() {
         return defaultValue != null;
     }
@@ -384,20 +390,21 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Returns the bit fields declared as part of this attribute.")
+            description = "Returns the bit fields declared as part of this attribute.")
     public List<MTBitField> getBitFields() {
         return bitFields;
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Indicates whether this attribute was declared with bit fields.")
+            description = "Indicates whether this attribute was declared with bit fields.")
     public boolean hasBitFields() {
         return bitFields.size() > 0;
     }
 
     @ModelMethod(category = ModelMethodCategory.PRIMARY_KEY,
-        description = "An attribute that represents a primary key has a type that indicates it is a primary key. This "
-                      + "method returns the type but with the primary key indicator set to false.")
+            description =
+                    "An attribute that represents a primary key has a type that indicates it is a primary key. This "
+                    + "method returns the type but with the primary key indicator set to false.")
     public MTType getNonPrimaryKeyType() {
         if (!type.isNativeType()) {
             return type;
@@ -409,7 +416,7 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.PRIMARY_KEY,
-        description = "Indicates if this attribute represents the primary key of its entity.")
+            description = "Indicates if this attribute represents the primary key of its entity.")
     public boolean isPrimaryKey() {
         return primaryKey;
     }
@@ -451,8 +458,7 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
         if (type == null) {
             if (MTNativeType.isNativeDataType(typeName)) {
                 type = new MTNativeType(null, typeName);
-            }
-            else {
+            } else {
                 anotherPass = true;
             }
         }
@@ -505,9 +511,9 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description =
-            "For attributes that represent an asset and have been defined with a content type, this will return "
-            + "that defined content type.")
+            description =
+                    "For attributes that represent an asset and have been defined with a content type, this will return "
+                    + "that defined content type.")
     public String getContentType() {
         return contentType != null ?
                contentType :
@@ -519,10 +525,10 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description =
-            "Indicates whether an attribute has been defined using **both** the `unique` and `parent` keywords. "
-            + "This can be used to establish unique constraints such that objects of this entity must have "
-            + "unique values of this attribute per parent object.")
+            description =
+                    "Indicates whether an attribute has been defined using **both** the `unique` and `parent` keywords. "
+                    + "This can be used to establish unique constraints such that objects of this entity must have "
+                    + "unique values of this attribute per parent object.")
     public boolean isParentUnique() {
         return parent && unique;
     }
@@ -532,35 +538,35 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Returns an optional list of constraints defined for this attribute.")
+            description = "Returns an optional list of constraints defined for this attribute.")
     public List<MTAttributeConstraint> getConstraints() {
         return constraints;
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Indicates whether this attribute has any defined constraints.")
+            description = "Indicates whether this attribute has any defined constraints.")
     public boolean hasConstraints() {
         return constraints.size() > 0;
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Returns the order in which this attribute was declared among the other attributes of this entity.")
+            description = "Returns the order in which this attribute was declared among the other attributes of this entity.")
     public int getOrder() {
         return order;
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Indicates whether this attribute has been defined with a unit.")
+            description = "Indicates whether this attribute has been defined with a unit.")
     public boolean hasUnit() {
         return unit != null;
     }
 
     @ModelMethod(category = ModelMethodCategory.TAGGING,
-        description =
-            "For attributes that are of a secondary entity type, this indicates whether the attribute as been "
-            + "tagged with the specified tag..")
+            description =
+                    "For attributes that are of a secondary entity type, this indicates whether the attribute as been "
+                    + "tagged with the specified tag..")
     public boolean secondaryEntityIsTagged(
-        @ModelMethodParameter(description = "The tag with which to check.")
+            @ModelMethodParameter(description = "The tag with which to check.")
             String tag) {
         if (!isSecondaryEntityType()) {
             return false;
@@ -569,9 +575,9 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description =
-            "For those attributes that are defined as the `byte` data type, this returns the size of an array "
-            + "that is holding values for this attribute.")
+            description =
+                    "For those attributes that are defined as the `byte` data type, this returns the size of an array "
+                    + "that is holding values for this attribute.")
     public Integer getByteArraySize() {
         if (type.isByteArrayType()) {
             return ((MTNativeType) type).getArraySize();
@@ -580,14 +586,14 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Indicates whether this attribute has been declared as `optional`.")
+            description = "Indicates whether this attribute has been declared as `optional`.")
     public boolean isOptional() {
         return nullable;
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
-        description = "Returns the space associated with this attribute. This property is provided more out of "
-                      + "convenience as you can also obtain this from its entity.")
+            description = "Returns the space associated with this attribute. This property is provided more out of "
+                          + "convenience as you can also obtain this from its entity.")
     public MTSpace getSpace() {
         if (entity != null) {
             return entity.getSpace();

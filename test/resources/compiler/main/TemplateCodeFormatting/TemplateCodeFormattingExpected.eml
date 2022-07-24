@@ -1,17 +1,13 @@
+$[language nothing]
+$[domain test]
 $[log]
-    $[foreach typedef in space.typedefs]
-
-Typedef: ${typedef.name}
-    $[/foreach]
-    $[foreach enum in space.enums]
-
-Enum: ${enum.name}
-    $[/foreach]
+// foreach
     $[foreach entity in space.entities]
 
         $[let qualifier = entity.isSecondary ? "Secondary ":""]
 ${qualifier}Entity: ${entity.name}
         $[foreach attribute in entity.attributes]
+// switch / case
             $[switch attribute.type]
                 $[case uuid]
                     $[let typeLongName = "Unique Identifier - 128 bits"]
@@ -37,6 +33,62 @@ ${qualifier}Entity: ${entity.name}
   Attribute
     Name: ${attribute.name}
     Type: ${typeLongName}
+            $[if attribute.name == "test"]inline if for ${attribute.description}$[/if]
+            $[if attribute.name == "test2"]
+attribute is test2
+            $[/if]
         $[/foreach]
     $[/foreach]
+// function
+    $[function func
+      D "Simple function"
+      (in1
+       D "first input",
+       in2,
+       in3
+       D "third input"
+      )->
+      (out1,
+       out2
+       D "second output",
+       out3
+      )
+    ]
+        $[if in1 == 2 && (in2 == "x" || in3 == 4.534)]
+            $[return]
+        $[/if]
+// do
+        $[do it.call(this)]
+// let
+        $[let i1 = 1]
+        $[let s1 = "hello"]
+        $[let f1 = 1.24353]
+// filters
+        $[let name = entity|domain:outerspace|name]
+${attribute|domain:earth|title}
+  ${attribute|domain:earth|title}  space before and stuff after
+ ${list|sort:ing asc case:false}
+ // escaped strings
+        $[let strwithesc = "this word is surrounded by escaped \"double quotes\" so the output should also!"]
+        $[let another = entity|title arg:"somet\"h\"ing"]
+        $[let startandend = "\"something\""]
+    $[/function]
+// publisher
+    $[publisher com.example.bigpublisher]
+// outlet
+$[outlet someoutlet]
+// default stuff
+$[/outlet]
+    $[/publisher]
+// author
+    $[author to com.example]
+        $[author to bigpublisher]
+            $[author to outlet someoutlet]
+// read all about it
+            $[/author]
+            $[author to somepublisher outlet someoutlet]
+// read all about it
+            $[/author]
+        $[/author]
+    $[/author]
 $[/log]

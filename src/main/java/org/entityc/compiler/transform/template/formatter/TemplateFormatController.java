@@ -137,15 +137,27 @@ public class TemplateFormatController {
                 segment.finalCharPos = currentCharPos;
                 currentCharPos += segment.text.length();
             }
-            if (segment.spaceAfter && (nextSegment == null || (!nextSegment.spaceBefore
-                                                               && nextSegment.element
-                                                                  != ConfigurableElement.RequiredSpace))) {
-                builder.append(" ");
-                currentCharPos++;
+            boolean addSpace = false;
+            if (segment.spaceAfter &&
+                nextSegment != null
+                && !nextSegment.spaceBefore
+                && nextSegment.element != ConfigurableElement.RequiredSpace
+                && nextSegment.element != ConfigurableElement.FunctionDelim
+                && nextSegment.element != ConfigurableElement.FunctionCallDelim
+                && nextSegment.element != ConfigurableElement.FunctionCallArgDelim
+                && nextSegment.element != ConfigurableElement.FunctionCloseParen
+                && nextSegment.element != ConfigurableElement.FunctionCallCloseParen
+                && nextSegment.element != ConfigurableElement.FunctionOpenParen
+                && nextSegment.element != ConfigurableElement.FunctionCallOpenParen
+            ) {
+                addSpace = true;
             }
             if (segment.enableNewLineAfter) {
                 builder.append("\n");
                 currentCharPos = 0;
+            } else if (addSpace && !nextSegment.enableNewLineBefore) {
+                builder.append(" ");
+                currentCharPos++;
             }
             previousSegmentEnabledLineAfter = segment.enableNewLineAfter;
         }
