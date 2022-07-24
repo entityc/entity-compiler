@@ -35,6 +35,16 @@ class ECStringUtilTest {
     void doubleEscapeDoubleQuotes() {
         assertEquals("\\\\\"DoubleQuotes\\\\\"", ECStringUtil.DoubleEscapeDoubleQuotes("\"DoubleQuotes\""));
     }
+
+    @Test
+    void isPath() {
+        assertEquals(true, ECStringUtil.IsPath(""));
+        assertEquals(true, ECStringUtil.IsPath("this-is-ok"));
+        assertEquals(true, ECStringUtil.IsPath("this/is-ok"));
+        assertEquals(true, ECStringUtil.IsPath("this/is/ok"));
+        assertEquals(false, ECStringUtil.IsPath("this-os&bad"));
+        assertEquals(false, ECStringUtil.IsPath("this/is+bad"));
+    }
     @Test
     void stripLineEnd() {
         assertEquals(ECStringUtil.StripLineEnd("WithoutCR\n"), "WithoutCR");

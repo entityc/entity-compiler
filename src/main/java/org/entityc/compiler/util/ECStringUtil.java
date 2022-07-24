@@ -105,6 +105,7 @@ public class ECStringUtil {
      * When reading in text with double quotes, before they can be written out they need to first
      * be double escaped so the end result is a single escaped double quote - just like the very original
      * input text that was parsed.
+     *
      * @param inputString The input string with double quotes.
      * @return Double escaped double quoted string.
      */
@@ -306,6 +307,24 @@ public class ECStringUtil {
         return shortName;
     }
 
+    public static boolean IsNamespace(String text) {
+        if (text == null || text.length() == 0) {
+            return false;
+        }
+        for (int i = 1; i < text.length(); i++) {
+            char ch = text.charAt(i);
+            if (!(Character.isLetterOrDigit(ch) || ch == '.')) {
+                return false;
+            }
+        }
+        for (String seg : text.split("\\.")) {
+            if (!IsIdentifier(seg)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public static boolean IsIdentifier(String text) {
         //ECLog.logFatal("Checking if identifier: \"" + text + "\"...");
         if (text == null || text.length() == 0) {
@@ -325,18 +344,13 @@ public class ECStringUtil {
         return true;
     }
 
-    public static boolean IsNamespace(String text) {
+    public static boolean IsPath(String text) {
         if (text == null || text.length() == 0) {
-            return false;
+            return true;
         }
-        for (int i = 1; i < text.length(); i++) {
+        for (int i = 0; i < text.length(); i++) {
             char ch = text.charAt(i);
-            if (!(Character.isLetterOrDigit(ch) || ch == '.')) {
-                return false;
-            }
-        }
-        for (String seg : text.split("\\.")) {
-            if (!IsIdentifier(seg)) {
+            if (!(Character.isLetterOrDigit(ch) || ch == '-' || ch == '/')) {
                 return false;
             }
         }
@@ -359,7 +373,7 @@ public class ECStringUtil {
 
     public static String RepeatString(String str, int times) {
         StringBuilder sb = new StringBuilder();
-        for (int i=0;i<times;i++) {
+        for (int i = 0; i < times; i++) {
             sb.append(str);
         }
         return sb.toString();

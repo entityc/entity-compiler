@@ -19,7 +19,6 @@ import org.entityc.compiler.doc.annotation.TemplateInstructionCategory;
 import org.entityc.compiler.model.entity.MTNativeType;
 import org.entityc.compiler.transform.template.TemplateLexer;
 import org.entityc.compiler.transform.template.formatter.TemplateFormatController;
-import org.entityc.compiler.util.ECLog;
 
 import java.text.DateFormat;
 import java.text.ParseException;
@@ -63,46 +62,6 @@ public class FTPrompt extends FTContainerNode implements FTBodyBlock {
         this.nativeType   = nativeType;
     }
 
-    @Override
-    public FTBody getBody() {
-        return body;
-    }
-
-    @Override
-    public void transform(FTTransformSession session) {
-        session.pushPromptBlock(this);
-        super.transformChildren(session, false);
-        session.popPromptBlock();
-    }
-
-    @Override
-    public int getTemplateLexerSymbol() {
-        return TemplateLexer.Prompt;
-    }
-
-    @Override
-    public boolean format(TemplateFormatController formatController, int indentLevel) {
-        boolean success = true;
-
-        formatController.addInstructionStart(indentLevel, this);
-        if (variableName != null) {
-            formatController.addInstructionInside(InstructionArgument, variableName, this.getStartLineNumber());
-            if (nativeType != null) {
-                formatController.addInstructionInside(InstructionArgumentDelim, ":", this.getStartLineNumber());
-                formatController.addInstructionInside(InstructionArgument, nativeType.getDataType().getName(), this.getStartLineNumber());
-            }
-        }
-        formatController.addInstructionEnd(this);
-        super.formatChildren(formatController, indentLevel);
-        formatController.addInstructionBlockEnd(indentLevel, this);
-        return success;
-    }
-
-    @Override
-    public boolean hasOwnBody() {
-        return true;
-    }
-
     public static boolean isInteger(String strNum) {
         if (strNum == null) {
             return false;
@@ -139,6 +98,47 @@ public class FTPrompt extends FTContainerNode implements FTBodyBlock {
         return true;
     }
 
+    @Override
+    public FTBody getBody() {
+        return body;
+    }
+
+    @Override
+    public void transform(FTTransformSession session) {
+        session.pushPromptBlock(this);
+        super.transformChildren(session, false);
+        session.popPromptBlock();
+    }
+
+    @Override
+    public int getTemplateLexerSymbol() {
+        return TemplateLexer.Prompt;
+    }
+
+    @Override
+    public boolean format(TemplateFormatController formatController, int indentLevel) {
+        boolean success = true;
+
+        formatController.addInstructionStart(indentLevel, this);
+        if (variableName != null) {
+            formatController.addInstructionInside(InstructionArgument, variableName, this.getStartLineNumber());
+            if (nativeType != null) {
+                formatController.addInstructionInside(InstructionArgumentDelim, ":", this.getStartLineNumber());
+                formatController.addInstructionInside(InstructionArgument, nativeType.getDataType().getName(),
+                                                      this.getStartLineNumber());
+            }
+        }
+        formatController.addInstructionEnd(this);
+        super.formatChildren(formatController, indentLevel);
+        formatController.addInstructionBlockEnd(indentLevel, this);
+        return success;
+    }
+
+    @Override
+    public boolean hasOwnBody() {
+        return true;
+    }
+
     public void prompt(FTTransformSession session) {
         String  text   = body.getText();
         boolean asking = true;
@@ -148,7 +148,11 @@ public class FTPrompt extends FTContainerNode implements FTBodyBlock {
             Scanner scanner = new Scanner(System.in);
             String  value   = scanner.nextLine();
             if (value.trim().length() == 0) {
-                value = session.getValue(variableName).toString();
+                if (session.getValue(variableName) == null) {
+                    value = "";
+                } else {
+                    value = session.getValue(variableName).toString();
+                }
             }
             try {
                 switch (nativeType.getDataType()) {
@@ -175,7 +179,8 @@ public class FTPrompt extends FTContainerNode implements FTBodyBlock {
                             session.setValue(variableName, Boolean.parseBoolean(value));
                         } else {
                             System.err.println(
-                                    "ERROR: Invalid boolean value \"" + value + "\" must be \"true\", \"false\", \"yes\", or \"no\".");
+                                    "ERROR: Invalid boolean value \"" + value
+                                    + "\" must be \"true\", \"false\", \"yes\", or \"no\".");
                             asking = true;
                         }
                         break;

@@ -20,6 +20,7 @@ import org.entityc.compiler.project.ProjectManager;
 import org.entityc.compiler.repository.RepositoryFile;
 import org.entityc.compiler.util.ECLog;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,6 +43,9 @@ public class CLBuild extends CLCommand {
         }
 
         String       configurationName = args[0];
+        if (configurationName.contains(File.separator)) {
+            ECLog.logFatal("The specified configuration name is not a valid configuration name: " + configurationName);
+        }
         List<String> defines           = new ArrayList<>();
         boolean quietMode = false;
 

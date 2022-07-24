@@ -34,6 +34,7 @@ public class FTIsFilter extends FTFilter {
     private enum KindOfThing {
         IDENTIFIER("identifier"),
         NAMESPACE("namespace"),
+        PATH("path"),
         CAPITALIZED("capitalized"),
         UNCAPITALIZED("uncapitalized"),
         ;
@@ -89,6 +90,8 @@ public class FTIsFilter extends FTFilter {
                     return ECStringUtil.IsIdentifier(stringValue);
                 case NAMESPACE:
                     return ECStringUtil.IsNamespace(stringValue);
+                case PATH:
+                    return ECStringUtil.IsPath(stringValue);
                 case CAPITALIZED:
                     return ECStringUtil.IsCapitalized(stringValue);
                 case UNCAPITALIZED:
