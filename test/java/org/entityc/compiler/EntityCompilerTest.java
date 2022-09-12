@@ -28,7 +28,7 @@ class EntityCompilerTest {
         final String TestResourceDir = BASE_RESOURCE_DIR + "/" + testName;
         String       strTmp          = System.getProperty("java.io.tmpdir");
         String       sourceFile      = TestResourceDir + "/" + testName + ".edl";
-        EntityCompiler.main(new String[]{"build", "Config", sourceFile, "-tp", TestResourceDir, "-D", "TEMP_DIR=" + strTmp});
+        EntityCompiler.main(new String[]{"build", "Config", sourceFile, "-tp", TestResourceDir, "-D", "TEMP_DIR=" + strTmp, "-D", "TEST_DIR=" + TestResourceDir});
         String actual   = FileUtils.readFileToString(new File(strTmp + File.separator + testName + ".txt"));
         String expected = FileUtils.readFileToString(new File(TestResourceDir + "/" + testName + "Expected.txt"));
         assertEquals(expected, actual);
@@ -104,6 +104,18 @@ class EntityCompilerTest {
 
         final String actual = TemplateFormatController.FormatCodeAsString(inputText, codeFormat);
         String expected = FileUtils.readFileToString(new File(expectedFile));
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void templateInstall() throws IOException {
+        final String testName = "TemplateInstall";
+        final String TestResourceDir = BASE_RESOURCE_DIR + "/" + testName;
+        String       strTmp          = System.getProperty("java.io.tmpdir");
+        String       sourceFile      = TestResourceDir + "/" + testName + ".edl";
+        EntityCompiler.main(new String[]{"build", "Config", sourceFile, "-tp", TestResourceDir, "-D", "TEMP_DIR=" + strTmp, "-D", "TEST_DIR=" + TestResourceDir});
+        String actual   = FileUtils.readFileToString(new File(strTmp + File.separator + "main/java/Source.java"));
+        String expected = FileUtils.readFileToString(new File(TestResourceDir + File.separator + "Source.java"));
         assertEquals(expected, actual);
     }
 }

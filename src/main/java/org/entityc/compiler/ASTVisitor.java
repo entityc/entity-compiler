@@ -648,6 +648,21 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     }
 
     @Override
+    public String visitDefineVariableString(EntityLanguageParser.DefineVariableStringContext ctx) {
+        String path;
+        if (ctx.id() != null) {
+            String idPath = idText(ctx.id());
+            if (idPath == null) {
+                ECLog.logFatal("Command line define variable \"" + ctx.id().getText() + "\" not set.");
+            }
+            path = idPath;
+        } else {
+            path = ECStringUtil.ProcessParserString(ctx.STRING().getText());
+        }
+        return path;
+    }
+
+    @Override
     public Object visitRepository(EntityLanguageParser.RepositoryContext ctx) {
         MTRepository                               repository            = new MTRepository(ctx, ctx.id().getText());
         EntityLanguageParser.RepositoryBodyContext repositoryBodyContext = ctx.repositoryBody();
@@ -670,7 +685,10 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
         List<EntityLanguageParser.RepositoryPathContext> repositoryPathContexts = repositoryBodyContext.repositoryPath();
         if (repositoryPathContexts != null && repositoryPathContexts.size() > 0) {
-            repository.setPath(ECStringUtil.ProcessParserString(repositoryPathContexts.get(0).STRING().getText()));
+
+            EntityLanguageParser.RepositoryPathContext pathContext = repositoryPathContexts.get(0);
+            String path = visitDefineVariableString(pathContext.defineVariableString());
+            repository.setPath(ECStringUtil.ProcessParserString(path));
         }
 
         List<EntityLanguageParser.RepositoryTypeContext> repositoryTypeContexts = repositoryBodyContext.repositoryType();
@@ -2213,17 +2231,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         if (body.outputPath().size() == 0) {
             ECLog.logFatal("An output must define a path.");
         }
-        String path;
         EntityLanguageParser.OutputPathContext outputPathContext = body.outputPath().get(body.outputPath().size() - 1);
-        if (outputPathContext.id() != null) {
-            String idPath = idText(outputPathContext.id());
-            if (idPath == null) {
-                ECLog.logFatal("Command line define variable \"" + outputPathContext.id().getText() + "\" not set.");
-            }
-            path = idPath;
-        } else {
-            path = ECStringUtil.ProcessParserString(outputPathContext.STRING().getText());
-        }
+        String path = visitDefineVariableString(outputPathContext.defineVariableString());
         output.setPath(path);
         currentConfiguration.addOutput(output);
         return output;

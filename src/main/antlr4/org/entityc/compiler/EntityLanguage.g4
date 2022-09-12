@@ -1180,6 +1180,10 @@ formatStatement
     : FORMAT id jsonObj
     ;
 
+defineVariableString
+    : STRING | id
+    ;
+
 directory
     : (OUTPUT | DIRECTORY) id '{' outputBody '}'
     ;
@@ -1192,7 +1196,7 @@ outputBody
     ;
 
 outputPath
-    : PATH (STRING|id)
+    : PATH defineVariableString
     ;
 
 templates
@@ -1263,7 +1267,7 @@ repositoryName
     ;
 
 repositoryPath
-    : PATH STRING
+    : PATH defineVariableString
     ;
 
 repositoryTag
