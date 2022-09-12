@@ -1,0 +1,44 @@
+space outer {
+}
+
+module test {
+
+    entity Entity1 {
+        primarykey uuid entity1_id
+
+        attributes {
+            int32 someint
+        }
+    }
+
+    entity Entity2 {
+        primarykey uuid entity2_id
+
+        attributes {
+            float somefloat
+        }
+    }
+}
+
+domain Code {
+    namespace org.entityc.code
+}
+
+configuration Config {
+    repository Local {
+        type local
+        path $(TEST_DIR)
+    }
+
+    output testOutput {
+        path $(TEMP_DIR:"/tmp")
+    }
+
+    templates {
+        import from Local
+
+        template Install {
+            output primary testOutput
+        }
+    }
+}

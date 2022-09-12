@@ -1,0 +1,11 @@
+package ${domain.namespace};
+
+public class Source {
+
+$[ foreach entity in space.entities ]
+    String ${entity.name|uncapitalize}() {
+        return "${entity.name}";
+    }
+
+$[/ foreach ]
+}

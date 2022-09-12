@@ -16,8 +16,6 @@ import org.entityc.compiler.model.config.MTFile;
 import org.entityc.compiler.model.config.MTRepository;
 import org.entityc.compiler.model.config.MTRepositoryImport;
 import org.entityc.compiler.model.config.MTTemplate;
-import org.entityc.compiler.model.domain.MTDomain;
-import org.entityc.compiler.model.language.MTLanguage;
 import org.entityc.compiler.repository.RepositoryCache;
 import org.entityc.compiler.repository.RepositoryFile;
 import org.entityc.compiler.repository.RepositoryImportManager;
@@ -51,7 +49,7 @@ import static org.entityc.compiler.transform.template.formatter.ConfigurableElem
 public class FTInstall extends FTNode {
 
     private final FTExpression sourceExpression;
-    private final FTExpression destNamespaceExpression;
+    private final FTExpression destExpression;
     private       String       sourceRepositoryName;
     private       boolean      copyOnly;
 
@@ -69,9 +67,9 @@ public class FTInstall extends FTNode {
                                            + "The path is relative to the directory in which the template was configured.")
                      FTExpression destExpression) {
         super(ctx);
-        this.copyOnly                = copy;
-        this.sourceExpression        = sourceExpression;
-        this.destNamespaceExpression = destExpression;
+        this.copyOnly         = copy;
+        this.sourceExpression = sourceExpression;
+        this.destExpression   = destExpression;
     }
 
     public boolean isCopyOnly() {
@@ -91,7 +89,7 @@ public class FTInstall extends FTNode {
         if (!sourceExpression.isConstant()) {
             ECLog.logFatal("Only string constant supported for source directory/file.");
         }
-        Object destFilepathObject = destNamespaceExpression.getValue(session);
+        Object destFilepathObject = destExpression.getValue(session);
         if (!(destFilepathObject instanceof String)) {
             ECLog.logFatal(this, "Destination expression of install instruction must resolve to a string value.");
         }
@@ -112,18 +110,16 @@ public class FTInstall extends FTNode {
 
         //ECLog.logInfo("Full relative path for install source file: " + repository.getPath() + "/" + sourceFilePath);
 
-        String sourceFileExtension    = null;
-        String sourceFilename         = null;
+        String destFileExtension      = null;
+        String destFilename           = null;
         int    lastPathSeparatorIndex = sourceFilePath.lastIndexOf(File.separator);
         int    lastExtensionIndex     = sourceFilePath.lastIndexOf(".");
         if (lastExtensionIndex != -1) {
             if (lastPathSeparatorIndex == -1 || lastExtensionIndex > lastPathSeparatorIndex) {
-                sourceFileExtension = sourceFilePath.substring(lastExtensionIndex + 1);
-                sourceFilePath      = sourceFilePath.substring(0, lastExtensionIndex);
+                destFileExtension = sourceFilePath.substring(lastExtensionIndex + 1);
+                destFilename    = sourceFilePath.substring(0, lastExtensionIndex);
                 if (lastPathSeparatorIndex != -1) {
-                    sourceFilename = sourceFilePath.substring(lastPathSeparatorIndex + 1);
-                } else {
-                    sourceFilename = sourceFilePath;
+                    destFilename = destFilename.substring(lastPathSeparatorIndex + 1);
                 }
             }
         }
@@ -134,12 +130,9 @@ public class FTInstall extends FTNode {
         repositoryImport.setRepositoryName(sourceRepositoryName);
         repositoryImport.setFilename(sourceFilePath);
         RepositoryFile repositoryFile = importManager.importFromRepository(session.getConfiguration().getSpace(),
-                                                                           repositoryImport, sourceFileExtension,
+                                                                           repositoryImport, "eml",
                                                                            false);
         File fileToInstall = new File(repositoryFile.getFilepath());
-
-        MTDomain   domain   = (MTDomain) session.getValue("domain");
-        MTLanguage language = (MTLanguage) session.getValue("language");
 
         String sourceFilenameToInstall = null;
         // need to run this as if it is a template being run within the running template but its output automatically goes to the destination directory specified.
@@ -167,9 +160,9 @@ public class FTInstall extends FTNode {
         }
         FTTemplate ftTemplate = fileTemplateTransform.getTemplate();
         // add a file instruction to write the entire "template" to the destination
-        FTFile ftFile = new FTFile(null, ftTemplate, false, destNamespaceExpression,
-                                   new FTConstant(null, sourceFilename),
-                                   new FTConstant(null, sourceFileExtension));
+        FTFile ftFile = new FTFile(null, ftTemplate, false, destExpression,
+                                   new FTConstant(null, destFilename),
+                                   new FTConstant(null, destFileExtension));
         if (copyOnly) {
             try {
                 ftFile.open(session);
@@ -206,7 +199,7 @@ public class FTInstall extends FTNode {
             success = false;
         }
         formatController.addInstructionInside(RequiredSpace, " ", this.getStartLineNumber());
-        if (!destNamespaceExpression.format(formatController, indentLevel)) {
+        if (!destExpression.format(formatController, indentLevel)) {
             success = false;
         }
         formatController.addInstructionEnd(this);

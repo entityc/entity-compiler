@@ -1,0 +1,4 @@
+$[domain Code]
+$[let destDir = "main/java"]
+$[install "Source.java" destDir]
+$[log info]Installed Source.java in ${destDir}$[/log]

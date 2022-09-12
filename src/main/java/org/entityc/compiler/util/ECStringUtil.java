@@ -401,4 +401,13 @@ public class ECStringUtil {
         }
         return path + File.separator;
     }
+
+    public static String ExtensionFromPath(String fullPathWithExtension) {
+        String extension = fullPathWithExtension;
+        if (fullPathWithExtension.contains(".")) {
+            extension = fullPathWithExtension.substring(fullPathWithExtension.lastIndexOf(".") + 1);
+        }
+        return extension;
+    }
+
 }
