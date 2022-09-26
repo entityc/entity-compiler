@@ -20,6 +20,7 @@ import org.entityc.compiler.repository.RepositoryFile;
 import org.entityc.compiler.repository.RepositoryImportManager;
 import org.entityc.compiler.transform.MTBaseTransform;
 import org.entityc.compiler.transform.TransformManager;
+import org.entityc.compiler.transform.template.tree.FTAssert;
 import org.entityc.compiler.transform.template.tree.FTAuthor;
 import org.entityc.compiler.transform.template.tree.FTBreak;
 import org.entityc.compiler.transform.template.tree.FTCall;
@@ -1043,6 +1044,18 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         currentContainer(ctx).addChild(logBlock);
         push(logBlock);
         return logBlock;
+    }
+
+    @Override
+    public FTAssert visitAssertTag(TemplateGrammer.AssertTagContext ctx) {
+        FTExpression condition = visitExpression(ctx.expression());
+        String levelName = ctx.identifier() != null ?
+                           ECStringUtil.ProcessParserString(ctx.identifier().getText()) :
+                           null;
+        FTAssert assertBlock = new FTAssert(ctx, currentContainer(ctx), condition, levelName);
+        currentContainer(ctx).addChild(assertBlock);
+        push(assertBlock);
+        return assertBlock;
     }
 
     @Override

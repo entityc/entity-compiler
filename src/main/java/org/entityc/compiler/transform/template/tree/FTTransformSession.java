@@ -74,6 +74,11 @@ public class FTTransformSession {
             if (template.getDefaultDomainName() != null) {
                 addReadonlyNamedValue("domain", space.getDomainWithName(template.getDefaultDomainName()));
             }
+            setValue("__assert_info", false);
+            setValue("__assert_debug", false);
+            setValue("__assert_warning", false);
+            setValue("__assert_error", false);
+            setValue("__assert_fatal", false);
         } else {
             stringOutputBuffer = new StringBuffer();
         }
@@ -223,6 +228,22 @@ public class FTTransformSession {
             ECLog.logFatal("Unbalanced body blocks.");
         }
         ((FTLog) logBlock).log();
+    }
+
+    public void pushAssertBlock(FTAssert assertBlock) {
+        assertBlock.getBody().clear();
+        bodyBlockStack.push(assertBlock);
+    }
+
+    public void popAssertBlock() {
+        if (bodyBlockStack.empty()) {
+            ECLog.logFatal("ERROR: An end of a block set was specified with no set block start.");
+        }
+        FTBodyBlock assertBlock = bodyBlockStack.pop();
+        if (!(assertBlock instanceof FTAssert)) {
+            ECLog.logFatal("Unbalanced body blocks.");
+        }
+        ((FTAssert) assertBlock).runAssert(this);
     }
 
     public void pushPromptBlock(FTPrompt promptBlock) {
