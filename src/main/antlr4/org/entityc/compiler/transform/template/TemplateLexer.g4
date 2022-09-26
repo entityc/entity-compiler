@@ -94,6 +94,7 @@ Let              : 'let' ;
 Do               : 'do' ;
 Load             : 'load' ;
 Log              : 'log' ;
+Assert           : 'assert' ;
 Prompt           : 'prompt' ;
 Extends          : 'extends' ;
 InstanceOf       : 'instanceof' ;

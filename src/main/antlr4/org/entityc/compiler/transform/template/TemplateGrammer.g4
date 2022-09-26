@@ -48,6 +48,7 @@ identifier
   | Version
   | Capture
   | Log
+  | Assert
   | Let
   | Do
   | Switch
@@ -83,6 +84,7 @@ instruction
   | versionTag
   | captureTag
   | logTag
+  | assertTag
   | promptTag
   | letTag
   | doTag
@@ -103,7 +105,7 @@ block
   ;
 
 blockEnd
-  : BlockEndTagStart (Function|Foreach|If|File|Capture|Switch|Log|Prompt|Send|Preserve|Author|Publisher|Outlet) BlockTagEnd
+  : BlockEndTagStart (Function|Foreach|If|File|Capture|Switch|Log|Assert|Prompt|Send|Preserve|Author|Publisher|Outlet) BlockTagEnd
   ;
 
 descriptionTag
@@ -242,6 +244,10 @@ preserveTag
 
 logTag
   : Log identifier?
+  ;
+
+assertTag
+  : Assert expression identifier
   ;
 
 promptTag

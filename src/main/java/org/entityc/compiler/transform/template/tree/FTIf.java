@@ -17,17 +17,17 @@ import org.entityc.compiler.transform.template.formatter.TemplateFormatControlle
 import org.entityc.compiler.transform.template.tree.expression.FTExpression;
 
 @TemplateInstruction(category = TemplateInstructionCategory.CONTROL_FLOW,
-    name = "if",
-    usage = "`if `*expression*",
-    summary = "Allows you to conditionally execute template code.",
-    description = "This instruction evaluates the provided instruction and if it resolves to `true` it will "
-                  + "execute its template code. If it is `false` and is followed by an `elseif`, execution will "
-                  + "move to that instruction. If `false` and is instead followed by an `else` statement, the "
-                  + "code contained in the `else` instruction is executed.",
-    contents = "This instruction represents the top of a possible `if`...`elseif`...`else` structure, where the "
-               + "`elseif` and `else` are optional. Between this instruction and either the next `elseif`, `else` "
-               + "or this instructions terminator is template code.",
-    seeAlso = {"elseif", "else"})
+        name = "if",
+        usage = "`if `*expression*",
+        summary = "Allows you to conditionally execute template code.",
+        description = "This instruction evaluates the provided instruction and if it resolves to `true` it will "
+                      + "execute its template code. If it is `false` and is followed by an `elseif`, execution will "
+                      + "move to that instruction. If `false` and is instead followed by an `else` statement, the "
+                      + "code contained in the `else` instruction is executed.",
+        contents = "This instruction represents the top of a possible `if`...`elseif`...`else` structure, where the "
+                   + "`elseif` and `else` are optional. Between this instruction and either the next `elseif`, `else` "
+                   + "or this instructions terminator is template code.",
+        seeAlso = {"elseif", "else"})
 public class FTIf extends FTContainerNode {
 
     private final FTExpression condition;
@@ -35,10 +35,11 @@ public class FTIf extends FTContainerNode {
 
     public FTIf(ParserRuleContext ctx, FTContainerNode parent,
                 @TemplateInstructionArgument(
-                    description = "The expression that is evaluated to determine whether to execute the template code "
-                                  + "of this instruction."
+                        description =
+                                "The expression that is evaluated to determine whether to execute the template code "
+                                + "of this instruction."
                 )
-                    FTExpression expression) {
+                FTExpression expression) {
         super(ctx, parent);
         if (ctx instanceof TemplateGrammer.ElseifTagContext) {
             elseif = true;
@@ -52,6 +53,18 @@ public class FTIf extends FTContainerNode {
 
     @Override
     public void transform(FTTransformSession session) {
+        if (IsConditionMet(condition, session)) {
+            super.transformChildren(session, true);
+        } else if (getChildren().size() > 0) {
+            // look for else and pickup there
+            FTNode lastNode = getChildren().get(getChildren().size() - 1);
+            if (lastNode instanceof FTElseIf || lastNode instanceof FTElse) {
+                lastNode.transform(session);
+            }
+        }
+    }
+
+    public static boolean IsConditionMet(FTExpression condition, FTTransformSession session) {
         boolean conditionMet = false;
         Object  value        = condition.getValue(session);
         if (value != null) {
@@ -59,35 +72,21 @@ public class FTIf extends FTContainerNode {
                 if (((Boolean) value).booleanValue()) {
                     conditionMet = true;
                 }
-            }
-            else if (value instanceof String) {
+            } else if (value instanceof String) {
                 if ((((String) value).length() > 0)) {
                     conditionMet = true;
                 }
-            }
-            else if ((value instanceof MTEnum)) {
+            } else if ((value instanceof MTEnum)) {
                 conditionMet = true;
-            }
-            else if (value instanceof Integer) {
+            } else if (value instanceof Integer) {
                 conditionMet = (((Integer) value) != 0);
-            }
-            else if (value instanceof Long) {
+            } else if (value instanceof Long) {
                 conditionMet = (((Long) value) != 0);
             }
-        }
-        else {
+        } else {
             conditionMet = false;
         }
-        if (conditionMet) {
-            super.transformChildren(session, true);
-        }
-        else if (getChildren().size() > 0) {
-            // look for else and pickup there
-            FTNode lastNode = getChildren().get(getChildren().size() - 1);
-            if (lastNode instanceof FTElseIf || lastNode instanceof FTElse) {
-                lastNode.transform(session);
-            }
-        }
+        return conditionMet;
     }
 
     @Override
