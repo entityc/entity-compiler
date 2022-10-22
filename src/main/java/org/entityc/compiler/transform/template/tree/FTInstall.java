@@ -39,13 +39,11 @@ import static org.entityc.compiler.transform.template.formatter.ConfigurableElem
         summary = "Provides an easy way to install files into your local project.",
         description = "When setting up a project using files from a library, this instruction makes it easy "
                       + "to install files from that library into the project directory structure. The files being installed "
-                      + "have their native file extension (not the one we use for templates) so they are easily "
-                      + "viewable and edited (using the code highlighter appropriate for them). You can also include "
-                      + "template code in them and the template code will execute during the install process. "
-                      + "Of course, the presence of the template code may interfere with the code highlighter and "
-                      + "as well, the template code will not be appropriately highlighted but when the amount of "
-                      + "template code is relatively small it can be very advantageous to use this install method over "
-                      + "just making it a template and running the template.")
+                      + "have their native file extension but ultimately end with the .eml extension. You can include "
+                      + "template code in them and the template code will execute during the install process. Using "
+                      + "this `install` instruction instead of the `import` has the advantage that you do not need to "
+                      + "include a `file` instruction to create the output file, the template being installed is the file "
+                      + "(after of course being transformed by its template code). ")
 public class FTInstall extends FTNode {
 
     private final FTExpression sourceExpression;
