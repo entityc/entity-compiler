@@ -62,6 +62,7 @@ import org.entityc.compiler.transform.template.tree.expression.FTConstant;
 import org.entityc.compiler.transform.template.tree.expression.FTExpression;
 import org.entityc.compiler.transform.template.tree.expression.FTFilterExpression;
 import org.entityc.compiler.transform.template.tree.expression.FTGlobalConstant;
+import org.entityc.compiler.transform.template.tree.expression.FTMap;
 import org.entityc.compiler.transform.template.tree.expression.FTMethodCall;
 import org.entityc.compiler.transform.template.tree.expression.FTNamedElement;
 import org.entityc.compiler.transform.template.tree.expression.FTOperand;
@@ -830,6 +831,8 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             return methodCall;
         } else if (ctx.arraySpecifier() != null) {
             return visitArraySpecifier(ctx.arraySpecifier());
+        } else if (ctx.mapSpecifier() != null) {
+            return visitMapSpecifier(ctx.mapSpecifier());
         }
         return null;
     }
@@ -843,6 +846,20 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
             }
         }
         return array;
+    }
+
+    @Override
+    public FTMap visitMapSpecifier(TemplateGrammer.MapSpecifierContext ctx) {
+        FTMap map = new FTMap(ctx);
+        if (ctx.mapItemList() != null)
+        {
+            for (TemplateGrammer.MapItemContext mapItemContext : ctx.mapItemList().mapItem()) {
+                FTExpression keyExpression   = visitExpression(mapItemContext.expression(0));
+                FTExpression valueExpression = visitExpression(mapItemContext.expression(1));
+                map.addKeyValueExpressions(keyExpression, valueExpression);
+            }
+        }
+        return map;
     }
 
     @Override

@@ -226,7 +226,12 @@ public class EntityCompiler {
             processBuilder.redirectError(errorOutputFile);
             try {
                 if (EntityCompiler.isVerbose()) {
-                    ECLog.logInfo("Running PROTOC...");
+                    StringBuilder sb = new StringBuilder();
+                    for (String cmd : processBuilder.command())
+                    {
+                        sb.append(cmd + " ");
+                    }
+                    ECLog.logInfo("Running PROTOC: " + sb);
                 }
 //                ECLog.logInfo("Running PROTOC: " + processBuilder.command());
                 Process process = processBuilder.start();

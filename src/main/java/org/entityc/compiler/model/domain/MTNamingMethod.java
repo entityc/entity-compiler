@@ -11,6 +11,7 @@ import org.entityc.compiler.util.ECStringUtil;
 public enum MTNamingMethod {
 
     STANDARD("standard", ""),
+    UNDERSCORE("underscore", "_"),
     UNDERSCORE_LOWERCASE("underscoreLowercase", "_"),
     UNDERSCORE_UPPERCASE("underscoreUppercase", "_"),
     LOWERCASE("lowercase", ""),
@@ -46,6 +47,8 @@ public enum MTNamingMethod {
         switch (this) {
             case STANDARD:
                 return name;
+            case UNDERSCORE:
+                return ECStringUtil.CamelToSeparator(name,delimiter);
             case UNDERSCORE_LOWERCASE:
             case DASHES_LOWERCASE:
                 return ECStringUtil.CamelToSeparator(name, delimiter).toLowerCase();
