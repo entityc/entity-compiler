@@ -9,6 +9,7 @@ The model classes of this type are intended to provide support for foundation ty
 | Class | Description |
 |-----|-----|
 |[`MFArray`](#class_MFArray)|This class represents a ordered array of objects. To create an empty array you can use: `$[let myList = @[]@]` then can use these methods on that variable (`myList` in this example) to access the array functionality that is exposed here.|
+|[`MFMap`](#class_MFMap)|This class represents a map of objects. To create an empty map you can use: `$[let myMap = @{}@]` then can use these methods on that variable (`myMap` in this example) to access the map functionality that is exposed here.|
 |[`MFSet`](#class_MFSet)|This class represents a unique set of objects. You cannot create an object of this class in template code, however, some classes have methods that will return such an object. Since this class does not offer methods to manipulate the object, it should be considered immutable. You can iterate through the items in a set using the `foreach` instruction. For example: `$[foreach item in mySet] ... $[/foreach]` would allow you to process each item(object) in the set.|
 
 <a name="class_MFArray"></a>
@@ -119,6 +120,123 @@ Allows you to remove a specified object from the array. This method returns the 
 #### `ArrayList` **`values`**
 
 Returns all the values of the array. When iterating this array with a `foreach` you do **not** need to use this method.
+
+
+
+<a name="class_MFMap"></a>
+## MFMap Class
+
+This class represents a map of objects. To create an empty map you can use: `$[let myMap = @{}@]` then can use these methods on that variable (`myMap` in this example) to access the map functionality that is exposed here.
+
+The following properties and methods are available for this class:
+
+<hr/>
+
+#### `MFMap` **`clear`**
+
+This method removes all items in the map.
+
+<hr/>
+
+#### `boolean containsKey(Object key)`
+
+Indicates if the map contains the specified key.
+
+| Parameter | Description |
+|-----|-----|
+|`Object key` | The key of which to determine its presence in the map. |
+
+<hr/>
+
+#### `boolean containsValue(Object value)`
+
+Indicates if the map contains the specified value.
+
+| Parameter | Description |
+|-----|-----|
+|`Object value` | The object of which to determine its presence in the map. |
+
+<hr/>
+
+#### `MFMap` **`copy`**
+
+Allows you to make a copy of this map. Since it returns the new map you can chain other map methods after this one.
+
+<hr/>
+
+#### `int` **`count`**
+
+Returns the number of items in the map.
+
+<hr/>
+
+#### `Object get(Object key)`
+
+Returns the value in the map by its specified key.
+
+| Parameter | Description |
+|-----|-----|
+|`Object key` | The key. |
+
+<hr/>
+
+#### `boolean` **`isEmpty`**
+
+Indicates if the map is empty (no items).
+
+<hr/>
+
+#### `Collection` **`keys`**
+
+Returns all the keys of the map
+
+<hr/>
+
+#### `MFMap put(Object key, Object o)`
+
+Allows you to add an object to this array. The `do` template instruction can be used to do this (e.g., `$[do array.add(obj)]`. This method returns the array itself so you can chain other array methods after this one.
+
+| Parameter | Description |
+|-----|-----|
+|`Object key` | The key to put to the map. |
+|`Object o` | The object to set to the map. |
+
+<hr/>
+
+#### `MFMap putAll(MFMap otherMap)`
+
+Allows you to add all elements of another map to this map. The `do` template instruction can be used to do  this (e.g., `$[do map.putAll(otherMap)]`. This method returns the map itself so you can chain other map methods after this one.
+
+| Parameter | Description |
+|-----|-----|
+|`MFMap otherMap` | The other map to add to this map. |
+
+<hr/>
+
+#### `MFMap remove(Object key)`
+
+Allows you to remove a specified entry from the map based on its key. This method returns the map itself so you can chain other map methods after this one.
+
+| Parameter | Description |
+|-----|-----|
+|`Object key` | The key to remove from this map. |
+
+<hr/>
+
+#### `MFMap remove(Object key, Object o)`
+
+Allows you to remove a specified object from the map based on its key. This method returns the map itself so you can chain other map methods after this one.
+
+| Parameter | Description |
+|-----|-----|
+|`Object key` | The key to remove from this map. |
+|`Object o` | The object to remove from this map. |
+
+<hr/>
+
+#### `Collection` **`values`**
+
+Returns all the values of the map. When iterating this array of values with a `foreach` you do **not** need to use this method.
 
 
 

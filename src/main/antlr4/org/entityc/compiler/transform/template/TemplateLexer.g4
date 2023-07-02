@@ -60,6 +60,8 @@ Pipe             : '|' ;
 Outputs          : '->' ;
 ArrayOpen        : '@[' ;
 ArrayClose       : ']@' ;
+MapOpen          : '@{' ;
+MapClose         : '}@' ;
 Dollar           : '$' ;
 File             : 'file' ;
 IfDoesNotExist   : 'ifdoesnotexist' ;
@@ -139,6 +141,7 @@ DIGIT            : [0-9];
 VERSION_NUM      : (INTEGER '.' INTEGER '.' INTEGER) ;
 FLOAT            : (INTEGER '.' DIGIT*) ;
 IDENT            : (LETTER|'_') (LETTER|DIGIT|'_'|'#')* ;
+//FILTER_IDENT     : (LETTER) (LETTER|'_')* ; we should use this for filters but have to wait until I sort out issue with intellij plugin
 STRING           : '"' (ESC | ~["\\])* '"' ;
 fragment ESC     : '\\' ["\bfnrt] ;
 DOT              : '.' ;
@@ -201,6 +204,8 @@ VarIsEqual          : IsEqual -> type(IsEqual) ;
 VarNotEqual         : NotEqual -> type(NotEqual) ;
 VarArrayOpen        : ArrayOpen -> type(ArrayOpen) ;
 VarArrayClose       : ArrayClose -> type(ArrayClose) ;
+VarMapOpen          : MapOpen -> type(MapOpen) ;
+VarMapClose         : MapClose -> type(MapClose) ;
 
 VarDomainType       : DomainType -> type(DomainType) ;
 VarEntityType       : EntityType -> type(EntityType) ;

@@ -289,6 +289,7 @@ expression
     | expression bop='||' expression
     | <assoc=right> expression bop='?' expression Colon expression
     | arraySpecifier
+    | mapSpecifier
     ;
 
 expressionList
@@ -297,6 +298,18 @@ expressionList
 
 arraySpecifier
     : '@[' expressionList? ']@'
+    ;
+
+mapItem
+    : expression ':' expression
+    ;
+
+mapItemList
+    : mapItem (',' mapItem)*
+    ;
+
+mapSpecifier
+    : MapOpen mapItemList? MapClose
     ;
 
 filterParamExpression

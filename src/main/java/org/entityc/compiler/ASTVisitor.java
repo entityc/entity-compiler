@@ -700,6 +700,9 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             }
             repository.setType(type);
         }
+        if (currentSpace() == null) {
+            ECLog.logFatal("Space must be defined before configuration.");
+        }
         currentSpace().addRepository(repository);
 
         return repository;

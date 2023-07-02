@@ -502,7 +502,7 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
         category = ModelMethodCategory.RELATIONSHIP,
         description = "Indicates whether this entity defines any relationships.")
     public boolean hasRelationships() {
-        return relationships.size() > 0 || secondaryRelationshipMap.size() > 0;
+        return relationships.size() > 0 || (secondaryRelationshipMap != null && secondaryRelationshipMap.size() > 0);
     }
 
     @ModelMethod(
