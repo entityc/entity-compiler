@@ -34,6 +34,8 @@ import java.util.Set;
 import java.util.Stack;
 import java.util.function.Predicate;
 
+import static org.entityc.compiler.transform.template.tree.FTLog.Level.FATAL;
+
 public class FTTransformSession {
 
     private static final List<String>           kUnasignable   = Arrays.asList("null", "true", "false");
@@ -72,7 +74,11 @@ public class FTTransformSession {
             addReadonlyNamedValue("space", space);
             addReadonlyNamedValue("rootTemplate", templateTransform);
             if (template.getDefaultDomainName() != null) {
-                addReadonlyNamedValue("domain", space.getDomainWithName(template.getDefaultDomainName()));
+                MTDomain defaultDomain = space.getDomainWithName(template.getDefaultDomainName());
+                if (defaultDomain == null) {
+                    ECLog.logFatal("Unable to find default name named: " + template.getDefaultDomainName());
+                }
+                addReadonlyNamedValue("domain", defaultDomain);
             }
             setValue("__assert_info", false);
             setValue("__assert_debug", false);
