@@ -130,6 +130,7 @@ Here is the full list of filters:
 | [`name`](#filter_detail_name) | This simply calls `getName()` on the input. It is more of a convenient way to get the name by using a filter. |
 | [`path`](#filter_detail_path) | This will convert a string or namespace object into a string where by a '/' character is used as a delimiter instead of a '.'. This is useful when you need to convert a namespace into a filepath. |
 | [`plural`](#filter_detail_plural) | This will attempt to pluralize the last word of the input string. If it can't determine the pluralization it may just return the same string. |
+| [`rename`](#filter_detail_rename) | Places underscore between words then forces all characters to be lowercase. |
 | [`reverse`](#filter_detail_reverse) | Given a collection of objects, this will return a collection that has the reverse order of the input. |
 | [`sort`](#filter_detail_sort) | Given a collection of objects, this will return a collection that is sorted by name. This is useful when generating code that is consistent each time in terms of the order of objects in the output. |
 | [`title`](#filter_detail_title) | Given a string of words in camel case format, this will capitalize each word in the string except those words that are typically not capitalized in a title (such as 'of', 'the'. 'and', etc.). |
@@ -440,6 +441,25 @@ Valid inputs for this filter are:
 | Class of Valid Input | Description |
 |---|---|
 | `String` | The string to pluralize. |
+
+<hr/>
+
+<a name="filter_detail_rename"></a>
+##### Filter: `rename`
+
+Places underscore between words then forces all characters to be lowercase.
+
+Valid inputs for this filter are:
+
+| Class of Valid Input | Description |
+|---|---|
+| `String` | The string to change into an underscore lowercase format. |
+
+This filter has the following parameters:
+
+| Usage with Parameter | Description |
+|---|---|
+| `rename:`*method* | Specifies the renaming method: standard, underscore, underscoreLowercase, underscoreUppercase, lowercase, uppercase, capitalize, dashesLowercase, dashesUppercase, parentPrefix |
 
 <hr/>
 
