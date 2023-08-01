@@ -99,13 +99,13 @@ public class MTDERelationship extends MTNode implements MTNamed, MTDomainBased, 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description = "Indicates if this relationship is a one-to-many.")
     public boolean isOneToMany() {
-        return relationship.isOneToMany();
+        return relationship != null && relationship.isOneToMany();
     }
 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description = "Indicates if this relationship is a many-to-many.")
     public boolean isManyToMany() {
-        return relationship.isManyToMany();
+        return relationship != null && relationship.isManyToMany();
     }
 
     @Override

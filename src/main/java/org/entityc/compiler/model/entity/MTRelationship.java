@@ -201,6 +201,18 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
         return getFullRelationshipPlurality() == FullRelationshipPlurality.MANY_TO_MANY;
     }
 
+    @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
+        description =
+            "Gets the entity on the other side of an implicit many-to-many entity.")
+    public MTEntity getImplicitToEntity() {
+        for(MTRelationship mmRel : to.getEntity().implicitRelationships) {
+            if (!mmRel.to.getEntityName().equals(from.getEntityName())) {
+                return mmRel.to.getEntity();
+            }
+        }
+        return null;
+    }
+
     @Override
     public void accept(MTVisitor visitor) {
 

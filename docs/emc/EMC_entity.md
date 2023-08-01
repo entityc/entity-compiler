@@ -1226,6 +1226,12 @@ Returns the "from" part of the relationship which references the entity in which
 
 <hr/>
 
+#### `MTEntity` **`implicitToEntity`**
+
+Gets the entity on the other side of an implicit many-to-many entity.
+
+<hr/>
+
 #### `boolean` **`isImplicit`**
 
 Indicates whether the relationship was created because although it was not declared it can be implied based on relationships declared to this entity.

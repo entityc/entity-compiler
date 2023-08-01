@@ -14,6 +14,7 @@ import org.entityc.compiler.model.entity.MTEntity;
 import org.entityc.compiler.model.entity.MTEnum;
 import org.entityc.compiler.model.entity.MTPrimaryKey;
 import org.entityc.compiler.model.entity.MTRelationship;
+import org.entityc.compiler.util.ECLog;
 
 // TODO: Create index from parent relationships
 
@@ -67,32 +68,34 @@ public class MTVImplicitTransform extends MTBaseTransform {
     public void visitRelationship(MTRelationship relationship) {
 
         MTEntity fromEntity = relationship.getFrom().getEntity();
-        MTEntity toEntity   = relationship.getTo().getEntity();
+        MTEntity toEntity = relationship.getTo().getEntity();
         if (toEntity == null || fromEntity == null) {
             relationship.resolveReferences(root.getSpace(), 0);
             toEntity = relationship.getTo().getEntity();
             fromEntity = relationship.getFrom().getEntity();
+            if (toEntity == null) {
+                ECLog.logFatal("The entity \"" + fromEntity.getName() + "\" has a relationship \"" + relationship.getName() + "\" but not to anything.");
+            }
         }
         MTPrimaryKey toPrimaryKey = toEntity.getPrimaryKey();
         if (toPrimaryKey == null) {
             return;
         }
-        FullRelationshipPlurality plurality      = relationship.getFullRelationshipPlurality();
-        MTPrimaryKey              fromPrimaryKey = fromEntity.getPrimaryKey();
+        FullRelationshipPlurality plurality = relationship.getFullRelationshipPlurality();
+        MTPrimaryKey fromPrimaryKey = fromEntity.getPrimaryKey();
         if (!relationship.getFrom().getEntity().isImplicit()) {
             if (fromPrimaryKey == null && plurality != FullRelationshipPlurality.MANY_TO_ONE) {
                 return;
             }
         }
         if (toPrimaryKey.getAttributes().size() != 1
-                || (fromPrimaryKey != null && fromPrimaryKey.getAttributes().size() != 1)) {
+            || (fromPrimaryKey != null && fromPrimaryKey.getAttributes().size() != 1)) {
             return; // unsupported right now
         }
 
         switch (plurality) {
             case MANY_TO_MANY: {
                 // create table to support relationship
-                String virtualEntityName = fromEntity.getName() + "-" + toEntity.getName();
                 MTEntity.AddImplicitManyToManyEntity(fromEntity.getSpace(), fromEntity, toEntity);
             }
             break;
