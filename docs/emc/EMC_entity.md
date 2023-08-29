@@ -576,6 +576,16 @@ Indicates whether this entity has any attributes.
 
 Indicates whether this entity defines any bit fields.
 
+<hr/>
+
+#### `MTRelationship relationshipNamed(String name)`
+
+Returns an relationship of this entity with the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the relationship to return. |
+
 
 ### Relationship Category
 
@@ -654,6 +664,16 @@ Indicates whether it has a least one relationship declared as parent to the spec
 #### `boolean` **`hasPrimaryParentRelationship`**
 
 Indicates whether this entity has a primary parent relationship. A primary parent relationship is one which is declared `parent` and **not** declared `optional`.
+
+<hr/>
+
+#### `boolean hasRelationshipNamed(String name)`
+
+Indicates whether this entity has an relationship with the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | *no description* |
 
 <hr/>
 

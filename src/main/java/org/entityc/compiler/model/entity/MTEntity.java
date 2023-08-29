@@ -785,6 +785,27 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
 
     @ModelMethod(
         category = ModelMethodCategory.RELATIONSHIP,
+        description = "Indicates whether this entity has an relationship with the specified name.")
+    public boolean hasRelationshipNamed(String name) {
+        for (MTRelationship relationship : relationships) {
+            if (relationship.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @ModelMethod(
+        category = ModelMethodCategory.ATTRIBUTE,
+        description = "Returns an relationship of this entity with the specified name.")
+    public MTRelationship relationshipNamed(
+        @ModelMethodParameter(description = "The name of the relationship to return.")
+        String name) {
+        return getRelationshipByName(name);
+    }
+
+    @ModelMethod(
+        category = ModelMethodCategory.RELATIONSHIP,
         description = "Returns the number of declared relationships.")
     public int getRelationshipCount() {
         return relationships.size();

@@ -46,7 +46,8 @@ public class LocalRepositoryImporter implements RepositoryImporter {
                 fos.close();
             } catch (IOException e) {
                 e.printStackTrace();
-                ECLog.logFatal("Unable to import file: " + inputFilepath + " >> " + e.getMessage());
+                File infile = new File(inputFilepath);
+                ECLog.logFatal("Unable to import file: " + infile.getAbsolutePath() + " >> " + e.getMessage());
             }
         }
         return cachedRepositoryFile;

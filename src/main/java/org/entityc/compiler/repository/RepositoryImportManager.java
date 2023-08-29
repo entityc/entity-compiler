@@ -21,10 +21,10 @@ import java.util.Map;
 
 public class RepositoryImportManager {
 
-    private final RepositoryCache                           repositoryCache;
-    private final Map<MTRepositoryType, RepositoryImporter> importersByType             = new HashMap<>();
-    private       List<RepositoryFile>                      repositoryFilesInOrder      = new ArrayList<>();
-    private       Map<String, RepositoryFile>               repositoryFilesByIdentifier = new HashMap<>();
+    private final RepositoryCache repositoryCache;
+    private final Map<MTRepositoryType, RepositoryImporter> importersByType = new HashMap<>();
+    private List<RepositoryFile> repositoryFilesInOrder = new ArrayList<>();
+    private Map<String, RepositoryFile> repositoryFilesByIdentifier = new HashMap<>();
 
     public RepositoryImportManager(RepositoryCache.CacheStructure structure) {
         this.repositoryCache = new RepositoryCache(structure);
@@ -55,35 +55,36 @@ public class RepositoryImportManager {
     public RepositoryFile importFromRepository(MTSpace space, MTRepositoryImport repositoryImport,
                                                String extension, boolean asInclude) {
 
-        String       repositoryName = repositoryImport.getRepositoryName();
-        MTRepository repository     = space.getRepositoryByName(repositoryName);
+        String repositoryName = repositoryImport.getRepositoryName();
+        MTRepository repository = space.getRepositoryByName(repositoryName);
         if (repository == null) {
             ECLog.logFatal(repositoryImport,
-                           "In space \"" + space.getName() + "\" cannot find a repository named \"" + repositoryName
-                           + "\".");
-        } else if (!repository.isValid()) {
+                "In space \"" + space.getName() + "\" cannot find a repository named \"" + repositoryName
+                    + "\".");
+        }
+        else if (!repository.isValid()) {
             ECLog.logFatal(repository, "Repository specification is not valid.");
         }
 
-        String           name     = repositoryImport.getFilename();
-        String           filename = name + "." + extension;
-        MTRepositoryType type     = repository.getType();
+        String name = repositoryImport.getFilename();
+        String filename = name + "." + extension;
+        MTRepositoryType type = repository.getType();
         boolean shouldUseSpaceRepository = space.getRepositoryThatImportedThisSpace() != null
-                                           && type == MTRepositoryType.LOCAL;
+            && type == MTRepositoryType.LOCAL;
 
         MTRepository sourceRepository = repository;
-        String       alternatePath    = null;
+        String alternatePath = null;
         if (shouldUseSpaceRepository) {
             sourceRepository = space.getRepositoryThatImportedThisSpace();
-            alternatePath    = repository.getPath();
+            alternatePath = repository.getPath();
         }
 
         RepositoryImporter repositoryImporter = importersByType.get(sourceRepository.getType());
         repositoryImporter.updateRepositoryCommitSHA1(
-                sourceRepository); // if it has one, fetch it so the cache will know if it needs to invalidate itself
+            sourceRepository); // if it has one, fetch it so the cache will know if it needs to invalidate itself
         repositoryCache.validateRepositoryInCache(sourceRepository);
         RepositoryFile cacheRepositoryFile = repositoryCache.getRepositoryFile(sourceRepository, filename,
-                                                                               asInclude);
+            asInclude);
         if (sourceRepository.getType() != MTRepositoryType.LOCAL
             && cacheRepositoryFile.exists()) { // check if it exists in the cache already
             if (EntityCompiler.isVerbose()) {
@@ -94,11 +95,14 @@ public class RepositoryImportManager {
         }
 
         RepositoryFile file = repositoryImporter.importFromRepository(sourceRepository, repositoryImport,
-                                                                      cacheRepositoryFile, extension, alternatePath);
+            cacheRepositoryFile, extension, alternatePath);
         if (file == null || !file.exists()) {
-            String nameOrPath = repository.getType() == MTRepositoryType.LOCAL ?
-                                repository.getPath() :
-                                repositoryName;
+            String nameOrPath = repositoryName;
+
+            if (repository.getType() == MTRepositoryType.LOCAL) {
+                File f = new File(repository.getPath());
+                nameOrPath = f.getAbsolutePath();
+            }
             ECLog.logFatal("Unable to import " + repository.getType() + " file: " + nameOrPath + "/" + filename);
         }
         addRepositoryFile(repositoryImport.getIdentifier(), file);
@@ -116,11 +120,11 @@ public class RepositoryImportManager {
 
     private String getRepositoryCachePath(MTRepository repository) {
         return repository.getOrganization() + File.separator + repository.getRepoName() + File.separator
-               + repository.getTag();
+            + repository.getTag();
     }
 
     public void close() {
-        repositoryFilesInOrder      = new ArrayList<>();
+        repositoryFilesInOrder = new ArrayList<>();
         repositoryFilesByIdentifier = new HashMap<>();
         for (RepositoryImporter importer : importersByType.values()) {
             importer.close();
