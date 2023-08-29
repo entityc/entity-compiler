@@ -113,6 +113,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     private       MTDEInterface                                       currentDomainEntityInterface;
     private       MTDEInterfaceOperation                              currentDomainEntityInterfaceOperation;
     private       MTSpace                                             foundSpace;
+    private       List<Vector<String>> inheritedTags;
 
     public MTSpace getFoundSpace() {
         return foundSpace;
@@ -1310,6 +1311,19 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     }
 
     @Override
+    public Object visitRelationshipsBody(EntityLanguageParser.RelationshipsBodyContext ctx) {
+        if (ctx.tagStatement() != null) {
+            inheritedTags = tagStringsFromTagStatements(ctx.tagStatement());
+        }
+
+        Object object = super.visitRelationshipsBody(ctx);
+
+        inheritedTags = null;
+
+        return object;
+    }
+
+    @Override
     public MTRelationship visitRelationshipStatement(EntityLanguageParser.RelationshipStatementContext ctx) {
         HalfRelationshipPlurality toPlurality = HalfRelationshipPlurality.ONE;
         if (ctx.MANY() != null) {
@@ -1350,6 +1364,9 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                                                          toEntityName, optional, parent, reverseName, toEntityIdName,
                                                          null);
 
+        if (inheritedTags != null) {
+            relationship.addTagsWithValues(inheritedTags);
+        }
         if (instantiation != null) {
             relationship.getTo().setTemplateInstantiation(instantiation);
         }
@@ -1910,11 +1927,25 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     }
 
     @Override
+    public Object visitDomainAttributesBody(EntityLanguageParser.DomainAttributesBodyContext ctx) {
+        if (ctx.tagStatement() != null) {
+            inheritedTags = tagStringsFromTagStatements(ctx.tagStatement());
+        }
+        Object object = super.visitDomainAttributesBody(ctx);
+        inheritedTags = null;
+
+        return object;
+    }
+
+    @Override
     public Object visitDomainAttribute(EntityLanguageParser.DomainAttributeContext ctx) {
         String attributeName = ctx.id().getText();
         if (currentDomainEntity != null) {
-            MTDEAttribute                                   domainEntityAttribute = currentDomainEntity.addDomainAttributeWithName(
+            MTDEAttribute domainEntityAttribute = currentDomainEntity.addDomainAttributeWithName(
                     attributeName);
+            if (inheritedTags != null) {
+                domainEntityAttribute.addTagsWithValues(inheritedTags);
+            }
             EntityLanguageParser.DomainAttributeBodyContext bodyContext           = ctx.domainAttributeBody();
             if (bodyContext != null) {
                 if (bodyContext.descriptionStatement() != null) {
@@ -1929,18 +1960,34 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     }
 
     @Override
+    public Object visitDomainRelationshipsBody(EntityLanguageParser.DomainRelationshipsBodyContext ctx) {
+        if (ctx.tagStatement() != null) {
+            inheritedTags = tagStringsFromTagStatements(ctx.tagStatement());
+        }
+
+        Object object = super.visitDomainRelationshipsBody(ctx);
+
+        inheritedTags = null;
+
+        return object;
+    }
+
+    @Override
     public Object visitDomainRelationship(EntityLanguageParser.DomainRelationshipContext ctx) {
         String relationshipName = ctx.id().getText();
         if (currentDomainEntity != null) {
-            MTDERelationship                                   domainEntityAttribute = currentDomainEntity.addDomainRelationshipWithName(
+            MTDERelationship domainEntityRelationship = currentDomainEntity.addDomainRelationshipWithName(
                     relationshipName);
+            if (inheritedTags != null) {
+                domainEntityRelationship.addTagsWithValues(inheritedTags);
+            }
             EntityLanguageParser.DomainRelationshipBodyContext bodyContext           = ctx.domainRelationshipBody();
             if (bodyContext != null) {
                 if (bodyContext.descriptionStatement() != null) {
-                    setNodeDescription(domainEntityAttribute, bodyContext.descriptionStatement(), false);
+                    setNodeDescription(domainEntityRelationship, bodyContext.descriptionStatement(), false);
                 }
                 if (bodyContext.tagStatement() != null) {
-                    domainEntityAttribute.addTagsWithValues(tagStringsFromTagStatements(bodyContext.tagStatement()));
+                    domainEntityRelationship.addTagsWithValues(tagStringsFromTagStatements(bodyContext.tagStatement()));
                 }
             }
         }
@@ -1978,6 +2025,20 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             currentDomainEntity.addAttribute(attribute);
         }
         return null;
+    }
+
+    @Override
+    public Object visitAttributesBody(EntityLanguageParser.AttributesBodyContext ctx) {
+
+        if (ctx.tagStatement() != null) {
+            inheritedTags = tagStringsFromTagStatements(ctx.tagStatement());
+        }
+
+        Object object = super.visitAttributesBody(ctx);
+
+        inheritedTags = null;
+
+        return object;
     }
 
     @Override
@@ -2063,6 +2124,10 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             if (qualifier.SEQUENTIAL() != null) {
                 attribute.setSequential(true);
             }
+        }
+
+        if (inheritedTags != null) {
+            attribute.addTagsWithValues(inheritedTags);
         }
 
         EntityLanguageParser.AttributeBodyContext bodyContext = ctx.attributeBody();

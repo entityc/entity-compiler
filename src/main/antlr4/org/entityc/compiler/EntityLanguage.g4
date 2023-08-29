@@ -364,7 +364,8 @@ attributes
 
 attributesBody
     :
-    ( attribute
+    ( tagStatement
+    | attribute
     )*
     ;
 
@@ -411,7 +412,8 @@ relationships
 
 relationshipsBody
     :
-    ( relationshipStatement
+    ( tagStatement
+    | relationshipStatement
     )*
     ;
 
@@ -835,7 +837,8 @@ domainAttributes
 
 domainAttributesBody
     :
-    ( domainAttributesRenameTo
+    ( tagStatement
+    | domainAttributesRenameTo
     | domainAttributesRenameAppendPrepend
     | domainAttributeReplaces
     | domainAttributeExclude
@@ -901,7 +904,8 @@ domainRelationships
 
 domainRelationshipsBody
     :
-    ( domainRelationship
+    ( tagStatement
+    | domainRelationship
     )*
     ;
 
