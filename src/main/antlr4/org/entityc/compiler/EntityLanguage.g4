@@ -898,6 +898,32 @@ domainAttributeBody
     )*
     ;
 
+/*
+These are attributes of the "to" entity of a relationship. This allows
+tagging of attributes with respect to its "path" from a relationship.
+*/
+domainRelationshipAttributes
+    : ATTRIBUTES '{' domainRelationshipAttributesBody '}'
+    ;
+
+domainRelationshipAttributesBody
+    :
+    ( tagStatement
+    | domainRelationshipAttribute
+    )*
+    ;
+
+domainRelationshipAttribute
+    : id '{' domainRelationshipAttributeBody '}'
+    ;
+
+domainRelationshipAttributeBody
+    :
+    ( descriptionStatement
+    | tagStatement
+    )*
+    ;
+
 domainRelationships
     : RELATIONSHIPS '{' domainRelationshipsBody '}'
     ;
@@ -917,6 +943,7 @@ domainRelationshipBody
     :
     ( descriptionStatement
     | tagStatement
+    | domainRelationshipAttributes
     )*
     ;
 

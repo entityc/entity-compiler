@@ -22,21 +22,7 @@ import org.entityc.compiler.model.config.MTSpaceImport;
 import org.entityc.compiler.model.config.MTSpaceInclude;
 import org.entityc.compiler.model.config.MTTemplate;
 import org.entityc.compiler.model.config.MTTransform;
-import org.entityc.compiler.model.domain.MTDApplyTemplate;
-import org.entityc.compiler.model.domain.MTDEAttribute;
-import org.entityc.compiler.model.domain.MTDEAttributeBitField;
-import org.entityc.compiler.model.domain.MTDEInterface;
-import org.entityc.compiler.model.domain.MTDEInterfaceOperation;
-import org.entityc.compiler.model.domain.MTDEInterfaceOperationConfig;
-import org.entityc.compiler.model.domain.MTDERelationship;
-import org.entityc.compiler.model.domain.MTDEntity;
-import org.entityc.compiler.model.domain.MTDEnum;
-import org.entityc.compiler.model.domain.MTDEnumItem;
-import org.entityc.compiler.model.domain.MTDModule;
-import org.entityc.compiler.model.domain.MTDView;
-import org.entityc.compiler.model.domain.MTDomain;
-import org.entityc.compiler.model.domain.MTNaming;
-import org.entityc.compiler.model.domain.MTNamingMethod;
+import org.entityc.compiler.model.domain.*;
 import org.entityc.compiler.model.entity.HalfRelationshipPlurality;
 import org.entityc.compiler.model.entity.MTAttribute;
 import org.entityc.compiler.model.entity.MTAttributeConstraint;
@@ -105,6 +91,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     private       MTAttribute                                         currentAttribute;
     private       MTDModule                                           currentDomainModule;
     private       MTDEntity                                           currentDomainEntity;
+    private       MTDERelationship                                    currentDomainRelationship;
     private       MTDEnum                                             currentDomainEnum;
     private       MTLanguage                                          currentLanguage;
     private       MTConfiguration                                     currentConfiguration;
@@ -1990,8 +1977,24 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                     domainEntityRelationship.addTagsWithValues(tagStringsFromTagStatements(bodyContext.tagStatement()));
                 }
             }
+            this.currentDomainRelationship = domainEntityRelationship;
         }
-        return null;
+        Object object = super.visitDomainRelationship(ctx);
+
+        this.currentDomainRelationship = null;
+
+        return object;
+    }
+
+    @Override
+    public Object visitDomainRelationshipAttribute(EntityLanguageParser.DomainRelationshipAttributeContext ctx) {
+        String attributeName = ctx.id().getText();
+
+        MTDERelationshipField relationshipField = new MTDERelationshipField(ctx, currentDomainRelationship, attributeName);
+        currentDomainRelationship.addField(relationshipField);
+        Object object = super.visitDomainRelationshipAttribute(ctx);
+
+        return object;
     }
 
     @Override
