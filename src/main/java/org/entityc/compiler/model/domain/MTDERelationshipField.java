@@ -45,7 +45,6 @@ public class MTDERelationshipField extends MTNode implements MTNamed, MTDomainBa
 
     @Override
     public boolean resolveReferences(MTSpace space, int pass) {
-        ECLog.logInfo("Resolving domain relationship field references...");
         if ( fieldIsAttribute() || fieldIsRelationship() ) {
             return false;
         }
