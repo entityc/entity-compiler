@@ -18,6 +18,7 @@ import org.entityc.compiler.model.config.MTSpace;
 import org.entityc.compiler.model.domain.MTNamed;
 import org.entityc.compiler.model.visitor.MTVisitor;
 import org.entityc.compiler.util.ECLog;
+import org.junit.jupiter.params.shadow.com.univocity.parsers.annotations.Copy;
 
 import java.util.List;
 
@@ -62,16 +63,37 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
         this.templateArgName = templateArgName;
     }
 
-    protected MTRelationship(String secondaryName, MTRelationship primaryRelationship) {
+    protected MTRelationship(String secondaryName, MTRelationship primaryRelationship, MTRelationshipHalf fromHalf, MTRelationshipHalf toHalf) {
         super(primaryRelationship.getParserRuleContext());
         this.name            = secondaryName;
-        this.from            = primaryRelationship.from;
-        this.to              = primaryRelationship.to;
+        this.from            = fromHalf;
+        if (toHalf != null) {
+            this.to = toHalf;
+        } else {
+            this.to = primaryRelationship.to;
+        }
         this.optional        = primaryRelationship.optional;
         this.parent          = primaryRelationship.parent;
         this.reverseName     = primaryRelationship.reverseName;
         this.toEntityIdName  = primaryRelationship.toEntityIdName;
         this.templateArgName = primaryRelationship.templateArgName;
+    }
+
+    public static MTRelationship Copy(MTRelationship relationship, MTEntity newFromEntity, MTEntity newToEntity) {
+
+        MTRelationshipHalf fromHalf = new MTRelationshipHalf(relationship.getParserRuleContext(),
+            relationship.getFrom().getPlurality(), newFromEntity.getName());
+        fromHalf.setEntity(newFromEntity);
+
+        MTRelationshipHalf toHalf = null;
+        if (newToEntity != null) {
+            toHalf = new MTRelationshipHalf(relationship.getParserRuleContext(),
+                relationship.getTo().getPlurality(), newToEntity.getName());
+            toHalf.setEntity(newToEntity);
+        }
+
+        MTRelationship copy = new MTRelationship(relationship.getName(), relationship, fromHalf, toHalf);
+        return copy;
     }
 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
@@ -304,7 +326,7 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
                     }
                     else {
                         // good unnamed pairing
-                        //System.out.println("unnamed Relationship \"" + getName() + "\" pairing between " + fromEntity.getName() + "." + this.getName() + " and " + toEntity.getName() + "." + fromRelationship.getName());
+                        System.out.println("unnamed Relationship \"" + getName() + "\" pairing between " + from.getEntityName() + "." + this.getName() + " and " + to.getEntityName() + "." + fromRelationship.getName());
                         this.reverseRelationship = fromRelationship;
                         this.from.setPlurality(fromRelationship.to.getPlurality());
                         found = true;

@@ -21,13 +21,7 @@ import org.entityc.compiler.model.visitor.MTVisitor;
 import org.entityc.compiler.util.ECLog;
 import org.entityc.compiler.util.ECStringUtil;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.entityc.compiler.doc.annotation.ModelMethodCategory.ENTITY_TEMPLATE;
@@ -59,6 +53,7 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
     private         int                                      largestFieldNumber        = 0;
     private         MTSpace                                  space;
     private         MTAttribute                              manyAttribute             = null; // if the entity was created from a "many <Entity> attributeName"
+    protected       Set<String>                              realms = new HashSet<>(); // a space entities can live in separate from the others - such as for composite entities
 
     public MTEntity(ParserRuleContext ctx, MTModule module, String name) {
         super(ctx);
@@ -87,6 +82,19 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
     @Override
     public String getName() {
         return name;
+    }
+
+    @ModelMethod(category = ModelMethodCategory.ENTITY,
+        description = "Adds the entity to a realm.")
+    public void addRealm(String realm) {
+        ECLog.logInfo("Added entity: " + getName() + " to realm " + realm);
+        realms.add(realm);
+    }
+
+    @ModelMethod(category = ModelMethodCategory.ENTITY,
+        description = "Returns true if this entity is part of a realm.")
+    public boolean isInRealm(String realm) {
+        return this.realms.contains(realm);
     }
 
     public static MTEntity AddImplicitManyToManyEntity(MTSpace space, MTEntity fromEntity, MTEntity toEntity) {
@@ -929,9 +937,23 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
         description = "Indicates whether this entity has at least one relationship with the specified tag.")
     public boolean hasRelationshipTagged(
         @ModelMethodParameter(description = "The tag with which to search.")
-            String tag) {
+        String tag) {
         for (MTRelationship relationship : getRelationships()) {
             if (relationship.hasTag(tag)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @ModelMethod(
+        category = ModelMethodCategory.TAGGING,
+        description = "Indicates whether this entity has at least one relationship to a named other entity.")
+    public boolean hasRelationshipToEntityNamed(
+        @ModelMethodParameter(description = "The name of the other entity.")
+        String toEntityName) {
+        for (MTRelationship relationship : getRelationships()) {
+            if (relationship.getTo().getEntityName().equals(toEntityName)) {
                 return true;
             }
         }

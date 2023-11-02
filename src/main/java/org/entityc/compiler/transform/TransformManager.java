@@ -6,7 +6,6 @@
 
 package org.entityc.compiler.transform;
 
-import org.entityc.compiler.EntityCompiler;
 import org.entityc.compiler.cmdline.CommandLine;
 import org.entityc.compiler.model.MTRoot;
 
@@ -22,6 +21,7 @@ public class TransformManager {
         // Server
         AddTransform(new MTVImplicitTransform(model, configurationName));
         AddTransform(new MTVPostgresTransform(model, configurationName));
+        AddTransform(new MTVReleasedTransform(model, configurationName));
     }
 
     public static void AddTransform(MTBaseTransform transform) {

@@ -8,17 +8,13 @@ package org.entityc.compiler.transform;
 
 import org.entityc.compiler.model.MTRoot;
 import org.entityc.compiler.model.config.MTSpace;
-import org.entityc.compiler.model.entity.FullRelationshipPlurality;
-import org.entityc.compiler.model.entity.MTAttribute;
-import org.entityc.compiler.model.entity.MTEntity;
-import org.entityc.compiler.model.entity.MTEnum;
-import org.entityc.compiler.model.entity.MTPrimaryKey;
-import org.entityc.compiler.model.entity.MTRelationship;
+import org.entityc.compiler.model.entity.*;
 import org.entityc.compiler.util.ECLog;
 
 // TODO: Create index from parent relationships
 
 public class MTVImplicitTransform extends MTBaseTransform {
+    private String realm = null;
 
     public MTVImplicitTransform(MTRoot root, String configurationName) {
         super("Implicit", root, configurationName);
@@ -71,12 +67,26 @@ public class MTVImplicitTransform extends MTBaseTransform {
         MTEntity toEntity = relationship.getTo().getEntity();
         if (toEntity == null || fromEntity == null) {
             relationship.resolveReferences(root.getSpace(), 0);
-            toEntity = relationship.getTo().getEntity();
+            toEntity   = relationship.getTo().getEntity();
             fromEntity = relationship.getFrom().getEntity();
             if (toEntity == null) {
                 ECLog.logFatal("The entity \"" + fromEntity.getName() + "\" has a relationship \"" + relationship.getName() + "\" but not to anything.");
             }
         }
+
+        // if this is a realm based transform then make sure we are operating on entities from that realm.
+        if (realm != null) {
+            if (!(fromEntity instanceof MTCompositeEntity) && (toEntity instanceof MTCompositeEntity)) {
+                ECLog.logInfo("(wrong class) REALM " + realm + ": not processing fromEntity: " + fromEntity.getName() + " toEntity: " + toEntity.getName());
+                return;
+            }
+            if (!fromEntity.isInRealm(realm) || !toEntity.isInRealm(realm)) {
+                ECLog.logInfo("(wrong realm) REALM " + realm + ": not processing fromEntity: " + fromEntity.getName() + " toEntity: " + toEntity.getName());
+                return;
+            }
+            ECLog.logInfo("REALM " + realm + ": PROCESSING fromEntity: " + fromEntity.getName() + " toEntity: " + toEntity.getName());
+        }
+
         MTPrimaryKey toPrimaryKey = toEntity.getPrimaryKey();
         if (toPrimaryKey == null) {
             return;
@@ -105,6 +115,12 @@ public class MTVImplicitTransform extends MTBaseTransform {
     @Override
     public String[] requiredDomainNames() {
         return new String[]{"Database"};
+    }
+
+    @Override
+    public void start(String realm) {
+        this.realm = realm;
+        super.start(realm);
     }
 
     @Override

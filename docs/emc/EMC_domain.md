@@ -11,6 +11,7 @@ Model classes that are domain specific are of this type. The classes are briefly
 |[`MTDEAttribute`](#class_MTDEAttribute)|Represents an attribute in your model in the context of a domain.|
 |[`MTDEAttributeConstraintExpression`](#class_MTDEAttributeConstraintExpression)|Represents a constraint on an attribute in the form of an expression.|
 |[`MTDERelationship`](#class_MTDERelationship)|Represents a relationship in your model in the context of a domain.|
+|[`MTDERelationshipField`](#class_MTDERelationshipField)|Represents a field (attribute or relationship) associated with the __to__ entity of the relationship.|
 |[`MTDEntity`](#class_MTDEntity)|Represents an entity in your model in the context of a domain.|
 |[`MTDEnum`](#class_MTDEnum)|Represents an enum in the context of a domain.|
 |[`MTDEnumItem`](#class_MTDEnumItem)|Represents an enum item in the context of a domain.|
@@ -233,6 +234,12 @@ Returns the description of this domain relationship, if it exists. Otherwise it 
 #### `String` **`explicitName`**
 
 If this relationship was explicitly renamed within its domain, it will return that name. Otherwise it will return `null`.
+
+<hr/>
+
+#### `Collection` **`fields`**
+
+Returns all the declared fields of this relationship.
 
 <hr/>
 
@@ -548,6 +555,18 @@ Returns the domain specific version of the specified relationship.
 |-----|-----|
 |`String name` | The name of the relationship to return. |
 |`boolean createIfNeeded` | If the domain based relationship has not yet been created, specifying `true` will make sure it is created before returning it. Otherwise `null` will be returned if it was not yet created. |
+
+<hr/>
+
+#### `boolean` **`hasDeclaredDomainRelationships`**
+
+Indicates if any relationships were declared in this domain entity declaration.
+
+<hr/>
+
+#### `boolean` **`hasParentRelationship`**
+
+Indicates whether this domain entity has a parent relationship. A parent relationship is one that has been declared as `parent`
 
 <hr/>
 

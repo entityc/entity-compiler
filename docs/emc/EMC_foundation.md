@@ -75,6 +75,16 @@ Returns the first item in the array.
 
 <hr/>
 
+#### `Object get(Integer index)`
+
+Returns the specified item by its index into the array.
+
+| Parameter | Description |
+|-----|-----|
+|`Integer index` | The index into the array that points to the item to be returned. |
+
+<hr/>
+
 #### `Object get(Long index)`
 
 Returns the specified item by its index into the array.

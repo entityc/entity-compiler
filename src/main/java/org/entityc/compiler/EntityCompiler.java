@@ -24,6 +24,8 @@ import org.entityc.compiler.repository.RepositoryCache;
 import org.entityc.compiler.repository.RepositoryFile;
 import org.entityc.compiler.repository.RepositoryImportManager;
 import org.entityc.compiler.transform.MTBaseTransform;
+import org.entityc.compiler.transform.MTVImplicitTransform;
+import org.entityc.compiler.transform.MTVReleasedTransform;
 import org.entityc.compiler.transform.TransformManager;
 import org.entityc.compiler.transform.template.FileTemplateTransform;
 import org.entityc.compiler.transform.template.TemplatePublishing;
@@ -132,8 +134,9 @@ public class EntityCompiler {
         root.resolveReferences(false);
         //model.processAssetAttributes();
         root.getSpace().checkValidReferences();
+        final String ImplicitTransformName = "Implicit";
 
-        TransformManager.GetTransformByName("Implicit").start();
+        TransformManager.GetTransformByName(ImplicitTransformName).start(null);
 
         for (MTTransform transformSpec : configuration.getTransforms()) {
             MTBaseTransform transform = TransformManager.GetTransformByName(transformSpec.getName());
@@ -143,8 +146,10 @@ public class EntityCompiler {
             if (commandLine.verbose) {
                 System.out.println("Running " + "transform" + " " + transform.getName());
             }
-            transform.start();
+            transform.start(null);
         }
+        MTBaseTransform implicitTransform = TransformManager.GetTransformByName(ImplicitTransformName);
+        ((MTVImplicitTransform)implicitTransform).start(MTVReleasedTransform.realm);
 
         root.resolveReferences(true);
         root.getSpace().checkValidReferences();

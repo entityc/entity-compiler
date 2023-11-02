@@ -106,8 +106,15 @@ public class MFArray extends MFObject {
     @ModelMethod(description = "Returns the specified item by its index into the array.")
     public Object get(
         @ModelMethodParameter(description = "The index into the array that points to the item to be returned.")
-            Long index) {
+        Long index) {
         return array.get(index.intValue());
+    }
+
+    @ModelMethod(description = "Returns the specified item by its index into the array.")
+    public Object get(
+        @ModelMethodParameter(description = "The index into the array that points to the item to be returned.")
+        Integer index) {
+        return array.get(index);
     }
 
     @ModelMethod(description =

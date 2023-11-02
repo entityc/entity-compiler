@@ -65,6 +65,10 @@ public class MTEnum extends MTType implements MTNamed, MTTemplateSupport {
         return items.size();
     }
 
+    @ModelMethod(category = ModelMethodCategory.ENUM, description = "Returns an item by its index.")
+    public MTEnumItem getItem(Long index) {
+        return getItem(index.intValue());
+    }
     public MTEnumItem getItem(int index) {
         return items.get(index);
     }

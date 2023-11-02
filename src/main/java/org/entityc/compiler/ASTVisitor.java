@@ -23,22 +23,7 @@ import org.entityc.compiler.model.config.MTSpaceInclude;
 import org.entityc.compiler.model.config.MTTemplate;
 import org.entityc.compiler.model.config.MTTransform;
 import org.entityc.compiler.model.domain.*;
-import org.entityc.compiler.model.entity.HalfRelationshipPlurality;
-import org.entityc.compiler.model.entity.MTAttribute;
-import org.entityc.compiler.model.entity.MTAttributeConstraint;
-import org.entityc.compiler.model.entity.MTBitField;
-import org.entityc.compiler.model.entity.MTEntity;
-import org.entityc.compiler.model.entity.MTEntityTemplate;
-import org.entityc.compiler.model.entity.MTEntityTemplateInstantiation;
-import org.entityc.compiler.model.entity.MTEnum;
-import org.entityc.compiler.model.entity.MTEnumItem;
-import org.entityc.compiler.model.entity.MTNativeType;
-import org.entityc.compiler.model.entity.MTPrimaryKey;
-import org.entityc.compiler.model.entity.MTRelationship;
-import org.entityc.compiler.model.entity.MTTagSet;
-import org.entityc.compiler.model.entity.MTTypedef;
-import org.entityc.compiler.model.entity.MTUnit;
-import org.entityc.compiler.model.entity.MTView;
+import org.entityc.compiler.model.entity.*;
 import org.entityc.compiler.model.expression.MTConstant;
 import org.entityc.compiler.model.expression.MTExpression;
 import org.entityc.compiler.model.expression.MTMethodCall;
@@ -1652,6 +1637,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             } else if (namingClassContext.MODULE() != null) {
                 classesWithNaming.add(MTModule.class);
             } else if (namingClassContext.ENTITY() != null) {
+                classesWithNaming.add(MTCompositeEntity.class);
                 classesWithNaming.add(MTEntity.class);
                 classesWithNaming.add(MTView.class);
             } else if (namingClassContext.ATTRIBUTE() != null) {

@@ -26,7 +26,7 @@ public abstract class MTBaseVisitor implements MTVisitor {
         this.root = root;
     }
 
-    public void start() {
+    public void start(String realm) {
         //ECLog.logInfo("Starting to visit model: " + model.getName());
         visit(this.root);
     }

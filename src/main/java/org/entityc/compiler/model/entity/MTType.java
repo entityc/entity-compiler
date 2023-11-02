@@ -55,6 +55,12 @@ public class MTType extends MTNode {
         return isNativeDataType(MTNativeType.DataType.DATE);
     }
 
+    @ModelMethod(category = ModelMethodCategory.TYPE,
+        description = "Indicates whether this type is the `data` data type.")
+    public boolean isDataType() {
+        return isNativeDataType(MTNativeType.DataType.BYTE_ARRAY);
+    }
+
     public void accept(MTVisitor visitor) {
 
     }

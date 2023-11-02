@@ -62,9 +62,9 @@ public class MTVPostgresTransform extends MTBaseTransform {
     }
 
     @Override
-    public void start() {
+    public void start(String realm) {
 
-        super.start();
+        super.start(realm);
 
         MTTransform transform        = getConfiguration().getTransformByName(getName());
         String      outputName       = transform.getOutputNameByLocalName("primary");
