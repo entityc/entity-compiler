@@ -6,11 +6,7 @@
 
 package org.entityc.compiler;
 
-import org.entityc.compiler.model.MTCodeFormat;
-import org.entityc.compiler.model.MTModule;
-import org.entityc.compiler.model.MTNamespace;
-import org.entityc.compiler.model.MTNode;
-import org.entityc.compiler.model.MTRoot;
+import org.entityc.compiler.model.*;
 import org.entityc.compiler.model.config.MTConfiguration;
 import org.entityc.compiler.model.config.MTDirectory;
 import org.entityc.compiler.model.config.MTProtoc;
@@ -68,24 +64,25 @@ import java.util.stream.Collectors;
 public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     private final Map<String, List<EntityLanguageParser.ViewContext>> abstractViewContexts = new HashMap<>();
-    private final Stack<MTSpace>                                      spaceStack           = new Stack<>();
-    private       MTRoot                                              root;
-    private       MTDomain                                            currentDomain;
-    private       MTModule                                            currentModule;
-    private       MTEntity                                            currentEntity;
-    private       MTAttribute                                         currentAttribute;
-    private       MTDModule                                           currentDomainModule;
-    private       MTDEntity                                           currentDomainEntity;
-    private       MTDERelationship                                    currentDomainRelationship;
-    private       MTDEnum                                             currentDomainEnum;
-    private       MTLanguage                                          currentLanguage;
-    private       MTConfiguration                                     currentConfiguration;
-    private       MTInterface                                         currentInterface;
-    private       MTRequest                                           currentRequest;
-    private       MTDEInterface                                       currentDomainEntityInterface;
-    private       MTDEInterfaceOperation                              currentDomainEntityInterfaceOperation;
-    private       MTSpace                                             foundSpace;
-    private       List<Vector<String>> inheritedTags;
+    private final Stack<MTSpace> spaceStack = new Stack<>();
+    private MTRoot root;
+    private MTRealm currentRealm;
+    private MTDomain currentDomain;
+    private MTModule currentModule;
+    private MTEntity currentEntity;
+    private MTAttribute currentAttribute;
+    private MTDModule currentDomainModule;
+    private MTDEntity currentDomainEntity;
+    private MTDERelationship currentDomainRelationship;
+    private MTDEnum currentDomainEnum;
+    private MTLanguage currentLanguage;
+    private MTConfiguration currentConfiguration;
+    private MTInterface currentInterface;
+    private MTRequest currentRequest;
+    private MTDEInterface currentDomainEntityInterface;
+    private MTDEInterfaceOperation currentDomainEntityInterfaceOperation;
+    private MTSpace foundSpace;
+    private List<Vector<String>> inheritedTags;
 
     public MTSpace getFoundSpace() {
         return foundSpace;
@@ -101,7 +98,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         if (!hasCurrentSpace()) {
             if (space != null) {
                 pushSpace(space);
-            } else if (root.getSpace() != null) {
+            }
+            else if (root.getSpace() != null) {
                 pushSpace(root.getSpace());
             }
         }
@@ -137,6 +135,14 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             }
             MTModule module = (MTModule) visit(moduleContext);
             currentSpace().addModule(module);
+        }
+
+        for (EntityLanguageParser.RealmContext realmContext : ctx.realm()) {
+            if (!hasCurrentSpace()) {
+                ECLog.logFatal("Realm" + fatalMessage);
+            }
+            MTRealm realm = (MTRealm) visit(realmContext);
+            currentSpace().addRealm(realm);
         }
 
         for (EntityLanguageParser.DomainContext domainContext : ctx.domain()) {
@@ -201,18 +207,19 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                 ECLog.logInfo("READING UNITS...");
             }
             for (EntityLanguageParser.UnitDefinitionContext unitDefinitionContext : ctx.unitsBody().unitDefinition()) {
-                String                                         name         = unitDefinitionContext.id(0).getText();
-                String                                         baseUnitName = unitDefinitionContext.EXTENDS() != null ?
-                                                                              unitDefinitionContext.id(1).getText() :
-                                                                              null;
-                EntityLanguageParser.UnitDefinitionBodyContext body         = unitDefinitionContext.unitDefinitionBody();
-                String                                         abbr         = null;
-                double                                         multiplier   = 1.0;
+                String name = unitDefinitionContext.id(0).getText();
+                String baseUnitName = unitDefinitionContext.EXTENDS() != null ?
+                    unitDefinitionContext.id(1).getText() :
+                    null;
+                EntityLanguageParser.UnitDefinitionBodyContext body = unitDefinitionContext.unitDefinitionBody();
+                String abbr = null;
+                double multiplier = 1.0;
                 if (body != null) {
                     for (EntityLanguageParser.UnitDefinitionFieldContext field : body.unitDefinitionField()) {
                         if (field.ABBR() != null) {
                             abbr = ECStringUtil.ProcessParserString(field.STRING().getText());
-                        } else if (field.MULTIPLIER() != null) {
+                        }
+                        else if (field.MULTIPLIER() != null) {
                             multiplier = Double.valueOf(field.FLOAT().getText());
                         }
                     }
@@ -251,10 +258,10 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     @Override
     public MTTypedef visitTypedefStatement(EntityLanguageParser.TypedefStatementContext ctx) {
 
-        int       bitWidth = ctx.INT32_TYPE() != null ?
-                             32 :
-                             64;
-        MTTypedef typedef  = new MTTypedef(ctx, currentModule, bitWidth, ctx.id().getText());
+        int bitWidth = ctx.INT32_TYPE() != null ?
+            32 :
+            64;
+        MTTypedef typedef = new MTTypedef(ctx, currentModule, bitWidth, ctx.id().getText());
         if (ctx.typedefBody().descriptionStatement() != null) {
             setNodeDescription(typedef, ctx.typedefBody().descriptionStatement(), false);
         }
@@ -296,8 +303,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTOperationConfig visitOperationConfig(EntityLanguageParser.OperationConfigContext ctx) {
-        MTOperationConfig                                config = new MTOperationConfig(ctx);
-        EntityLanguageParser.OperationConfigBlockContext block  = ctx.operationConfigBlock();
+        MTOperationConfig config = new MTOperationConfig(ctx);
+        EntityLanguageParser.OperationConfigBlockContext block = ctx.operationConfigBlock();
 
         for (EntityLanguageParser.OperationConfigContextContext contextContext : block.operationConfigContext()) {
             config.addArgument(visitOperationConfigContext(contextContext));
@@ -335,8 +342,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTResponse visitOperationResponse(EntityLanguageParser.OperationResponseContext ctx) {
-        MTResponse                                         response = new MTResponse(ctx);
-        EntityLanguageParser.OperationResponseBlockContext block    = ctx.operationResponseBlock();
+        MTResponse response = new MTResponse(ctx);
+        EntityLanguageParser.OperationResponseBlockContext block = ctx.operationResponseBlock();
 
         if (block.operationResponseStatus() != null) {
             for (EntityLanguageParser.OperationResponseStatusContext statusContext : block.operationResponseStatus()) {
@@ -355,12 +362,12 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     @Override
     public MTOperationConfigArgument visitOperationConfigContext(EntityLanguageParser.OperationConfigContextContext ctx) {
         MTOperationConfigArgument.ArgumentType contextType = MTOperationConfigArgument.ArgumentType.FromName(
-                ctx.operationConfigContextType().getText());
-        MTOperationConfigArgument              argument    = new MTOperationConfigArgument(ctx, contextType,
-                                                                                           ctx.id(0).getText(),
-                                                                                           ctx.id().size() > 1 ?
-                                                                                           ctx.id(1).getText() :
-                                                                                           null, true);
+            ctx.operationConfigContextType().getText());
+        MTOperationConfigArgument argument = new MTOperationConfigArgument(ctx, contextType,
+            ctx.id(0).getText(),
+            ctx.id().size() > 1 ?
+                ctx.id(1).getText() :
+                null, true);
         if (ctx.operationContextBlock().descriptionStatement() != null) {
             setNodeDescription(argument, ctx.operationContextBlock().descriptionStatement(), false);
         }
@@ -370,12 +377,12 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     @Override
     public MTOperationConfigArgument visitOperationConfigArgument(EntityLanguageParser.OperationConfigArgumentContext ctx) {
         MTOperationConfigArgument.ArgumentType argumentType = MTOperationConfigArgument.ArgumentType.FromName(
-                ctx.operationConfigArgumentType().getText());
-        MTOperationConfigArgument              argument     = new MTOperationConfigArgument(ctx, argumentType,
-                                                                                            ctx.id(0).getText(),
-                                                                                            ctx.id().size() > 1 ?
-                                                                                            ctx.id(1).getText() :
-                                                                                            null, false);
+            ctx.operationConfigArgumentType().getText());
+        MTOperationConfigArgument argument = new MTOperationConfigArgument(ctx, argumentType,
+            ctx.id(0).getText(),
+            ctx.id().size() > 1 ?
+                ctx.id(1).getText() :
+                null, false);
         if (ctx.operationArgumentBlock().descriptionStatement() != null) {
             setNodeDescription(argument, ctx.operationArgumentBlock().descriptionStatement(), false);
         }
@@ -384,7 +391,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTRequestBody visitOperationRequestBody(EntityLanguageParser.OperationRequestBodyContext ctx) {
-        MTRequestBody                                         body  = new MTRequestBody(ctx);
+        MTRequestBody body = new MTRequestBody(ctx);
         EntityLanguageParser.OperationRequestBodyBlockContext block = ctx.operationRequestBodyBlock();
         if (block.operationBodyContentType() != null && block.operationBodyContentType().size() > 0) {
             body.setContentType(ECStringUtil.ProcessParserString(block.operationBodyContentType(0).STRING().getText()));
@@ -406,8 +413,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         if (ctx.STRING() != null) {
             pathUrlString = ctx.STRING().getText();
         }
-        MTRequestEndpoint                                         path  = new MTRequestEndpoint(ctx, currentRequest,
-                                                                                                pathUrlString);
+        MTRequestEndpoint path = new MTRequestEndpoint(ctx, currentRequest,
+            pathUrlString);
         EntityLanguageParser.OperationRequestEndpointBlockContext block = ctx.operationRequestEndpointBlock();
 
         if (block != null) {
@@ -428,11 +435,12 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         String statusText = null;
         if (ctx.id() != null) {
             statusText = ctx.id().getText();
-        } else if (ctx.INTEGER() != null) {
+        }
+        else if (ctx.INTEGER() != null) {
             statusText = ctx.INTEGER().getText();
         }
-        MTResponseStatus                                         status = new MTResponseStatus(ctx, statusText);
-        EntityLanguageParser.OperationResponseStatusBlockContext block  = ctx.operationResponseStatusBlock();
+        MTResponseStatus status = new MTResponseStatus(ctx, statusText);
+        EntityLanguageParser.OperationResponseStatusBlockContext block = ctx.operationResponseStatusBlock();
 
         if (block.descriptionStatement() != null) {
             setNodeDescription(status, block.descriptionStatement(), false);
@@ -448,7 +456,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTResponseBody visitOperationResponseBody(EntityLanguageParser.OperationResponseBodyContext ctx) {
-        MTResponseBody                                         body  = new MTResponseBody(ctx);
+        MTResponseBody body = new MTResponseBody(ctx);
         EntityLanguageParser.OperationResponseBodyBlockContext block = ctx.operationResponseBodyBlock();
         if (block.operationBodyContentType() != null && block.operationBodyContentType().size() > 0) {
             body.setContentType(ECStringUtil.ProcessParserString(block.operationBodyContentType(0).STRING().getText()));
@@ -465,17 +473,17 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     @Override
     public MTRequestEndpointParam visitOperationRequestEndpointParam(EntityLanguageParser.OperationRequestEndpointParamContext ctx) {
 
-        String                paramName = ctx.id().getText();
-        boolean               query     = ctx.QUERY() != null;
-        String                typeName  = ctx.type().getText();
-        MTNativeType.DataType dataType  = MTNativeType.DataType.FromName(typeName);
+        String paramName = ctx.id().getText();
+        boolean query = ctx.QUERY() != null;
+        String typeName = ctx.type().getText();
+        MTNativeType.DataType dataType = MTNativeType.DataType.FromName(typeName);
 
         if (dataType == null) {
             ECLog.logWarning(ctx.type(), "Operation parameters must be of a native type. Using int32.");
             dataType = MTNativeType.DataType.INT32;
         }
         MTRequestEndpointParam param = new MTRequestEndpointParam(ctx, query, new MTNativeType(ctx.type(), dataType),
-                                                                  paramName);
+            paramName);
 
         if (ctx.operationRequestEndpointParamBlock() != null
             && ctx.operationRequestEndpointParamBlock().descriptionStatement() != null) {
@@ -493,21 +501,23 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             // Binary operator
             String opSymbol = ctx.bop.getText();
             if (MTOperation.Operator.isValidOperator(opSymbol)) {
-                MTOperation.Operator operator           = MTOperation.Operator.getOperatorBySymbol(opSymbol);
-                List<MTExpression>   operandExpressions = new ArrayList<>(3);
+                MTOperation.Operator operator = MTOperation.Operator.getOperatorBySymbol(opSymbol);
+                List<MTExpression> operandExpressions = new ArrayList<>(3);
                 if (ctx.ID() != null) {
                     MTOperand operand = new MTOperand(ctx, MTOperand.Type.UNKNOWN, ctx.ID().getText());
                     if (operand != null) {
                         operandExpressions.add(operand);
                     }
                     //ECLog.logInfo(">>>> With Operator: " + opSymbol + " and ID: " + ctx.ID().getText());
-                } else if (ctx.methodCall() != null) {
+                }
+                else if (ctx.methodCall() != null) {
                     MTExpression methodCall = visitMethodCall(ctx.methodCall());
                     if (methodCall != null) {
                         operandExpressions.add(methodCall);
                     }
                     //ECLog.logInfo(">>>> With Operator: " + opSymbol + " and method call: " + ctx.methodCall().getText());
-                } else {
+                }
+                else {
                     //ECLog.logInfo(">>>> With Operator: " + opSymbol);
                 }
 
@@ -519,7 +529,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                     MTExpression operandExpression = visitExpression(expressionContext);
                     if (operandExpression != null) {
                         operandExpressions.add(operandExpression);
-                    } else {
+                    }
+                    else {
                         ECLog.logFatal(expressionContext, "Unable to parse: " + expressionContext.getText());
                     }
                 }
@@ -529,17 +540,21 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
                 expression = new MTOperation(ctx, operator, operandExpressions);
             }
-        } else if (ctx.methodCall() != null) {
+        }
+        else if (ctx.methodCall() != null) {
             // Method call
             expression = visitMethodCall(ctx.methodCall());
-        } else if (ctx.primary() != null) {
+        }
+        else if (ctx.primary() != null) {
             // Constant or a variable
             EntityLanguageParser.ConstantContext constantContext = ctx.primary().constant();
             if (constantContext != null) {
                 expression = visitConstant(ctx.primary().constant());
-            } else if (ctx.primary().expression() != null) {
+            }
+            else if (ctx.primary().expression() != null) {
                 expression = visitExpression(ctx.primary().expression());
-            } else if (ctx.primary().ident() != null) {
+            }
+            else if (ctx.primary().ident() != null) {
 
                 // could be either an entity attribute name or a config of an interface
                 if (currentDomainEntityInterfaceOperation != null
@@ -551,27 +566,30 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                             return expression;
                         }
                     }
-                } else {
+                }
+                else {
                     //ECLog.logInfo(ctx.primary(), "No domain operation context here: " + ctx.primary().ID().getText());
                 }
                 // variable to an attribute name or other variable in the model
                 if (currentDomainEntity == null) {
                     expression = new MTOperand(ctx.primary(), MTOperand.Type.ATTRIBUTE, currentEntity.getName(),
-                                               ctx.primary().ident().getText());
+                        ctx.primary().ident().getText());
                     //ECLog.logFatal(ctx.primary(), "Attribute references can only be made in the context of an entity.");
-                } else {
+                }
+                else {
                     expression = new MTOperand(ctx.primary(), MTOperand.Type.ATTRIBUTE,
-                                               currentDomainEntity.getEntityName(), ctx.primary().ident().getText());
+                        currentDomainEntity.getEntityName(), ctx.primary().ident().getText());
                 }
             }
-        } else if (ctx.prefix != null) {
+        }
+        else if (ctx.prefix != null) {
             String opSymbol = ctx.prefix.getText();
             if (MTOperation.Operator.isValidOperator(opSymbol)) {
                 if (ctx.expression().size() < 1) {
                     ECLog.logFatal(ctx, "Unsupported expression: " + ctx.getText());
                 }
                 MTOperation.Operator operator = MTOperation.Operator.getOperatorBySymbol(opSymbol);
-                List<MTExpression>   operands = new ArrayList<>();
+                List<MTExpression> operands = new ArrayList<>();
                 operands.add(visitExpression(ctx.expression().get(0)));
                 expression = new MTOperation(ctx, operator, operands);
             }
@@ -587,14 +605,18 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         MTConstant expression = null;
         if (ctx.STRING() != null) {
             expression = new MTConstant(ctx, ctx.STRING().getText());
-        } else if (ctx.INTEGER() != null) {
+        }
+        else if (ctx.INTEGER() != null) {
             expression = new MTConstant(ctx, Long.valueOf(ctx.INTEGER().getText()));
-        } else if (ctx.FLOAT() != null) {
+        }
+        else if (ctx.FLOAT() != null) {
             expression = new MTConstant(ctx, Double.valueOf(ctx.FLOAT().getText()));
-        } else if (ctx.BOOLEAN != null) {
+        }
+        else if (ctx.BOOLEAN != null) {
             boolean value = ctx.BOOLEAN.getText().equals("true");
             expression = new MTConstant(ctx, value);
-        } else {
+        }
+        else {
             ECLog.logFatal(ctx, "Unknown constant: " + ctx.getText());
         }
         return expression;
@@ -611,7 +633,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                 MTExpression operandExpression = visitExpression(expressionContext);
                 if (operandExpression != null) {
                     methodCall.addArgument(operandExpression);
-                } else {
+                }
+                else {
                     ECLog.logFatal(expressionContext, "Unable to parse: " + expressionContext.getText());
                 }
             }
@@ -629,7 +652,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                 ECLog.logFatal("Command line define variable \"" + ctx.id().getText() + "\" not set.");
             }
             path = idPath;
-        } else {
+        }
+        else {
             path = ECStringUtil.ProcessParserString(ctx.STRING().getText());
         }
         return path;
@@ -637,13 +661,13 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public Object visitRepository(EntityLanguageParser.RepositoryContext ctx) {
-        MTRepository                               repository            = new MTRepository(ctx, ctx.id().getText());
+        MTRepository repository = new MTRepository(ctx, ctx.id().getText());
         EntityLanguageParser.RepositoryBodyContext repositoryBodyContext = ctx.repositoryBody();
 
         List<EntityLanguageParser.RepositoryOrganizationContext> repositoryOrganizationContexts = repositoryBodyContext.repositoryOrganization();
         if (repositoryOrganizationContexts != null && repositoryOrganizationContexts.size() > 0) {
             repository.setOrganization(
-                    ECStringUtil.ProcessParserString(repositoryOrganizationContexts.get(0).STRING().getText()));
+                ECStringUtil.ProcessParserString(repositoryOrganizationContexts.get(0).STRING().getText()));
         }
 
         List<EntityLanguageParser.RepositoryNameContext> repositoryNameContexts = repositoryBodyContext.repositoryName();
@@ -669,7 +693,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             MTRepositoryType type = MTRepositoryType.FromName(repositoryTypeContexts.get(0).id().getText());
             if (type == null) {
                 ECLog.logFatal(repositoryTypeContexts.get(0),
-                               "Unknown repository type: " + repositoryTypeContexts.get(0).id().getText());
+                    "Unknown repository type: " + repositoryTypeContexts.get(0).id().getText());
             }
             repository.setType(type);
         }
@@ -683,8 +707,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     public MTSpace currentSpace() {
         return hasCurrentSpace() ?
-               spaceStack.peek() :
-               null;
+            spaceStack.peek() :
+            null;
     }
 
     private boolean hasCurrentSpace() {
@@ -710,10 +734,11 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         int numNamespaces = body.spaceNamespace().size();
         if (numNamespaces > 1) {
             ECLog.logError(body, "Only one namespace declaration is allowed.");
-        } else if (numNamespaces == 1) {
+        }
+        else if (numNamespaces == 1) {
             EntityLanguageParser.SpaceNamespaceContext ns = body.spaceNamespace(0);
             space.setNamespace(
-                    new MTNamespace(ns, segmentsForPathID(ns.namespaceIdent().id()).toArray(new String[0]), false));
+                new MTNamespace(ns, segmentsForPathID(ns.namespaceIdent().id()).toArray(new String[0]), false));
         }
 
 //        List<EntityLanguageParser.SpaceImportContext> importContexts = body.spaceImport();
@@ -762,9 +787,11 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         for (EntityLanguageParser.OutputSpecContext outputSpecContext : ctx.protocBody().outputSpec()) {
             if (outputSpecContext.id().size() == 1) {
                 protoc.setSourceOutputName(outputSpecContext.id(0).getText());
-            } else if (outputSpecContext.id(0).getText().equals("source")) {
+            }
+            else if (outputSpecContext.id(0).getText().equals("source")) {
                 protoc.setSourceOutputName(outputSpecContext.id(1).getText());
-            } else if (outputSpecContext.id(0).getText().equals("header")) {
+            }
+            else if (outputSpecContext.id(0).getText().equals("header")) {
                 protoc.setHeaderOutputName(outputSpecContext.id(1).getText());
             }
         }
@@ -786,9 +813,9 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     public MTSpaceImport visitSpaceImport(EntityLanguageParser.SpaceImportContext ctx) {
         MTSpaceImport modelImport = new MTSpaceImport();
         for (EntityLanguageParser.IdContext idContext : ctx.idList().id()) {
-            MTRepositoryImport repoImport     = new MTRepositoryImport(ctx, false);
-            String             filename       = idContext.getText();
-            String             repositoryName = idText(ctx.id());
+            MTRepositoryImport repoImport = new MTRepositoryImport(ctx, false);
+            String filename = idContext.getText();
+            String repositoryName = idText(ctx.id());
             repoImport.setFilename(filename);
             repoImport.setRepositoryName(repositoryName);
             modelImport.addImport(repoImport);
@@ -802,9 +829,9 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         MTSpaceInclude spaceInclude = new MTSpaceInclude();
 
         for (EntityLanguageParser.IdContext idContext : ctx.idList().id()) {
-            MTRepositoryImport modelImport    = new MTRepositoryImport(ctx, true);
-            String             filename       = idContext.getText();
-            String             repositoryName = idText(ctx.id());
+            MTRepositoryImport modelImport = new MTRepositoryImport(ctx, true);
+            String filename = idContext.getText();
+            String repositoryName = idText(ctx.id());
             modelImport.setFilename(filename);
             modelImport.setRepositoryName(repositoryName);
             spaceInclude.addImport(modelImport);
@@ -831,8 +858,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTModule visitModule(EntityLanguageParser.ModuleContext ctx) {
-        String   moduleName = ctx.id().getText();
-        MTModule module     = currentSpace().getModuleWithName(moduleName);
+        String moduleName = ctx.id().getText();
+        MTModule module = currentSpace().getModuleWithName(moduleName);
         if (module == null) {
             module = new MTModule(ctx, currentSpace(), moduleName);
         }
@@ -845,13 +872,13 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     }
 
     private void setNodeDescription
-            (MTNode node,
-             List<EntityLanguageParser.DescriptionStatementContext> statementContexts,
-             boolean append) {
-        StringBuilder              mainBuilder    = new StringBuilder();
-        StringBuilder              summaryBuilder = new StringBuilder();
-        StringBuilder              detailBuilder  = new StringBuilder();
-        Map<String, StringBuilder> builderMap     = new HashMap<>();
+        (MTNode node,
+         List<EntityLanguageParser.DescriptionStatementContext> statementContexts,
+         boolean append) {
+        StringBuilder mainBuilder = new StringBuilder();
+        StringBuilder summaryBuilder = new StringBuilder();
+        StringBuilder detailBuilder = new StringBuilder();
+        Map<String, StringBuilder> builderMap = new HashMap<>();
         builderMap.put("main", mainBuilder);
         builderMap.put("summary", summaryBuilder);
         builderMap.put("detail", detailBuilder);
@@ -859,14 +886,15 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             List<String> types = new ArrayList<>();
             if (statementContext.id().size() == 0) {
                 types.add("main"); // default when none specified
-            } else {
+            }
+            else {
                 types =
-                        statementContext.id().stream()
-                                        .map(EntityLanguageParser.IdContext::getText)
-                                        .collect(Collectors.toList());
+                    statementContext.id().stream()
+                        .map(EntityLanguageParser.IdContext::getText)
+                        .collect(Collectors.toList());
             }
             String lineWithQuotes = statementContext.STRING().getSymbol().getText();
-            String line           = ECStringUtil.ProcessParserString(lineWithQuotes).trim();
+            String line = ECStringUtil.ProcessParserString(lineWithQuotes).trim();
 
             if (line.equals("")) {
                 line = "\n\n";
@@ -876,8 +904,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                 if (!builderMap.containsKey(type)) {
                     ECLog.logFatal("Description type of \"" + type + "\" not supported.");
                 }
-                StringBuilder builder       = builderMap.get(type);
-                int           builderLength = builder.length();
+                StringBuilder builder = builderMap.get(type);
+                int builderLength = builder.length();
                 if (builderLength > 0) {
                     char lastChar = builder.charAt(builderLength - 1);
                     if (lastChar != '\n' && line.charAt(0) != '\n') {
@@ -892,7 +920,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             mainString = mainString.replace("\\\"", "\"");
             if (append) {
                 node.appendDescription(mainString);
-            } else {
+            }
+            else {
                 node.setDescription(mainString);
             }
         }
@@ -901,7 +930,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             summaryString = summaryString.replace("\\\"", "\"");
             if (append) {
                 node.appendSummary(summaryString);
-            } else {
+            }
+            else {
                 node.setSummary(summaryString);
             }
         }
@@ -910,7 +940,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             detailString = detailString.replace("\\\"", "\"");
             if (append) {
                 node.appendDetail(detailString);
-            } else {
+            }
+            else {
                 node.setDetail(detailString);
             }
         }
@@ -933,8 +964,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTEntity visitEntity(EntityLanguageParser.EntityContext ctx) {
-        List<String>                                   templateArgs        = new ArrayList<>();
-        String                                         entityName          = null;
+        List<String> templateArgs = new ArrayList<>();
+        String entityName = null;
         EntityLanguageParser.EntityTemplateDeclContext templateDeclContext = ctx.entityDecl().entityTemplateDecl();
         currentDomainEntity = null;
 
@@ -944,8 +975,9 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                 templateArgs.add(templateDeclContext.id(i).getText());
             }
             currentEntity = new MTEntityTemplate(ctx, currentModule, entityName, templateArgs);
-        } else {
-            entityName    = ctx.entityDecl().entityName().id().getText();
+        }
+        else {
+            entityName = ctx.entityDecl().entityName().id().getText();
             currentEntity = new MTEntity(ctx, currentModule, entityName);
         }
 
@@ -954,7 +986,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
         if (ctx.entityDecl().PRIMARY() != null) {
             currentEntity.setDeclaredAsPrimary(true);
-        } else if (ctx.entityDecl().SECONDARY() != null) {
+        }
+        else if (ctx.entityDecl().SECONDARY() != null) {
             currentEntity.setDeclaredAsSecondary(true);
         }
 
@@ -984,17 +1017,18 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         if (primaryKeyAttributes.size() > 0) {
             if (currentEntity.isDeclaredAsSecondary()) {
                 ECLog.logError(ctx.entityDecl().entityName().id(),
-                               "A secondary entity \"" + currentEntity.getName() + "\" cannot declare a primary key!");
+                    "A secondary entity \"" + currentEntity.getName() + "\" cannot declare a primary key!");
             }
             MTPrimaryKey primaryKey = new MTPrimaryKey(ctx);
             for (MTAttribute attribute : primaryKeyAttributes) {
                 primaryKey.addAttribute(attribute);
             }
             currentEntity.setPrimaryKey(primaryKey);
-        } else {
+        }
+        else {
             if (currentEntity.isDeclaredAsPrimary() && !currentEntity.isTransient()) {
                 ECLog.logError(ctx.entityDecl().entityName().id(),
-                               "A primary entity \"" + currentEntity.getName() + "\" must declare a primary key!");
+                    "A primary entity \"" + currentEntity.getName() + "\" must declare a primary key!");
             }
         }
 
@@ -1041,8 +1075,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTEnum visitEnumStatement(EntityLanguageParser.EnumStatementContext ctx) {
-        String  enumName = ctx.id().getText();
-        boolean extern   = ctx.EXTERN() != null;
+        String enumName = ctx.id().getText();
+        boolean extern = ctx.EXTERN() != null;
         if (extern) {
             MTEnum existingEnum = currentSpace().getEnumWithName(enumName);
             if (existingEnum != null) {
@@ -1056,8 +1090,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         }
         mtEnum.addTagsWithValues(tagStringsFromTagStatements(ctx.tagStatement()));
         for (EntityLanguageParser.EnumItemContext ic : ctx.enumItem()) {
-            String     itemName   = ic.id().getText();
-            Integer    itemNumber = Integer.valueOf(ic.INTEGER().getSymbol().getText());
+            String itemName = ic.id().getText();
+            Integer itemNumber = Integer.valueOf(ic.INTEGER().getSymbol().getText());
             MTEnumItem mtEnumItem = mtEnum.addItem(ic, itemName, itemNumber);
             if (ic.enumItemBody() != null && ic.enumItemBody().tagStatement() != null) {
                 mtEnumItem.addTagsWithValues(tagStringsFromTagStatements(ic.enumItemBody().tagStatement()));
@@ -1080,10 +1114,10 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTDView visitView(EntityLanguageParser.ViewContext ctx) {
-        String  currentEntityName = currentDomainEntity != null ?
-                                    currentDomainEntity.getEntityName() :
-                                    null;
-        MTDView domainView        = new MTDView(ctx, currentDomain, currentEntityName, ctx.id().getText());
+        String currentEntityName = currentDomainEntity != null ?
+            currentDomainEntity.getEntityName() :
+            null;
+        MTDView domainView = new MTDView(ctx, currentDomain, currentEntityName, ctx.id().getText());
         // , ctx.DEFAULT() != null
         if (ctx.viewBlock() != null) {
             EntityLanguageParser.ViewBlockContext viewBlockContext = ctx.viewBlock();
@@ -1096,7 +1130,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             if (viewBlockContext.viewAttributes() != null && viewBlockContext.viewAttributes().size() > 0) {
                 if (viewBlockContext.viewAttributes().size() > 1) {
                     ECLog.logFatal(viewBlockContext.viewAttributes(1),
-                                   "Only specify one attributes section of a view.");
+                        "Only specify one attributes section of a view.");
                 }
                 // INCLUDE
                 EntityLanguageParser.ViewAttributesContext attributesContext = viewBlockContext.viewAttributes(0);
@@ -1107,21 +1141,27 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                         for (MTTagSet tagSet : visitViewTaggedList(vaiContext.viewTaggedList())) {
                             if (secondaryEntities) {
                                 domainView.addIncludedAttributeSecondaryEntityTagSet(tagSet);
-                            } else {
+                            }
+                            else {
                                 domainView.addIncludedAttributeTagSet(tagSet);
                             }
                         }
-                    } else if (vaiContext.ARRAY() != null) {
+                    }
+                    else if (vaiContext.ARRAY() != null) {
                         domainView.setIncludedArrayAttributes(true);
-                    } else if (vaiContext.CREATION() != null) {
+                    }
+                    else if (vaiContext.CREATION() != null) {
                         domainView.setIncludedCreationAttributes(true);
-                    } else if (vaiContext.MODIFICATION() != null) {
+                    }
+                    else if (vaiContext.MODIFICATION() != null) {
                         domainView.setIncludedModificationAttributes(true);
-                    } else if (vaiContext.viewIdentifierList() != null && !vaiContext.viewIdentifierList().isEmpty()) {
+                    }
+                    else if (vaiContext.viewIdentifierList() != null && !vaiContext.viewIdentifierList().isEmpty()) {
                         for (EntityLanguageParser.IdContext attrName : vaiContext.viewIdentifierList().id()) {
                             domainView.addIncludedAttributeName(attrName.getText());
                         }
-                    } else {
+                    }
+                    else {
                         domainView.setIncludedAllAttributes(true);
                     }
                 }
@@ -1133,21 +1173,27 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                         for (MTTagSet tagSet : visitViewTaggedList(vaeContext.viewTaggedList())) {
                             if (secondaryEntities) {
                                 domainView.addExcludedAttributeSecondaryEntityTagSet(tagSet);
-                            } else {
+                            }
+                            else {
                                 domainView.addExcludedAttributeTagSet(tagSet);
                             }
                         }
-                    } else if (vaeContext.ARRAY() != null) {
+                    }
+                    else if (vaeContext.ARRAY() != null) {
                         domainView.setExcludedArrayAttributes(true);
-                    } else if (vaeContext.CREATION() != null) {
+                    }
+                    else if (vaeContext.CREATION() != null) {
                         domainView.setExcludedCreationAttributes(true);
-                    } else if (vaeContext.MODIFICATION() != null) {
+                    }
+                    else if (vaeContext.MODIFICATION() != null) {
                         domainView.setExcludedModificationAttributes(true);
-                    } else if (vaeContext.viewIdentifierList() != null && !vaeContext.viewIdentifierList().isEmpty()) {
+                    }
+                    else if (vaeContext.viewIdentifierList() != null && !vaeContext.viewIdentifierList().isEmpty()) {
                         for (EntityLanguageParser.IdContext attrName : vaeContext.viewIdentifierList().id()) {
                             domainView.addExcludedAttributeName(attrName.getText());
                         }
-                    } else {
+                    }
+                    else {
                         domainView.setExcludedAllAttributes(true);
                     }
                 }
@@ -1156,50 +1202,55 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             if (viewBlockContext.viewRelationships() != null && viewBlockContext.viewRelationships().size() > 0) {
                 if (viewBlockContext.viewRelationships().size() > 1) {
                     ECLog.logFatal(viewBlockContext.viewRelationships(1),
-                                   "Only specify one relationships section of a view.");
+                        "Only specify one relationships section of a view.");
                 }
                 // INCLUDE
                 EntityLanguageParser.ViewRelationshipsContext relationshipsContext = viewBlockContext.viewRelationships(
-                        0);
+                    0);
                 for (EntityLanguageParser.ViewRelationshipIncludeContext vriContext : relationshipsContext.viewRelationshipsBlock().viewRelationshipInclude()) {
-                    boolean hasAs                     = vriContext.AS() != null;
-                    boolean hasWithView               = vriContext.WITH() != null && vriContext.VIEW() != null;
-                    boolean entityRef                 = vriContext.ENTITY() != null;
-                    int     usedIdCount               = (hasAs ?
-                                                         1 :
-                                                         0) + (hasWithView ?
-                                                               1 :
-                                                               0);
+                    boolean hasAs = vriContext.AS() != null;
+                    boolean hasWithView = vriContext.WITH() != null && vriContext.VIEW() != null;
+                    boolean entityRef = vriContext.ENTITY() != null;
+                    int usedIdCount = (hasAs ?
+                        1 :
+                        0) + (hasWithView ?
+                        1 :
+                        0);
                     boolean hasEntityOrRelationshipId = vriContext.id().size() > usedIdCount;
-                    int     viewIdIndex               = hasEntityOrRelationshipId ?
-                                                        1 :
-                                                        0;
-                    String  relationshipOrEntityName  = hasEntityOrRelationshipId ?
-                                                        vriContext.id(0).getText() :
-                                                        null;
+                    int viewIdIndex = hasEntityOrRelationshipId ?
+                        1 :
+                        0;
+                    String relationshipOrEntityName = hasEntityOrRelationshipId ?
+                        vriContext.id(0).getText() :
+                        null;
 
                     if (vriContext.TAGGED() != null) {
                         for (MTTagSet tagSet : visitViewTaggedList(vriContext.viewTaggedList())) {
                             domainView.addIncludedRelationshipTagSet(tagSet);
                         }
-                    } else if (!hasEntityOrRelationshipId) {
+                    }
+                    else if (!hasEntityOrRelationshipId) {
                         if (vriContext.PARENT() != null) {
                             domainView.setIncludedParentRelationships(true);
-                        } else if (vriContext.TOONE() != null) {
+                        }
+                        else if (vriContext.TOONE() != null) {
                             domainView.setIncludedOneRelationships(true);
-                        } else if (vriContext.TOMANY() != null) {
+                        }
+                        else if (vriContext.TOMANY() != null) {
                             domainView.setIncludedManyRelationships(true);
                         }
-                    } else {
+                    }
+                    else {
 
                         if (entityRef) {
                             domainView.addIncludedRelationshipEntityName(relationshipOrEntityName);
                             if (vriContext.AS() != null) {
                                 domainView.renameRelationshipOfEntityName(relationshipOrEntityName,
-                                                                          vriContext.id(1).getText());
+                                    vriContext.id(1).getText());
                                 viewIdIndex++;
                             }
-                        } else {
+                        }
+                        else {
                             domainView.addIncludedRelationshipName(relationshipOrEntityName);
                             if (vriContext.AS() != null) {
                                 domainView.renameRelationship(relationshipOrEntityName, vriContext.id(1).getText());
@@ -1212,17 +1263,22 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                             String viewName = vriContext.id(viewIdIndex).getText();
                             if (relationshipOrEntityName == null) {
                                 domainView.setRelationshipWithViewName(viewName);
-                            } else if (entityRef) {
+                            }
+                            else if (entityRef) {
                                 domainView.setViewNameForRelationshipEntityName(relationshipOrEntityName, viewName);
-                            } else {
+                            }
+                            else {
                                 domainView.setViewNameForRelationshipName(relationshipOrEntityName, viewName);
                             }
-                        } else if (vriContext.PRIMARYKEY() != null) {
+                        }
+                        else if (vriContext.PRIMARYKEY() != null) {
                             if (relationshipOrEntityName == null) {
                                 domainView.setRelationshipWithPrimaryKey(true);
-                            } else if (entityRef) {
+                            }
+                            else if (entityRef) {
                                 domainView.setPrimaryKeyForRelationshipEntityName(relationshipOrEntityName);
-                            } else {
+                            }
+                            else {
                                 domainView.setPrimaryKeyForRelationshipName(relationshipOrEntityName);
                             }
                         }
@@ -1235,27 +1291,34 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                         for (MTTagSet tagSet : visitViewTaggedList(vreContext.viewTaggedList())) {
                             domainView.addExcludedRelationshipTagSet(tagSet);
                         }
-                    } else if (!hasEntityOrRelationshipId) {
+                    }
+                    else if (!hasEntityOrRelationshipId) {
                         if (vreContext.PARENT() != null) {
                             domainView.setExcludedParentRelationships(true);
-                        } else if (vreContext.TOONE() != null) {
+                        }
+                        else if (vreContext.TOONE() != null) {
                             domainView.setExcludedOneRelationships(true);
-                        } else if (vreContext.TOMANY() != null) {
+                        }
+                        else if (vreContext.TOMANY() != null) {
                             domainView.setExcludedManyRelationships(true);
-                        } else {
+                        }
+                        else {
                             domainView.setExcludedAllRelationships(true);
                         }
-                    } else if (vreContext.TOONE() != null || vreContext.TOMANY() != null
-                               || vreContext.PARENT() != null) {
+                    }
+                    else if (vreContext.TOONE() != null || vreContext.TOMANY() != null
+                        || vreContext.PARENT() != null) {
                         boolean entityRef = vreContext.ENTITY() != null;
 
                         String relationshipOrEntityName = vreContext.id().getText();
                         if (entityRef) {
                             domainView.addExcludedRelationshipEntityName(relationshipOrEntityName);
-                        } else {
+                        }
+                        else {
                             domainView.addExcludedRelationshipName(relationshipOrEntityName);
                         }
-                    } else {
+                    }
+                    else {
                         domainView.setExcludedAllRelationships(true);
                     }
                 }
@@ -1301,13 +1364,13 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         if (ctx.MANY() != null) {
             toPlurality = HalfRelationshipPlurality.MANY;
         }
-        String                        fromEntityName   = currentEntity.getName();
-        String                        toEntityName     = null;
-        String                        relationshipName = null;
-        MTEntityTemplateInstantiation instantiation    = null;
+        String fromEntityName = currentEntity.getName();
+        String toEntityName = null;
+        String relationshipName = null;
+        MTEntityTemplateInstantiation instantiation = null;
         if (ctx.relationshipTemplateAs() != null) {
             instantiation = new MTEntityTemplateInstantiation(ctx.relationshipTemplateAs(),
-                                                              ctx.relationshipTemplateAs().id().getText());
+                ctx.relationshipTemplateAs().id().getText());
             for (EntityLanguageParser.RelationshipTemplateArgContext argContext : ctx.relationshipTemplateAs().relationshipTemplateArg()) {
                 instantiation.addTemplateArgEntityName(argContext.id().getText(), argContext.UNIQUE() != null);
             }
@@ -1315,13 +1378,14 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         toEntityName = ctx.id(0).getText();
         if (ctx.id().size() == 1) {
             relationshipName = ECStringUtil.Uncapitalize(toEntityName);
-        } else {
+        }
+        else {
             relationshipName = ctx.id(1).getText();
         }
 
-        boolean optional    = ctx.OPTIONAL() != null;
-        boolean parent      = ctx.PARENT() != null;
-        String  reverseName = null;
+        boolean optional = ctx.OPTIONAL() != null;
+        boolean parent = ctx.PARENT() != null;
+        String reverseName = null;
 
         if (ctx.relationshipReverseName() != null && ctx.relationshipReverseName().id() != null) {
             reverseName = ctx.relationshipReverseName().id().getText();
@@ -1333,8 +1397,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         }
 
         MTRelationship relationship = new MTRelationship(ctx, relationshipName, fromEntityName, toPlurality,
-                                                         toEntityName, optional, parent, reverseName, toEntityIdName,
-                                                         null);
+            toEntityName, optional, parent, reverseName, toEntityIdName,
+            null);
 
         if (inheritedTags != null) {
             relationship.addTagsWithValues(inheritedTags);
@@ -1353,21 +1417,21 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTAttributeConstraint visitAttributeConstraint(EntityLanguageParser.AttributeConstraintContext ctx) {
-        String                                              constraintName = ctx.id().getText();
-        EntityLanguageParser.AttributeConstraintBodyContext block          = ctx.attributeConstraintBody();
+        String constraintName = ctx.id().getText();
+        EntityLanguageParser.AttributeConstraintBodyContext block = ctx.attributeConstraintBody();
         if (block == null || block.expression().size() == 0) {
             ECLog.logFatal("Attribute constraints must have an expression. Constraint " + currentEntity.getName() + "."
-                           + currentAttribute.getName() + "." + constraintName + " does not.");
+                + currentAttribute.getName() + "." + constraintName + " does not.");
         }
         if (ctx.attributeConstraintBody().expression().size() > 1) {
             ECLog.logFatal(
-                    "Attribute constraints can only have one expression. Constraint " + currentEntity.getName() + "."
+                "Attribute constraints can only have one expression. Constraint " + currentEntity.getName() + "."
                     + currentAttribute.getName() + "." + constraintName + " is specified with "
                     + ctx.attributeConstraintBody().expression().size() + " expressions: "
                     + ctx.attributeConstraintBody().expression().toString());
         }
         MTAttributeConstraint constraint = new MTAttributeConstraint(ctx, currentAttribute, constraintName,
-                                                                     visitExpression(block.expression(0)));
+            visitExpression(block.expression(0)));
 
         if (block.descriptionStatement() != null) {
             setNodeDescription(constraint, block.descriptionStatement(), false);
@@ -1382,21 +1446,29 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTDomain visitDomain(EntityLanguageParser.DomainContext ctx) {
-        String  name                = ctx.ID(0).getText();
-        boolean extending           = ctx.EXTENDS() != null;
-        boolean specializing        = !extending && (ctx.ID().size() > 1);
-        String  extendingDomainName = extending ?
-                                      ctx.ID(1).getText() :
-                                      null;
-        String  specializingName    = specializing ?
-                                      ctx.ID(1).getText() :
-                                      null;
+        String name = ctx.ID(0).getText();
+        boolean extending = ctx.EXTENDS() != null;
+        boolean specializing = !extending && (ctx.ID().size() > 1);
+        String extendingDomainName = extending ?
+            ctx.ID(1).getText() :
+            null;
+        String specializingName = specializing ?
+            ctx.ID(1).getText() :
+            null;
 
+        if (currentRealm != null) {
+            ECLog.logInfo("Visiting domain: " + name + " in realm: " + currentRealm.getName());
+            if (!specializing) {
+                ECLog.logFatal("Only specialized domains can be defined in a realm. Domain: " + name + " realm: " + currentRealm.getName());
+            }
+        }
         if (currentSpace().getDomainWithName(name) != null) {
             currentDomain = currentSpace().getDomainWithName(name);
-        } else {
+        }
+        else {
             currentDomain = new MTDomain(ctx, currentSpace(), name, extendingDomainName);
         }
+
         if (specializingName != null) {
             currentDomain.addSpecializedAsName(specializingName);
         }
@@ -1446,11 +1518,12 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         int numNamespaces = block.domainNamespace().size();
         if (numNamespaces > 1) {
             ECLog.logError(block, "Only one namespace declaration is allowed.");
-        } else if (numNamespaces == 1) {
+        }
+        else if (numNamespaces == 1) {
             EntityLanguageParser.DomainNamespaceContext ns = block.domainNamespace(0);
             currentDomain.setNamespace(
-                    new MTNamespace(ns, segmentsForPathID(ns.namespaceIdent().id()).toArray(new String[0]),
-                                    ns.SPACE() != null));
+                new MTNamespace(ns, segmentsForPathID(ns.namespaceIdent().id()).toArray(new String[0]),
+                    ns.SPACE() != null));
         }
 
         if (block.domainFlattenSecondaryEntities() != null
@@ -1478,9 +1551,9 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTDApplyTemplate visitDomainApplyTemplate(EntityLanguageParser.DomainApplyTemplateContext ctx) {
-        MTDApplyTemplate                                    applyTemplate = new MTDApplyTemplate(ctx, currentDomain,
-                                                                                                 ctx.id().getText());
-        EntityLanguageParser.DomainApplyTemplateBodyContext body          = ctx.domainApplyTemplateBody();
+        MTDApplyTemplate applyTemplate = new MTDApplyTemplate(ctx, currentDomain,
+            ctx.id().getText());
+        EntityLanguageParser.DomainApplyTemplateBodyContext body = ctx.domainApplyTemplateBody();
         if (body != null) {
             if (body.descriptionStatement() != null) {
                 setNodeDescription(applyTemplate, body.descriptionStatement(), false);
@@ -1488,8 +1561,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             if (body.tagStatement() != null) {
                 applyTemplate.addTagsWithValues(tagStringsFromTagStatements(body.tagStatement()));
             }
-            if (body.templateConfig() != null && body.templateConfig().size() > 0) {
-                EntityLanguageParser.TemplateConfigContext configContext = body.templateConfig().get(0);
+            if (body.transformConfig() != null && body.transformConfig().size() > 0) {
+                EntityLanguageParser.TransformConfigContext configContext = body.transformConfig().get(0);
                 applyTemplate.setConfig(visitJsonObj(configContext.jsonObj()));
             }
         }
@@ -1500,19 +1573,24 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     public JsonObject visitJsonObj(EntityLanguageParser.JsonObjContext ctx) {
         JsonObjectBuilder builder = Json.createObjectBuilder();
         for (EntityLanguageParser.JsonPairContext context : ctx.jsonPair()) {
-            String name  = ECStringUtil.ProcessParserString(context.STRING().getText());
+            String name = ECStringUtil.ProcessParserString(context.STRING().getText());
             Object value = visitJsonValue(context.jsonValue());
             if (value instanceof JsonArray) {
                 builder.add(name, (JsonArray) value);
-            } else if (value instanceof JsonObject) {
+            }
+            else if (value instanceof JsonObject) {
                 builder.add(name, (JsonObject) value);
-            } else if (value instanceof JsonValue) {
+            }
+            else if (value instanceof JsonValue) {
                 builder.add(name, (JsonValue) value);
-            } else if (value instanceof Long) {
+            }
+            else if (value instanceof Long) {
                 builder.add(name, ((Long) value).longValue());
-            } else if (value instanceof Double) {
+            }
+            else if (value instanceof Double) {
                 builder.add(name, ((Double) value).doubleValue());
-            } else if (value instanceof String) {
+            }
+            else if (value instanceof String) {
                 builder.add(name, (String) value);
             }
         }
@@ -1523,19 +1601,26 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     public Object visitJsonValue(EntityLanguageParser.JsonValueContext ctx) {
         if (ctx.jsonArr() != null) {
             return visitJsonArr(ctx.jsonArr());
-        } else if (ctx.jsonObj() != null) {
+        }
+        else if (ctx.jsonObj() != null) {
             return visitJsonObj(ctx.jsonObj());
-        } else if (ctx.STRING() != null) {
+        }
+        else if (ctx.STRING() != null) {
             return ECStringUtil.ProcessParserString(ctx.STRING().getText());
-        } else if (ctx.FLOAT() != null) {
+        }
+        else if (ctx.FLOAT() != null) {
             return Double.valueOf(ctx.FLOAT().getText());
-        } else if (ctx.INTEGER() != null) {
+        }
+        else if (ctx.INTEGER() != null) {
             return Long.valueOf(ctx.INTEGER().getText());
-        } else if (ctx.getText().equals("true")) {
+        }
+        else if (ctx.getText().equals("true")) {
             return JsonValue.TRUE;
-        } else if (ctx.getText().equals("false")) {
+        }
+        else if (ctx.getText().equals("false")) {
             return JsonValue.FALSE;
-        } else if (ctx.getText().equals("null")) {
+        }
+        else if (ctx.getText().equals("null")) {
             return JsonValue.NULL;
         }
         ECLog.logFatal(ctx, "Specified Json value is not supported: " + ctx.getText());
@@ -1545,20 +1630,25 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     @Override
     public Object visitDomainTagging(EntityLanguageParser.DomainTaggingContext ctx) {
         for (EntityLanguageParser.DomainTaggingTagContext taggingTagContext : ctx.domainTaggingTag()) {
-            MTTagDef     tagDef     = visitDomainTaggingTag(taggingTagContext);
-            String       context    = ctx.id().getText();
+            MTTagDef tagDef = visitDomainTaggingTag(taggingTagContext);
+            String context = ctx.id().getText();
             MTTagContext tagContext = null;
             if (context.equals("entity")) {
                 tagContext = MTTagContext.ENTITY;
-            } else if (context.equals("attribute")) {
+            }
+            else if (context.equals("attribute")) {
                 tagContext = MTTagContext.ATTRIBUTE;
-            } else if (context.equals("relationship")) {
+            }
+            else if (context.equals("relationship")) {
                 tagContext = MTTagContext.RELATIONSHIP;
-            } else if (context.equals("domain")) {
+            }
+            else if (context.equals("domain")) {
                 tagContext = MTTagContext.DOMAIN;
-            } else if (context.equals("enum")) {
+            }
+            else if (context.equals("enum")) {
                 tagContext = MTTagContext.ENUM;
-            } else if (context.equals("enum_item")) {
+            }
+            else if (context.equals("enum_item")) {
                 tagContext = MTTagContext.ENUM_ITEM;
             }
             tagDef.setTagContext(tagContext);
@@ -1580,12 +1670,12 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         if (!ctx.domainTaggingTagValue().isEmpty()) {
             if (ctx.domainTaggingTagValue().size() > 1) {
                 ECLog.logFatal(ctx.domainTaggingTagValue(1),
-                               "A tag definition can only have at most one value definition.");
+                    "A tag definition can only have at most one value definition.");
             }
             EntityLanguageParser.DomainTaggingTagValueContext valueContext = ctx.domainTaggingTagValue(0);
-            MTNativeType.DataType                             dataType     = MTNativeType.DataType.FromName(
-                    valueContext.domainTaggingTagValueType().getText());
-            MTTagValueDef                                     tagValueDef  = new MTTagValueDef(valueContext, dataType);
+            MTNativeType.DataType dataType = MTNativeType.DataType.FromName(
+                valueContext.domainTaggingTagValueType().getText());
+            MTTagValueDef tagValueDef = new MTTagValueDef(valueContext, dataType);
             if (valueContext.descriptionStatement() != null) {
                 setNodeDescription(tagValueDef, valueContext.descriptionStatement(), false);
             }
@@ -1600,11 +1690,11 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     @Override
     public Object visitDomainNaming(EntityLanguageParser.DomainNamingContext ctx) {
 
-        MTNamingMethod method         = null;
-        String         prefix         = null;
-        String         suffix         = null;
-        String         primaryKeyName = null;
-        Boolean        withUnits      = null;
+        MTNamingMethod method = null;
+        String prefix = null;
+        String suffix = null;
+        String primaryKeyName = null;
+        Boolean withUnits = null;
 
         for (EntityLanguageParser.DomainNamingMethodContext methodContext : ctx.domainNamingBody().domainNamingMethod()) {
             method = MTNamingMethod.fromName(methodContext.ID().getSymbol().getText());
@@ -1634,23 +1724,31 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         for (EntityLanguageParser.NamingClassContext namingClassContext : ctx.namingClass()) {
             if (namingClassContext.SPACE() != null) {
                 classesWithNaming.add(MTSpace.class);
-            } else if (namingClassContext.MODULE() != null) {
+            }
+            else if (namingClassContext.MODULE() != null) {
                 classesWithNaming.add(MTModule.class);
-            } else if (namingClassContext.ENTITY() != null) {
+            }
+            else if (namingClassContext.ENTITY() != null) {
                 classesWithNaming.add(MTCompositeEntity.class);
                 classesWithNaming.add(MTEntity.class);
                 classesWithNaming.add(MTView.class);
-            } else if (namingClassContext.ATTRIBUTE() != null) {
+            }
+            else if (namingClassContext.ATTRIBUTE() != null) {
                 classesWithNaming.add(MTAttribute.class);
-            } else if (namingClassContext.RELATIONSHIP() != null) {
+            }
+            else if (namingClassContext.RELATIONSHIP() != null) {
                 classesWithNaming.add(MTRelationship.class);
-            } else if (namingClassContext.ENUM() != null) {
+            }
+            else if (namingClassContext.ENUM() != null) {
                 classesWithNaming.add(MTEnum.class);
-            } else if (namingClassContext.ENUMITEM() != null) {
+            }
+            else if (namingClassContext.ENUMITEM() != null) {
                 classesWithNaming.add(MTEnumItem.class);
-            } else if (namingClassContext.TYPEDEF() != null) {
+            }
+            else if (namingClassContext.TYPEDEF() != null) {
                 classesWithNaming.add(MTTypedef.class);
-            } else {
+            }
+            else {
                 ECLog.logError("That naming class is not supported: " + namingClassContext.getText());
             }
         }
@@ -1693,7 +1791,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                     ECLog.logFatal("Domain module can only have one applied template.");
                 }
                 MTDApplyTemplate applyTemplate = visitDomainModuleApplyTemplate(
-                        block.domainModuleApplyTemplate().get(0));
+                    block.domainModuleApplyTemplate().get(0));
                 currentDomainModule.setApplyTemplate(applyTemplate);
             }
         }
@@ -1757,8 +1855,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     public Object visitDomainEnum(EntityLanguageParser.DomainEnumContext ctx) {
 
         MTNamingMethod method = null;
-        String         prefix = null;
-        String         suffix = null;
+        String prefix = null;
+        String suffix = null;
 
         String currentDomainEnumName = ctx.ID().getText();
         this.currentDomainEnum = new MTDEnum(ctx, this.currentDomain, currentDomainEnumName);
@@ -1777,19 +1875,20 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             }
 
             if (block.domainEnumItemRenameTo() != null) {
-                for(EntityLanguageParser.DomainEnumItemRenameToContext renameToContext : block.domainEnumItemRenameTo()) {
+                for (EntityLanguageParser.DomainEnumItemRenameToContext renameToContext : block.domainEnumItemRenameTo()) {
                     MTDEnumItem domainEnumItem = currentDomainEnum.getDomainEnumItem(renameToContext.id(0).getText(), true);
                     domainEnumItem.setExplicitName(renameToContext.id(1).getText());
                 }
             }
 
             for (EntityLanguageParser.DomainEnumItemContext itemContext : block.domainEnumItem()) {
-                String      itemName    = itemContext.ID().getText();
+                String itemName = itemContext.ID().getText();
                 MTDEnumItem mtdEnumItem = null;
                 if (currentDomainEnum.getEnum() != null) {
                     MTEnumItem enumItem = currentDomainEnum.getEnum().getItemByName(itemName);
                     mtdEnumItem = currentDomainEnum.getDomainEnumItem(enumItem, true);
-                } else {
+                }
+                else {
                     mtdEnumItem = currentDomainEnum.getDomainEnumItem(itemName, true);
                 }
 
@@ -1848,7 +1947,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     public MTDEInterfaceOperation visitDomainOperation(EntityLanguageParser.DomainOperationContext ctx) {
 
         currentDomainEntityInterfaceOperation = new MTDEInterfaceOperation(ctx, currentDomainEntityInterface,
-                                                                           ctx.id(0).getText(), ctx.id(1).getText());
+            ctx.id(0).getText(), ctx.id(1).getText());
         if (ctx.EXTENDS() != null) {
 
             EntityLanguageParser.ExtendingOperationBodyContext body = ctx.extendingOperationBody();
@@ -1858,14 +1957,14 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
                 }
                 if (body.extendingOperationConfig() != null && body.extendingOperationConfig().size() > 0) {
                     currentDomainEntityInterfaceOperation.setExtendingOperationConfig(
-                            visitExtendingOperationConfig(body.extendingOperationConfig(0)));
+                        visitExtendingOperationConfig(body.extendingOperationConfig(0)));
                 }
                 if (body.operationRequest() != null && body.operationRequest().size() > 0) {
                     currentDomainEntityInterfaceOperation.setRequest(visitOperationRequest(body.operationRequest(0)));
                 }
                 if (body.operationResponse() != null && body.operationResponse().size() > 0) {
                     currentDomainEntityInterfaceOperation.setResponse(
-                            visitOperationResponse(body.operationResponse(0)));
+                        visitOperationResponse(body.operationResponse(0)));
                 }
 
                 visitExtendingOperationBody(body);
@@ -1878,12 +1977,12 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTDEInterfaceOperationConfig visitExtendingOperationConfig
-            (EntityLanguageParser.ExtendingOperationConfigContext ctx) {
+        (EntityLanguageParser.ExtendingOperationConfigContext ctx) {
         MTDEInterfaceOperationConfig extendingConfig = new MTDEInterfaceOperationConfig(ctx, ctx.id() != null ?
-                                                                                             ctx.id().getText() :
-                                                                                             null,
-                                                                                        currentDomainEntityInterface.getInterfaceName(),
-                                                                                        currentDomainEntityInterfaceOperation.getExtendedOperationName());
+            ctx.id().getText() :
+            null,
+            currentDomainEntityInterface.getInterfaceName(),
+            currentDomainEntityInterfaceOperation.getExtendedOperationName());
         for (EntityLanguageParser.ExtendingOperationAssignmentContext assignmentContext : ctx.extendingOperationConfigBlock().extendingOperationAssignment()) {
             extendingConfig.addConfigAssignment(assignmentContext.id(0).getText(), assignmentContext.id(1).getText());
         }
@@ -1915,11 +2014,11 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         String attributeName = ctx.id().getText();
         if (currentDomainEntity != null) {
             MTDEAttribute domainEntityAttribute = currentDomainEntity.addDomainAttributeWithName(
-                    attributeName);
+                attributeName);
             if (inheritedTags != null) {
                 domainEntityAttribute.addTagsWithValues(inheritedTags);
             }
-            EntityLanguageParser.DomainAttributeBodyContext bodyContext           = ctx.domainAttributeBody();
+            EntityLanguageParser.DomainAttributeBodyContext bodyContext = ctx.domainAttributeBody();
             if (bodyContext != null) {
                 if (bodyContext.descriptionStatement() != null) {
                     setNodeDescription(domainEntityAttribute, bodyContext.descriptionStatement(), false);
@@ -1950,11 +2049,11 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         String relationshipName = ctx.id().getText();
         if (currentDomainEntity != null) {
             MTDERelationship domainEntityRelationship = currentDomainEntity.addDomainRelationshipWithName(
-                    relationshipName);
+                relationshipName);
             if (inheritedTags != null) {
                 domainEntityRelationship.addTagsWithValues(inheritedTags);
             }
-            EntityLanguageParser.DomainRelationshipBodyContext bodyContext           = ctx.domainRelationshipBody();
+            EntityLanguageParser.DomainRelationshipBodyContext bodyContext = ctx.domainRelationshipBody();
             if (bodyContext != null) {
                 if (bodyContext.descriptionStatement() != null) {
                     setNodeDescription(domainEntityRelationship, bodyContext.descriptionStatement(), false);
@@ -1985,13 +2084,14 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public Object visitDomainAttributesRenameTo(EntityLanguageParser.DomainAttributesRenameToContext ctx) {
-        String attributeName        = ctx.id(0).getText();
+        String attributeName = ctx.id(0).getText();
         String renamedAttributeName = ctx.id(1).getText();
         if (currentDomainEntity == null) {
             currentDomain.setExplicitAttributeName(attributeName, renamedAttributeName);
-        } else {
+        }
+        else {
             currentDomainEntity.getDomainAttributeByName(attributeName, true).setExplicitAttributeName(
-                    renamedAttributeName);
+                renamedAttributeName);
         }
         return null;
     }
@@ -2007,8 +2107,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public Object visitDomainAttributeAdd(EntityLanguageParser.DomainAttributeAddContext ctx) {
-        String      attributeName = ctx.attribute().id(0).getText();
-        MTAttribute attribute     = visitAttribute(ctx.attribute());
+        String attributeName = ctx.attribute().id(0).getText();
+        MTAttribute attribute = visitAttribute(ctx.attribute());
         ECLog.logInfo(ctx, "Adding domain entity attribute: " + attribute.getName());
         if (currentDomainEntity != null) {
             currentDomainEntity.addAttribute(attribute);
@@ -2042,7 +2142,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         if (ctx.type() != null) {
             if (ctx.type().BYTE_TYPE() != null) {
                 typeName = ctx.type().BYTE_TYPE().getText();
-            } else {
+            }
+            else {
                 typeName = ctx.type().getText();
             }
         }
@@ -2060,24 +2161,25 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             unitName = ctx.id(1).getText();
         }
 
-        MTEntity    entity    = currentDomainEntity != null ?
-                                currentDomainEntity.getEntity() :
-                                currentEntity;
+        MTEntity entity = currentDomainEntity != null ?
+            currentDomainEntity.getEntity() :
+            currentEntity;
         MTAttribute attribute = new MTAttribute(ctx, entity, typeName, attributeName, unitName, arraySize);
         this.currentAttribute = attribute;
 
-        int        indexOfDefaultValueId = unitName == null ?
-                                           1 :
-                                           2;
-        MTConstant defaultValue          = null;
+        int indexOfDefaultValueId = unitName == null ?
+            1 :
+            2;
+        MTConstant defaultValue = null;
         if (ctx.constant() != null) {
             defaultValue = visitConstant(ctx.constant());
-        } else if (ctx.id().size() > indexOfDefaultValueId) {
+        }
+        else if (ctx.id().size() > indexOfDefaultValueId) {
             EntityLanguageParser.IdContext enumItemContext = ctx.id(indexOfDefaultValueId);
-            String                         enumItemName    = enumItemContext.getText();
+            String enumItemName = enumItemContext.getText();
             if (attribute.getTypeName() == null) {
                 ECLog.logFatal(enumItemContext,
-                               "The default value can only be an enum item if the attribute type is an enum.");
+                    "The default value can only be an enum item if the attribute type is an enum.");
             }
             defaultValue = new MTConstant(enumItemContext, attribute.getTypeName(), enumItemName);
         }
@@ -2129,7 +2231,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             }
             if (bodyContext.contentType() != null && bodyContext.contentType().size() > 0) {
                 attribute.setContentType(
-                        ECStringUtil.ProcessParserString(bodyContext.contentType(0).STRING().getSymbol().getText()));
+                    ECStringUtil.ProcessParserString(bodyContext.contentType(0).STRING().getSymbol().getText()));
             }
             if (bodyContext.bitfield() != null && bodyContext.bitfield().size() > 0) {
                 for (EntityLanguageParser.BitfieldContext bitfieldContext : bodyContext.bitfield()) {
@@ -2148,7 +2250,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public Object visitDomainAttributesRenameAppendPrepend
-            (EntityLanguageParser.DomainAttributesRenameAppendPrependContext ctx) {
+        (EntityLanguageParser.DomainAttributesRenameAppendPrependContext ctx) {
         return null;
     }
 
@@ -2156,8 +2258,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     public Object visitDomainAttributeReplaces(EntityLanguageParser.DomainAttributeReplacesContext ctx) {
 
         String replacingAttributeName = ctx.id(0).getText();
-        String typeName               = ctx.type().getText();
-        MTUnit unit                   = null;
+        String typeName = ctx.type().getText();
+        MTUnit unit = null;
 
         if (ctx.id().size() > 1) {
             String unitName = ctx.id(1).getText();
@@ -2169,7 +2271,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         MTNativeType.DataType dataType = MTNativeType.DataType.FromName(typeName);
 
         MTAttribute attribute = new MTAttribute(ctx, currentDomainEntity.getEntityName(), typeName,
-                                                replacingAttributeName);
+            replacingAttributeName);
         if (unit != null) {
             attribute.setUnit(unit);
         }
@@ -2180,7 +2282,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         if (dataType != null) {
             if (dataType == MTNativeType.DataType.INT32) {
                 numberOfBits = 32;
-            } else if (dataType == MTNativeType.DataType.INT64) {
+            }
+            else if (dataType == MTNativeType.DataType.INT64) {
                 numberOfBits = 64;
             }
         }
@@ -2190,11 +2293,11 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         }
 
         for (EntityLanguageParser.BitfieldContext bitfieldContext : ctx.replacesBody().bitfield()) {
-            MTBitField            bitField                = visitBitfield(bitfieldContext);
+            MTBitField bitField = visitBitfield(bitfieldContext);
             MTDEAttributeBitField domainAttributeBitField = new MTDEAttributeBitField(bitfieldContext, domainAttribute,
-                                                                                      bitField.getHigh(),
-                                                                                      bitField.getLow(),
-                                                                                      bitField.getName());
+                bitField.getHigh(),
+                bitField.getLow(),
+                bitField.getName());
             domainAttribute.addReplacedBitField(domainAttributeBitField);
         }
         // TODO: check for overlapping bit fields - display error if so
@@ -2207,12 +2310,13 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         String name = null;
         if (ctx.UNUSED() != null) {
             name = ctx.UNUSED().getText();
-        } else {
+        }
+        else {
             name = ctx.id().getText();
         }
         EntityLanguageParser.BitCountContext bitCountContext = ctx.bitCount();
         MTBitField bitField = new MTBitField(ctx, Integer.valueOf(bitCountContext.INTEGER().getText()),
-                                             name);
+            name);
         if (ctx.UNUSED() != null) {
             bitField.setUnused(true);
         }
@@ -2229,15 +2333,20 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             Object value = visitJsonValue(context);
             if (value instanceof JsonArray) {
                 builder.add((JsonArray) value);
-            } else if (value instanceof JsonObject) {
+            }
+            else if (value instanceof JsonObject) {
                 builder.add((JsonObject) value);
-            } else if (value instanceof JsonValue) {
+            }
+            else if (value instanceof JsonValue) {
                 builder.add((JsonValue) value);
-            } else if (value instanceof Long) {
+            }
+            else if (value instanceof Long) {
                 builder.add(((Long) value).longValue());
-            } else if (value instanceof Double) {
+            }
+            else if (value instanceof Double) {
                 builder.add(((Double) value).doubleValue());
-            } else if (value instanceof String) {
+            }
+            else if (value instanceof String) {
                 builder.add((String) value);
             }
         }
@@ -2246,16 +2355,16 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTDApplyTemplate visitDomainEntityApplyTemplate(EntityLanguageParser.DomainEntityApplyTemplateContext
-                                                                   ctx) {
-        MTDApplyTemplate                                    applyTemplate = new MTDApplyTemplate(ctx,
-                                                                                                 currentDomainEntity,
-                                                                                                 ctx.id().getText());
-        EntityLanguageParser.DomainApplyTemplateBodyContext body          = ctx.domainApplyTemplateBody();
+                                                               ctx) {
+        MTDApplyTemplate applyTemplate = new MTDApplyTemplate(ctx,
+            currentDomainEntity,
+            ctx.id().getText());
+        EntityLanguageParser.DomainApplyTemplateBodyContext body = ctx.domainApplyTemplateBody();
         if (ctx.domainApplyTemplateBody().descriptionStatement() != null) {
             setNodeDescription(applyTemplate, ctx.domainApplyTemplateBody().descriptionStatement(), false);
         }
-        if (body.templateConfig() != null && body.templateConfig().size() > 0) {
-            EntityLanguageParser.TemplateConfigContext configContext = body.templateConfig().get(0);
+        if (body.transformConfig() != null && body.transformConfig().size() > 0) {
+            EntityLanguageParser.TransformConfigContext configContext = body.transformConfig().get(0);
             applyTemplate.setConfig(visitJsonObj(configContext.jsonObj()));
         }
         return applyTemplate;
@@ -2263,16 +2372,16 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTDApplyTemplate visitDomainModuleApplyTemplate(EntityLanguageParser.DomainModuleApplyTemplateContext
-                                                                   ctx) {
-        MTDApplyTemplate                                    applyTemplate = new MTDApplyTemplate(ctx,
-                                                                                                 currentDomainModule,
-                                                                                                 ctx.id().getText());
-        EntityLanguageParser.DomainApplyTemplateBodyContext body          = ctx.domainApplyTemplateBody();
+                                                               ctx) {
+        MTDApplyTemplate applyTemplate = new MTDApplyTemplate(ctx,
+            currentDomainModule,
+            ctx.id().getText());
+        EntityLanguageParser.DomainApplyTemplateBodyContext body = ctx.domainApplyTemplateBody();
         if (ctx.domainApplyTemplateBody().descriptionStatement() != null) {
             setNodeDescription(applyTemplate, ctx.domainApplyTemplateBody().descriptionStatement(), false);
         }
-        if (body.templateConfig() != null && body.templateConfig().size() > 0) {
-            EntityLanguageParser.TemplateConfigContext configContext = body.templateConfig().get(0);
+        if (body.transformConfig() != null && body.transformConfig().size() > 0) {
+            EntityLanguageParser.TransformConfigContext configContext = body.transformConfig().get(0);
             applyTemplate.setConfig(visitJsonObj(configContext.jsonObj()));
         }
         return applyTemplate;
@@ -2280,7 +2389,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTDirectory visitDirectory(EntityLanguageParser.DirectoryContext ctx) {
-        MTDirectory                            output = new MTDirectory(ctx, ctx.id().getText());
+        MTDirectory output = new MTDirectory(ctx, ctx.id().getText());
         EntityLanguageParser.OutputBodyContext body = ctx.outputBody();
         if (body.descriptionStatement() != null) {
             setNodeDescription(output, body.descriptionStatement(), false);
@@ -2297,11 +2406,12 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     private String idText(EntityLanguageParser.IdContext idNode) {
         if (idNode.macro() != null) {
-            String macroName    = idNode.macro().ident(0).getText();
+            String macroName = idNode.macro().ident(0).getText();
             String defaultValue = null;
             if (idNode.macro().ident().size() > 1) {
                 defaultValue = idNode.macro().ident(1).getText();
-            } else if (idNode.macro().STRING() != null) {
+            }
+            else if (idNode.macro().STRING() != null) {
                 defaultValue = ECStringUtil.ProcessParserString(idNode.macro().STRING().getText());
             }
             String value = EntityCompiler.GetDefineValue(macroName, defaultValue);
@@ -2339,7 +2449,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public MTRepositoryImport visitTemplatesImport(EntityLanguageParser.TemplatesImportContext ctx) {
-        String             repositoryName   = ctx.id().getText();
+        String repositoryName = ctx.id().getText();
         MTRepositoryImport repositoryImport = new MTRepositoryImport(ctx, false);
         repositoryImport.setRepositoryName(repositoryName);
         return repositoryImport;
@@ -2362,18 +2472,20 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         for (EntityLanguageParser.OutputSpecContext specContext : body.outputSpec()) {
             if (specContext.id().size() == 2) {
                 template.addNamedOutput(specContext.id(0).getText(), specContext.id(1).getText());
-            } else if (specContext.id().size() == 1) {
+            }
+            else if (specContext.id().size() == 1) {
                 template.addNamedOutput(specContext.PRIMARY().getText(), specContext.id(0).getText());
-            } else {
+            }
+            else {
                 ECLog.logFatal(ctx, "Template output spec requires 2 arguments.");
             }
         }
         if (body.descriptionStatement() != null) {
             setNodeDescription(template, body.descriptionStatement(), false);
         }
-        if (body.templateConfig() != null) {
-            if (body.templateConfig() != null && body.templateConfig().size() > 0) {
-                EntityLanguageParser.TemplateConfigContext configContext = body.templateConfig().get(0);
+        if (body.transformConfig() != null) {
+            if (body.transformConfig() != null && body.transformConfig().size() > 0) {
+                EntityLanguageParser.TransformConfigContext configContext = body.transformConfig().get(0);
                 template.setConfig(visitJsonObj(configContext.jsonObj()));
             }
         }
@@ -2385,13 +2497,25 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     @Override
     public MTTransform visitTransform(EntityLanguageParser.TransformContext ctx) {
         MTTransform transform = new MTTransform(ctx, currentConfiguration, ctx.id().getText());
+        EntityLanguageParser.TransformBodyContext body = ctx.transformBody();
+        if (body == null) {
+            ECLog.logFatal(ctx, "Invalid transform definition.");
+        }
         for (EntityLanguageParser.OutputSpecContext specContext : ctx.transformBody().outputSpec()) {
             if (specContext.id().size() == 2) {
                 transform.addNamedOutput(specContext.id(0).getText(), specContext.id(1).getText());
-            } else if (specContext.id().size() == 1) {
+            }
+            else if (specContext.id().size() == 1) {
                 transform.addNamedOutput(specContext.PRIMARY().getText(), specContext.id(0).getText());
-            } else {
+            }
+            else {
                 ECLog.logFatal(ctx, "Transform output spec requires 2 arguments.");
+            }
+        }
+        if (body.transformConfig() != null) {
+            if (body.transformConfig() != null && body.transformConfig().size() > 0) {
+                EntityLanguageParser.TransformConfigContext configContext = body.transformConfig().get(0);
+                transform.setConfig(visitJsonObj(configContext.jsonObj()));
             }
         }
         currentConfiguration.addTransform(transform);
@@ -2418,7 +2542,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
         String mappedToTypeName = null;
         if (ctx.STRING() != null) {
             mappedToTypeName = ECStringUtil.ProcessParserString(ctx.STRING().getText());
-        } else {
+        }
+        else {
             mappedToTypeName = ctx.id().getText();
         }
         currentLanguage.addType(ctx.type().getText(), mappedToTypeName, ctx.REF() != null, ctx.NULLABLE() != null);
@@ -2431,9 +2556,11 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             String commentText = ECStringUtil.ProcessParserString(body.STRING().getText());
             if (body.LINE() != null) {
                 currentLanguage.setLineComment(commentText);
-            } else if (body.BLOCK_START() != null) {
+            }
+            else if (body.BLOCK_START() != null) {
                 currentLanguage.setBlockCommentStart(commentText);
-            } else if (body.BLOCK_END() != null) {
+            }
+            else if (body.BLOCK_END() != null) {
                 currentLanguage.setBlockCommentEnd(commentText);
             }
         }
@@ -2443,8 +2570,8 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     @Override
     public Object visitLanguageOperators(EntityLanguageParser.LanguageOperatorsContext ctx) {
         for (EntityLanguageParser.OperatorsBodyContext body : ctx.operatorsBody()) {
-            String       operatorName = body.id().getText();
-            List<String> symbols      = new ArrayList<>();
+            String operatorName = body.id().getText();
+            List<String> symbols = new ArrayList<>();
             for (TerminalNode symbolString : body.STRING()) {
                 symbols.add(ECStringUtil.ProcessParserString(symbolString.getText()));
             }
@@ -2456,15 +2583,15 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     @Override
     public Object visitLanguageFunctions(EntityLanguageParser.LanguageFunctionsContext ctx) {
         for (EntityLanguageParser.FunctionsBodyContext body : ctx.functionsBody()) {
-            String             name     = body.id(0).getText();
-            String             mapping  = ECStringUtil.ProcessParserString(body.STRING().getText());
+            String name = body.id(0).getText();
+            String mapping = ECStringUtil.ProcessParserString(body.STRING().getText());
             MTLanguageFunction function = new MTLanguageFunction(body, currentLanguage, name, mapping);
             for (int i = 0; i < body.type().size(); i++) {
-                String                     typeStr = body.type(i).getText();
-                String                     argName = body.id(i + 1).getText();
-                MTNativeType.DataType      argType = MTNativeType.DataType.FromName(typeStr);
-                MTLanguageFunctionArgument arg     = new MTLanguageFunctionArgument(body.id(i + 1), function, argType,
-                                                                                    argName);
+                String typeStr = body.type(i).getText();
+                String argName = body.id(i + 1).getText();
+                MTNativeType.DataType argType = MTNativeType.DataType.FromName(typeStr);
+                MTLanguageFunctionArgument arg = new MTLanguageFunctionArgument(body.id(i + 1), function, argType,
+                    argName);
                 function.addArg(arg);
             }
             currentLanguage.addFunction(function);
@@ -2476,7 +2603,7 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
     public Object visitVersion(EntityLanguageParser.VersionContext ctx) {
         Integer[] parts = new Integer[]{0, 0, 0};
 
-        int    partIndex     = 0;
+        int partIndex = 0;
         String versionString = ctx.VERSIONNUM().getText();
         for (String partStr : versionString.split(".")) {
             parts[partIndex++] = Integer.valueOf(partStr);
@@ -2490,10 +2617,27 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
 
     @Override
     public Object visitFormatStatement(EntityLanguageParser.FormatStatementContext ctx) {
-        String       formatName = ctx.id().getText();
-        JsonObject   settings   = visitJsonObj(ctx.jsonObj());
+        String formatName = ctx.id().getText();
+        JsonObject settings = visitJsonObj(ctx.jsonObj());
         MTCodeFormat codeFormat = new MTCodeFormat(ctx, formatName, settings);
         root.addCodeFormat(codeFormat);
         return super.visitFormatStatement(ctx);
+    }
+
+    @Override
+    public Object visitRealm(EntityLanguageParser.RealmContext ctx) {
+        EntityLanguageParser.RealmBodyContext bodyContext = ctx.realmBody();
+        String realmName = ctx.id().getText();
+        MTRealm realm = null;
+        if (currentSpace().hasRealmWithName(realmName)) {
+            realm = currentSpace().getRealmWithName(realmName);
+        } else {
+            realm = new MTRealm(realmName);
+        }
+        this.currentRealm = realm;
+        visit(bodyContext);
+        this.currentRealm = null;
+
+        return realm;
     }
 }

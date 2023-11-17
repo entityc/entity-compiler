@@ -8,6 +8,8 @@ package org.entityc.compiler.transform.template.tree.filter;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.entityc.compiler.model.domain.MTDomainBased;
+import org.entityc.compiler.model.entity.MTAttribute;
+import org.entityc.compiler.model.entity.MTRelationship;
 import org.entityc.compiler.transform.template.tree.FTTransformSession;
 import org.entityc.compiler.transform.template.tree.expression.FTConstant;
 import org.entityc.compiler.transform.template.tree.expression.FTExpression;
@@ -27,6 +29,10 @@ public class FTFullnameFilter extends FTFilter {
               + "This can be useful for construction a Java import statement, for instance.");
         addSingleInputType(MTDomainBased.class,
                            "Any class that is with respect to a domain (such as MTDEntity).");
+        addSingleInputType(MTAttribute.class,
+            "An attribute.");
+        addSingleInputType(MTRelationship.class,
+            "A relationship.");
         addFilterParam(delimiterParam);
     }
 
@@ -45,7 +51,12 @@ public class FTFullnameFilter extends FTFilter {
         }
         if (input instanceof MTDomainBased) {
             return ((MTDomainBased) input).getFullname(delim);
+        } else if (input instanceof MTAttribute) {
+            return ((MTAttribute) input).getEntityName() + delim + ((MTAttribute) input).getName();
+        } else if (input instanceof MTRelationship) {
+            return ((MTRelationship) input).getFrom().getEntityName() + delim + ((MTRelationship) input).getName();
         }
+
         return null;
     }
 }

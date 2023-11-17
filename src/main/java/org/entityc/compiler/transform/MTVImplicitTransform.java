@@ -77,14 +77,14 @@ public class MTVImplicitTransform extends MTBaseTransform {
         // if this is a realm based transform then make sure we are operating on entities from that realm.
         if (realm != null) {
             if (!(fromEntity instanceof MTCompositeEntity) && (toEntity instanceof MTCompositeEntity)) {
-                ECLog.logInfo("(wrong class) REALM " + realm + ": not processing fromEntity: " + fromEntity.getName() + " toEntity: " + toEntity.getName());
+                //ECLog.logInfo("(wrong class) REALM " + realm + ": not processing fromEntity: " + fromEntity.getName() + " toEntity: " + toEntity.getName());
                 return;
             }
             if (!fromEntity.isInRealm(realm) || !toEntity.isInRealm(realm)) {
-                ECLog.logInfo("(wrong realm) REALM " + realm + ": not processing fromEntity: " + fromEntity.getName() + " toEntity: " + toEntity.getName());
+                //ECLog.logInfo("(wrong realm) REALM " + realm + ": not processing fromEntity: " + fromEntity.getName() + " toEntity: " + toEntity.getName());
                 return;
             }
-            ECLog.logInfo("REALM " + realm + ": PROCESSING fromEntity: " + fromEntity.getName() + " toEntity: " + toEntity.getName());
+            //ECLog.logInfo("REALM " + realm + ": PROCESSING fromEntity: " + fromEntity.getName() + " toEntity: " + toEntity.getName());
         }
 
         MTPrimaryKey toPrimaryKey = toEntity.getPrimaryKey();

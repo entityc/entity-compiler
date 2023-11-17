@@ -79,6 +79,10 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
         this.templateArgName = primaryRelationship.templateArgName;
     }
 
+    @Override
+    public String toString() {
+        return getFrom().getEntityName() + "." + getName() + " -(" + to.getPlurality().toString() + ")-> " + getTo().getEntityName();
+    }
     public static MTRelationship Copy(MTRelationship relationship, MTEntity newFromEntity, MTEntity newToEntity) {
 
         MTRelationshipHalf fromHalf = new MTRelationshipHalf(relationship.getParserRuleContext(),
@@ -326,7 +330,7 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
                     }
                     else {
                         // good unnamed pairing
-                        System.out.println("unnamed Relationship \"" + getName() + "\" pairing between " + from.getEntityName() + "." + this.getName() + " and " + to.getEntityName() + "." + fromRelationship.getName());
+                        //System.out.println("unnamed Relationship \"" + getName() + "\" pairing between " + from.getEntityName() + "." + this.getName() + " and " + to.getEntityName() + "." + fromRelationship.getName());
                         this.reverseRelationship = fromRelationship;
                         this.from.setPlurality(fromRelationship.to.getPlurality());
                         found = true;

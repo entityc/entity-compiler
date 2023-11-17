@@ -91,6 +91,7 @@ HUMAN        : 'human' ;
 READABLE     : 'readable' ;
 IDENTIFICATION : 'identification' ;
 
+REALM        : 'realm' ;
 DOMAIN       : 'domain' ;
 ATTRIBUTES   : 'attributes' ;
 REPLACES     : 'replaces' ;
@@ -189,7 +190,7 @@ ident
   | INTERFACE | OPERATION | QUERY | STATUS | CUSTOM | PARAM | TYPE | ENDPOINT
   | CONFIG | CONTEXT | ARGUMENT | HUMAN | READABLE | IDENTIFICATION | NAME | ORGANIZATION
   | REQUIRES | ROLE | READ | WRITE | WHEN | USER | ARRAY
-  | APPLY | DESCRIPTION | TAGS | METADATA | FORMATTING | FORMAT | COMMENTS
+  | APPLY | DESCRIPTION | TAGS | METADATA | FORMATTING | FORMAT | COMMENTS | REALM
   ;
 
 macro
@@ -274,6 +275,7 @@ root
     | entity
     | enumStatement
     | domain
+    | realm
     | configuration
     | units
     | language
@@ -585,6 +587,17 @@ bitCount
     : '(' INTEGER ')'
     ;
 
+realm
+    : REALM id '{' realmBody '}'
+    ;
+
+realmBody
+    :
+    ( descriptionStatement
+    | tagStatement
+    | domain
+    )*
+    ;
 /*
  *
  DOMAIN
@@ -755,7 +768,7 @@ domainApplyTemplateBody
     :
     ( descriptionStatement
     | tagStatement
-    | templateConfig
+    | transformConfig
     )*
     ;
 
@@ -763,7 +776,7 @@ defaultTemplateConfig
     : DEFAULT CONFIG jsonObj
     ;
 
-templateConfig
+transformConfig
     : CONFIG jsonObj
     ;
 
@@ -1247,7 +1260,7 @@ templateBody
     ( descriptionStatement
     | tagStatement
     | outputSpec
-    | templateConfig
+    | transformConfig
     )*
     ;
 
@@ -1267,6 +1280,8 @@ transform
 transformBody
     :
     ( outputSpec
+    | transformConfig
+    | REALM id
     )*
     ;
 

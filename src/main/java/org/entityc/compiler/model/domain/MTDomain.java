@@ -365,7 +365,7 @@ public class MTDomain extends MTNode implements MTReferenceResolution, MTTemplat
     public void checkValidReferences(MTSpace space) {
         for (MTDEntity domainEntity : domainEntities) {
             if (domainEntity.getEntity() == null) {
-                ECLog.logFatal(domainEntity, "Could not find entity: " + domainEntity.getEntityName());
+                //ECLog.logFatal(domainEntity, "Could not find entity: " + domainEntity.getEntityName());
             }
         }
     }

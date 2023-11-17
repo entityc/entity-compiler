@@ -87,7 +87,7 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
     @ModelMethod(category = ModelMethodCategory.ENTITY,
         description = "Adds the entity to a realm.")
     public void addRealm(String realm) {
-        ECLog.logInfo("Added entity: " + getName() + " to realm " + realm);
+        //ECLog.logInfo("Added entity: " + getName() + " to realm " + realm);
         realms.add(realm);
     }
 
@@ -95,6 +95,12 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
         description = "Returns true if this entity is part of a realm.")
     public boolean isInRealm(String realm) {
         return this.realms.contains(realm);
+    }
+
+    @ModelMethod(category = ModelMethodCategory.ENTITY,
+        description = "Returns true if this entity is a composite entity.")
+    public boolean isCompositeEntity() {
+        return this instanceof MTCompositeEntity;
     }
 
     public static MTEntity AddImplicitManyToManyEntity(MTSpace space, MTEntity fromEntity, MTEntity toEntity) {
