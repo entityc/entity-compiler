@@ -29,17 +29,17 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
 
     public static final String INTERNAL_MANY_TO_MANY_TAG = "internal:many-to-many";
 
-    private final String             name;
+    private final String name;
     private final MTRelationshipHalf to;
     private final MTRelationshipHalf from;
-    private final boolean            optional;
-    private final boolean            parent;
-    private final String             reverseName;
-    private final String             toEntityIdName;
-    private final String             templateArgName;
-    private       boolean            implicit;
-    private       MTRelationship     reverseRelationship;
-    private       MTAttribute        effectiveAttribute;
+    private final boolean optional;
+    private final boolean parent;
+    private final String reverseName;
+    private final String toEntityIdName;
+    private final String templateArgName;
+    private boolean implicit;
+    private MTRelationship reverseRelationship;
+    private MTAttribute effectiveAttribute;
 
     public MTRelationship(ParserRuleContext ctx,
                           String name,
@@ -51,38 +51,46 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
                           String reverseName,
                           String toEntityIdName,
                           String templateArgName
-                         ) {
+    ) {
         super(ctx);
-        this.name            = name;
-        this.from            = new MTRelationshipHalf(ctx, fromEntityName);
-        this.to              = new MTRelationshipHalf(ctx, toPlurality, toEntityName);
-        this.optional        = optional;
-        this.parent          = parent;
-        this.reverseName     = reverseName;
-        this.toEntityIdName  = toEntityIdName;
+        this.name = name;
+        this.from = new MTRelationshipHalf(ctx, fromEntityName);
+        this.to = new MTRelationshipHalf(ctx, toPlurality, toEntityName);
+        this.optional = optional;
+        this.parent = parent;
+        this.reverseName = reverseName;
+        this.toEntityIdName = toEntityIdName;
         this.templateArgName = templateArgName;
+//        if (name.equals("gearCompany")) {
+//            ECLog.logInfo("Created gearCompany relationship");
+//        }
     }
 
     protected MTRelationship(String secondaryName, MTRelationship primaryRelationship, MTRelationshipHalf fromHalf, MTRelationshipHalf toHalf) {
         super(primaryRelationship.getParserRuleContext());
-        this.name            = secondaryName;
-        this.from            = fromHalf;
+        this.name = secondaryName;
+        this.from = fromHalf;
         if (toHalf != null) {
             this.to = toHalf;
-        } else {
+        }
+        else {
             this.to = primaryRelationship.to;
         }
-        this.optional        = primaryRelationship.optional;
-        this.parent          = primaryRelationship.parent;
-        this.reverseName     = primaryRelationship.reverseName;
-        this.toEntityIdName  = primaryRelationship.toEntityIdName;
+        this.optional = primaryRelationship.optional;
+        this.parent = primaryRelationship.parent;
+        this.reverseName = primaryRelationship.reverseName;
+        this.toEntityIdName = primaryRelationship.toEntityIdName;
         this.templateArgName = primaryRelationship.templateArgName;
+//        if (name.equals("gearCompany")) {
+//            ECLog.logInfo("Created gearCompany relationship");
+//        }
     }
 
     @Override
     public String toString() {
         return getFrom().getEntityName() + "." + getName() + " -(" + to.getPlurality().toString() + ")-> " + getTo().getEntityName();
     }
+
     public static MTRelationship Copy(MTRelationship relationship, MTEntity newFromEntity, MTEntity newToEntity) {
 
         MTRelationshipHalf fromHalf = new MTRelationshipHalf(relationship.getParserRuleContext(),
@@ -102,7 +110,7 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description = "Indicates whether the relationship was created because although it was not declared it can be "
-                      + "implied based on relationships declared to this entity.")
+            + "implied based on relationships declared to this entity.")
     public boolean isImplicit() {
         return implicit;
     }
@@ -113,14 +121,14 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description = "When a relationship is defined as part of an entity template, it has a template argument that "
-                      + "will be used when an entity is created from it. This will return the name of that argument.")
+            + "will be used when an entity is created from it. This will return the name of that argument.")
     public String getTemplateArgName() {
         return templateArgName;
     }
 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description = "Returns the \"to\" part of the relationship. This part tells you about the entity to which this "
-                      + "relationship is bound.")
+            + "relationship is bound.")
     public MTRelationshipHalf getTo() {
         return to;
     }
@@ -128,21 +136,21 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description =
             "Returns the \"from\" part of the relationship which references the entity in which this relationship "
-            + "is defined.")
+                + "is defined.")
     public MTRelationshipHalf getFrom() {
         return from;
     }
 
     @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
         description = "Returns the effective attribute associated with this relationship. The effective attribute "
-                      + "can help you persist the relationship in a database.")
+            + "can help you persist the relationship in a database.")
     public MTAttribute getEffectiveAttribute() {
         if (effectiveAttribute == null
             && to.getEntity() != null && from.getEntity() != null
         ) {
             if (to.getPlurality() == HalfRelationshipPlurality.ONE) {
                 MTAttribute primarykeyAttribute = to.getEntity().getPrimaryKey().getAttributes().get(0);
-                String      typeName            = INT64.getName();
+                String typeName = INT64.getName();
                 if (primarykeyAttribute.getType().isNativeType()) {
                     typeName = ((MTNativeType) (primarykeyAttribute.getType())).getDataType().getName();
                 }
@@ -161,23 +169,23 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description =
             "Indicates whether this relationship was defined with the `parent` keyword. Relationships defined "
-            + "this way are ones that imply that this entity considers its identity as being the combination "
-            + "of its parent entity and itself.")
+                + "this way are ones that imply that this entity considers its identity as being the combination "
+                + "of its parent entity and itself.")
     public boolean isParent() {
         return parent;
     }
 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description = "Indicates whether this relationship was defined with the `parent` keyword and **not** with "
-                      + "the `optional` keyword. Within the set of relationships of an entity, only one relationship "
-                      + "should be defined this way.")
+            + "the `optional` keyword. Within the set of relationships of an entity, only one relationship "
+            + "should be defined this way.")
     public boolean isPrimaryParent() {
         return isParent() && !isOptional();
     }
 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description = "Indicates whether this relationship was defined with the `optional` keyword, indicating that "
-                      + "relationships to the other entity is not required.")
+            + "relationships to the other entity is not required.")
     public boolean isOptional() {
         return optional;
     }
@@ -188,7 +196,7 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description = "Returns the relationship from the perspective \"to\" entity to this entity, that is, the "
-                      + "reverse relationship.")
+            + "reverse relationship.")
     public MTRelationship getReverseRelationship() {
         return reverseRelationship;
     }
@@ -196,8 +204,8 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description =
             "Indicates whether this relationship is a one-to-many; where in a one-to-many relationship an object "
-            + "of this entity can have multiple relationships with objects of another entity but not the other way "
-            + "around.")
+                + "of this entity can have multiple relationships with objects of another entity but not the other way "
+                + "around.")
     public boolean isOneToMany() {
         return getFullRelationshipPlurality() == FullRelationshipPlurality.ONE_TO_MANY;
     }
@@ -222,7 +230,7 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description =
             "Indicates whether this relationship is a many-to-many; where in a many-to-many relationship multiple "
-            + "objects of this entity can have multiple relationships with objects of another entity.")
+                + "objects of this entity can have multiple relationships with objects of another entity.")
     public boolean isManyToMany() {
         return getFullRelationshipPlurality() == FullRelationshipPlurality.MANY_TO_MANY;
     }
@@ -231,7 +239,7 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
         description =
             "Gets the entity on the other side of an implicit many-to-many entity.")
     public MTEntity getImplicitToEntity() {
-        for(MTRelationship mmRel : to.getEntity().implicitRelationships) {
+        for (MTRelationship mmRel : to.getEntity().implicitRelationships) {
             if (!mmRel.to.getEntityName().equals(from.getEntityName())) {
                 return mmRel.to.getEntity();
             }
@@ -246,7 +254,7 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
 
     @Override
     public boolean resolveReferences(MTSpace space, int pass) {
-        this.from.setEntity(space.getEntityWithName(from.getEntityName()));
+        this.from.resolveReferences(space, pass);
 
         if (this.to.getEntity() == null) {
             if (this.to.getTemplateInstantiation() != null) {
@@ -254,41 +262,38 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
                     this.to.getTemplateInstantiation().getEntityTemplateName());
                 if (template == null) {
                     ECLog.logFatal(this.to.getTemplateInstantiation(), "Unable to find entity template with name: "
-                                                                       + this.to.getTemplateInstantiation().getEntityTemplateName());
+                        + this.to.getTemplateInstantiation().getEntityTemplateName());
                 }
                 this.to.setEntity(
                     template.makeEntity(from.getEntity(), to.getEntityName(), this.to.getTemplateInstantiation(),
-                                        space));
+                        space));
             }
             else {
-                this.to.setEntity(space.getEntityWithName(to.getEntityName()));
+                this.to.resolveReferences(space, pass);
             }
         }
 
         if (this.from.getEntityName() == null) {
-            System.err.println("ERROR: Could not resolve from entity: " + this.from.getEntityName());
+            ECLog.logError("Could not resolve from entity: " + this.from.getEntityName());
             return false;
         }
         if (this.to.getEntityName() == null) {
-            System.err.println("ERROR: Could not resolve to entity: " + this.to.getEntityName());
+            ECLog.logError("Could not resolve to entity: " + this.to.getEntityName());
             return false;
         }
 
         // find a list of possble relationships between entities
-        if (to.getEntity() == null) {
-            MTEntity toEntity = space.getEntityWithName(to.getEntityName());
-            if (toEntity == null) {
-                if (pass > 7) {
-                    ECLog.logFatal(this, "Unable to find entity named: " + to.getEntityName());
-                }
-                return false;
+        boolean anotherPass = this.to.resolveReferences(space, pass);
+        if (anotherPass) {
+            if (pass > 7) {
+                ECLog.logFatal(this, "Unable to find entity named: " + to.getEntityName());
             }
-            to.setEntity(toEntity);
+            return false;
         }
         List<MTRelationship> possibleFromRelationships = to.getEntity().findPossibleRelationshipsWithEntity(
             from.getEntity());
 
-        boolean found      = false;
+        boolean found = false;
         boolean duplicates = false;
 
         if (pass == 0) {
@@ -300,7 +305,7 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
                         duplicates = true;
                         ECLog.logError(
                             "Found duplicate reverse named relationship matches for: " + from.getEntityName() + " > "
-                            + getReverseName() + " < " + to.getEntityName());
+                                + getReverseName() + " < " + to.getEntityName());
                         break;
                     }
                     else {
@@ -323,9 +328,9 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
                     if (found) {
                         duplicates = true;
                         ECLog.logWarning(fromRelationship,
-                                         "Found duplicate relationship matches between " + from.getEntity().getName()
-                                         + "." + this.getName() + " and " + to.getEntity().getName() + "."
-                                         + fromRelationship.getName());
+                            "Found duplicate relationship matches between " + from.getEntity().getName()
+                                + "." + this.getName() + " and " + to.getEntity().getName() + "."
+                                + fromRelationship.getName());
                         break;
                     }
                     else {
@@ -345,9 +350,9 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
                 return false;
             }
 
-            if (!found && !alreadyProcessed) {
-                //System.out.println("Could not find reverse relationship between " + fromEntityName + " and " + toEntityName);
-            }
+//            if (!found && !alreadyProcessed) {
+//                ECLog.logWarning("Could not find reverse relationship between " + from.getEntityName() + " and " + to.getEntityName() + " for relationship: " + getName());
+//            }
         }
 
         return false;
@@ -367,8 +372,8 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
 
     public MTRelationship makeCopyFromEntityName(String fromEntityNameOfCopy) {
         MTRelationship copy = new MTRelationship(null, name, fromEntityNameOfCopy, from.getPlurality(),
-                                                 to.getEntityName(), optional, parent, reverseName, toEntityIdName,
-                                                 templateArgName);
+            to.getEntityName(), optional, parent, reverseName, toEntityIdName,
+            templateArgName);
         return copy;
     }
 
@@ -381,7 +386,7 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
         description = "Indicates whether the \"to\" entity of this relationship has been tagged with the specified tag.")
     public boolean hasToEntityTagged(
         @ModelMethodParameter(description = "The tag with which to search.")
-            String tag) {
+        String tag) {
         return to != null && to.getEntity().hasTag(tag);
     }
 }

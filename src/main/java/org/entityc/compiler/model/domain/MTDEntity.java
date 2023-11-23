@@ -885,4 +885,9 @@ public class MTDEntity extends MTNode implements MTReferenceResolution, MTDomain
         }
         return null;
     }
+
+    @Override
+    public String toString() {
+        return domain.getName() + "." + entityName;
+    }
 }

@@ -24,6 +24,12 @@ class EntityCompilerTest {
         runTemplateTest(TestName);
     }
 
+    @Test
+    void compileReleasedTransform() throws IOException {
+        final String TestName = "ReleasedTransform";
+        runTemplateTest(TestName);
+    }
+
     private void runTemplateTest(String testName) throws IOException {
         final String TestResourceDir = BASE_RESOURCE_DIR + "/" + testName;
         String       strTmp          = System.getProperty("java.io.tmpdir");

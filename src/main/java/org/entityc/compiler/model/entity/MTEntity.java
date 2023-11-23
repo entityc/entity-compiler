@@ -841,7 +841,7 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
         description = "Returns a list of relationships from this entity to a specified entity.")
     public List<MTRelationship> getRelationshipsWithToEntity(
         @ModelMethodParameter(description = "The entity that the relationships are **to**.")
-            MTEntity toEntity) {
+        MTEntity toEntity) {
         List<MTRelationship> matchingRelationships = new ArrayList<>();
         for (MTRelationship relationship : relationships) {
             if (relationship.getTo().getEntityName().equals(toEntity.getName())) {
@@ -849,6 +849,21 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
             }
         }
         return matchingRelationships;
+    }
+
+    @ModelMethod(
+        category = ModelMethodCategory.RELATIONSHIP,
+        description = "Returns the first relationships from this entity to a specified entity. This method should be used when only one is expected.")
+    public MTRelationship getRelationshipWithToEntity(
+        @ModelMethodParameter(description = "The entity that the relationships are **to**.")
+        MTEntity toEntity) {
+        List<MTRelationship> matchingRelationships = new ArrayList<>();
+        for (MTRelationship relationship : relationships) {
+            if (relationship.getTo().getEntityName().equals(toEntity.getName())) {
+                return relationship;
+            }
+        }
+        return null;
     }
 
     @ModelMethod(

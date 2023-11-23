@@ -5,6 +5,7 @@ import org.entityc.compiler.model.MTModule;
 import org.entityc.compiler.util.ECLog;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 public class MTCompositeEntity extends MTEntity {
@@ -39,7 +40,7 @@ public class MTCompositeEntity extends MTEntity {
         return constituentEntities.containsKey(tag);
     }
 
-    public MTEntity getAnyConstituentEntity(String tag) {
+    public MTEntity getAnyConstituentEntity(String tag, HashSet history) {
         MTEntity constituentEntity = constituentEntities.get(tag);
         if (constituentEntity != null) {
             return constituentEntity;
@@ -47,6 +48,9 @@ public class MTCompositeEntity extends MTEntity {
         ECLog.logInfo("getAnyConstituentEntity(" + tag + ") Checking relationships for " + getName() + "...");
         for (MTRelationship relationship : getRelationships()) {
             MTEntity toEntity = relationship.getTo().getEntity();
+            if (history.contains(toEntity.getName())) {
+                continue; // break infinite recursion
+            }
             if (toEntity.hasTag("release:top") && tag.equals(ReleaseTag)) {
                 return toEntity;
             }
@@ -54,7 +58,8 @@ public class MTCompositeEntity extends MTEntity {
                 ECLog.logInfo("  Relationship " + relationship.getName() + " to entity " + toEntity.getName() + " is not to a composite entity.");
                 continue;
             }
-            MTEntity compositeToEntity = ((MTCompositeEntity)toEntity).getAnyConstituentEntity(tag);
+            history.add(toEntity.getName());
+            MTEntity compositeToEntity = ((MTCompositeEntity)toEntity).getAnyConstituentEntity(tag, history);
             if (compositeToEntity != null) {
                 return compositeToEntity;
             }
@@ -63,8 +68,12 @@ public class MTCompositeEntity extends MTEntity {
         return null;
     }
 
-    public boolean hasAnyConstituentEntity(String tag) {
-        return getAnyConstituentEntity(tag) != null;
+    public MTEntity getAnyConstituentEntity(String tag) {
+        return getAnyConstituentEntity(tag, new HashSet());
+    }
+
+        public boolean hasAnyConstituentEntity(String tag) {
+        return getAnyConstituentEntity(tag, new HashSet()) != null;
     }
 
     public void addAttribute(String tag, MTAttribute attribute, MTEntity fromEntity) {

@@ -1,0 +1,124 @@
+space RevisionedStuff {
+
+
+}
+
+module Everything
+{
+
+entity WidgetType {
+    primarykey uuid widgetTypeId
+
+    attributes {
+        string identifier
+        string title
+        optional string description
+    }
+    relationships {
+        many Widget widgets
+    }
+}
+
+entity ProductRelease<O,V> {
+    primarykey uuid productReleaseId
+
+    T "release:binder"
+
+    relationships {
+        parent one ProductLineRelease productLineRelease
+        one O
+        one V
+    }
+}
+
+entity ProductLineRelease {
+    primarykey uuid productLineReleaseId
+    T "release:top"
+
+    attributes {
+        string identifier
+        string notes
+    }
+    relationships {
+        many ProductRelease<unique Widget, unique WidgetRevision> as WidgetRevisionRelease {}
+        many ProductRelease<unique Thing, unique ThingRevision> as ThingRevisionRelease {}
+    }
+}
+
+entity Widget {
+    primarykey uuid widgetId
+
+    T "release:object"
+
+    attributes {
+        string identifier
+        string title
+        optional string description
+    }
+    relationships {
+        many WidgetRevision revisions
+        parent one WidgetType type
+    }
+}
+
+entity WidgetRevision {
+    primarykey uuid widgetRevisionId
+
+    T "release:version"
+
+    attributes {
+        sequential int64 number
+        optional string notes
+    }
+    relationships {
+        parent one Widget widget
+    }
+}
+
+entity Thing {
+    primarykey uuid thingId
+
+    T "release:object"
+
+    attributes {
+        string identifier
+        string title
+        optional string description
+    }
+    relationships {
+        many ThingRevision revisions
+        parent one Widget widget
+    }
+}
+
+entity ThingRevision {
+    primarykey uuid thingRevisionId
+
+    T "release:version"
+
+    attributes {
+        sequential int64 number
+        optional string notes
+    }
+    relationships {
+        parent one Thing thing
+    }
+}
+}
+
+configuration Config
+{
+    output testOutput {
+        path $(TEMP_DIR:"/tmp")
+    }
+
+    transform Released {
+    }
+
+    templates {
+        template ReleasedTemplate {
+            output primary testOutput
+        }
+    }
+}
+

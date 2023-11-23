@@ -59,14 +59,19 @@ public class MTVReleasedTransform extends MTBaseTransform {
         Map<String, MTEntity> releasedRelatedEntityMap = new HashMap<>();
         Map<String, MTEntity> releasedVarientOfEntityMap = new HashMap<>();
 
+        List<MTRelationship> relationshipsToResolve = new ArrayList<>();
+        List<MTCompositeEntity> compositeEntityList = new ArrayList<>();
+
         for (MTModule module : space.getModules()) {
             //ECLog.logInfo("--------------------------------------------------------- MODULE: " + module.getName());
             if (module.isIncluded()) {
                 //ECLog.logInfo("Ignoring module: " + module.getName());
                 continue;
             }
+            //
             // Find all the ones that are not involved in versioning and add them
             // to our new "version-less" realm.
+            //
             for (MTEntity entity : module.getEntities()) {
                 if (entity.hasTag("release:binder")
                     || entity.hasTag("release:object")
@@ -75,7 +80,11 @@ public class MTVReleasedTransform extends MTBaseTransform {
                 }
                 entity.addRealm(realm);
             }
-            List<MTCompositeEntity> compositeEntityList = new ArrayList<>();
+            //
+            // Go through all the entities, find the ones that have both an object and version,
+            // create a new composite entity and then copy over the attributes (we will copy the
+            // relationships in another pass).
+            //
             for (MTEntity entity : module.getEntities()) {
                 if (entity.isIncluded() || entity.isExtern() || entity.isImplicit() || entity.isTransient()
                     || !entity.hasTag("release:binder")) {
@@ -118,8 +127,9 @@ public class MTVReleasedTransform extends MTBaseTransform {
                 releasedRelatedEntityMap.put(objectEntity.getName(), objectEntity);
                 releasedRelatedEntityMap.put(versionEntity.getName(), versionEntity);
 
+                //
                 // Now create a new entity that unifies these three
-
+                //
                 MTCompositeEntity compositeEntity = new MTCompositeEntity(objectEntity.getParserRuleContext(),
                     objectEntity.getModule(),
                     compositEntityNamePrefix + objectEntity.getName());
@@ -151,6 +161,7 @@ public class MTVReleasedTransform extends MTBaseTransform {
                 releaseFKRelationship.addTag("ignore");
                 compositeEntity.addRelationship(releaseFKRelationship);
                 compositeEntity.addConstituentEntity(MTCompositeEntity.ReleaseTag, releaseEntity);
+                relationshipsToResolve.add(releaseFKRelationship);
                 //
                 // Object Entity Attributes
                 //
@@ -175,6 +186,7 @@ public class MTVReleasedTransform extends MTBaseTransform {
                 }
 
                 compositeEntityList.add(compositeEntity);
+                //ECLog.logInfo("Creating Composite Entity: " + compositeEntity.getName());
                 compositeEntityConstituentMap.put(objectEntity.getName(), compositeEntity);
                 compositeEntityConstituentMap.put(versionEntity.getName(), compositeEntity);
 
@@ -186,75 +198,22 @@ public class MTVReleasedTransform extends MTBaseTransform {
                     HalfRelationshipPlurality.MANY,
                     compositeEntity.getName(), true, false, null, null, null);
                 releaseEntity.addRelationship(releaseRelationship);
+                relationshipsToResolve.add(releaseRelationship);
 
                 // Relationships are more complicated so we first need to process all
                 // the entities first, then do another pass so we can randomly reference the other
                 // entities.
             }
-            //ECLog.logInfo("FOUND " + compositeEntityList.size() + " composite objects in module: " + module.getName());
-            for (MTCompositeEntity compositeEntity : compositeEntityList) {
-                MTEntity objectEntity = compositeEntity.getConstituentEntity(MTCompositeEntity.ObjectTag);
-                MTEntity versionEntity = compositeEntity.getConstituentEntity(MTCompositeEntity.VersionTag);
-                //ECLog.logInfo("Object entity " + objectEntity.getName() + " has " + objectEntity.getRelationshipCount() + " relationships.");
-                for (MTRelationship relationship : objectEntity.getRelationships()) {
-                    //ECLog.logInfo(">>>> relationship: " + relationship.getName());
-                    if (compositeEntity.hasRelationshipNamed(relationship.getName())) {
-                        ECLog.logWarning("We have already copied relationship: " + relationship.getName());
-                        continue;
-                    }
-                    MTEntity toEntity = relationship.getTo().getEntity();
-                    // don't take relationships to version
-                    if (toEntity.getName().equals(versionEntity.getName())) {
-                        continue;
-                    }
-                    if (!compositeEntityConstituentMap.containsKey(toEntity.getName())) {
-                        // we can copy the relationship exactly - just have to fix the "from" which is done
-                        // in the Copy method.
-                        MTRelationship newRelationship = MTRelationship.Copy(relationship, compositeEntity, null);
-                        //ECLog.logInfo("Adding Composite Object Relationship to non-composite entity: " + newRelationship.getName());
-                        compositeEntity.addRelationship(newRelationship);
-                        continue;
-                    }
-                    MTCompositeEntity toCompositeEntity = compositeEntityConstituentMap.get(toEntity.getName());
-                    MTRelationship newRelationship = MTRelationship.Copy(relationship, compositeEntity, toCompositeEntity);
-                    compositeEntity.addRelationship(newRelationship);
-                    //ECLog.logInfo("Adding Composite Object Relationship to Composite object: " + newRelationship.getName());
-                }
-                //ECLog.logInfo("Entity " + compositeEntity.getName() + " has Version entity " + versionEntity.getName() + " has " + versionEntity.getRelationshipCount() + " relationships.");
-                for (MTRelationship relationship : versionEntity.getRelationships()) {
-                    MTEntity toEntity = relationship.getTo().getEntity();
-                    if (toEntity == null) {
-                        ECLog.logWarning("Relationship " + versionEntity.getName() + "." + relationship.getName() + " does NOT have a \"to\" entity!");
-                        continue;
-                    }
-                    // don't take relationships to object parent
-                    if (relationship.isParent() && toEntity.getName().equals(objectEntity.getName())) {
-                        continue;
-                    }
-                    if (!compositeEntityConstituentMap.containsKey(toEntity.getName())) {
-                        // we can copy the relationship exactly - just have to fix the "from" which is done
-                        // in the Copy method.
-                        MTRelationship newRelationship = MTRelationship.Copy(relationship, compositeEntity, null);
-                        //ECLog.logInfo("Adding Composite Version Relationship to non-composite entity: " + newRelationship.getName());
-                        compositeEntity.addRelationship(newRelationship);
-                        continue;
-                    }
-                    MTCompositeEntity toCompositeEntity = compositeEntityConstituentMap.get(toEntity.getName());
-                    MTRelationship newRelationship = MTRelationship.Copy(relationship, compositeEntity, toCompositeEntity);
-                    //ECLog.logInfo("Adding Composite Version Relationship to Composite object: " + newRelationship.getName());
-                    compositeEntity.addRelationship(newRelationship);
-                }
-                compositeEntity.getModule().addEntity(compositeEntity);
-                space.addEntity(compositeEntity);
-            }
-
         }
-        // ------------------------------------------------
-        // It turns out that for any entity related to a
-        // Released entity we also need to create a Released
-        // version of it so it.
-        // ------------------------------------------------
-        boolean foundReleasedRelated = false;
+        //ECLog.logInfo("FOUND " + compositeEntityList.size() + " composite entities");
+
+        //
+        // Now we need to see all the other entities related to the object or version entities and convert them also
+        // to composite entities (even though they don't have version entities) so that we don't have non-composite
+        // entities making reference to composite entities.
+        //
+        boolean foundReleasedRelated;
+        int newReleasedEntities = 0;
         do {
             foundReleasedRelated = false;
             for (MTModule module : space.getModules()) {
@@ -263,6 +222,7 @@ public class MTVReleasedTransform extends MTBaseTransform {
                     continue;
                 }
 
+                // TODO: we need to also check relationships from composite to not-fully-composite since it may be assumed
                 for (MTEntity entity : module.getEntities()) {
                     if (entity.isIncluded() || entity.isExtern() || entity.isImplicit()
                         || entity.isSecondary() || entity.isTransient()) {
@@ -276,11 +236,15 @@ public class MTVReleasedTransform extends MTBaseTransform {
                         continue;
                     }
 
+                    //
+                    // Determine if this entity has a relationship with a "Released" entity and if so, get the
+                    // top Release entity.
+                    //
                     MTEntity releaseEntity = null;
                     boolean isRelatedToReleased = false;
                     for (MTRelationship relationship : entity.getRelationships()) {
                         MTEntity toEntity = relationship.getTo().getEntity();
-                        if (releasedVarientOfEntityMap.containsKey(toEntity.getName()) ) {
+                        if (releasedVarientOfEntityMap.containsKey(toEntity.getName())) {
                             //ECLog.logInfo("----- is related to released via relationship: " + entity.getName() + "." + relationship.getName() + " toEntity = " + toEntity.getName());
                             MTEntity relatedEntity = releasedVarientOfEntityMap.get(toEntity.getName());
                             if (relatedEntity.isCompositeEntity()) {
@@ -291,12 +255,16 @@ public class MTVReleasedTransform extends MTBaseTransform {
                         }
                     }
 
+                    //
+                    // If it is not related to a released entity then skip the rest.
+                    //
                     if (!isRelatedToReleased) {
                         continue;
                     }
 
                     //
-                    // Create the Released entity
+                    // Create the Released "composite" entity. Even though it will be created as a composite entity, it will only have
+                    // the object and release constituents.
                     //
                     foundReleasedRelated = true;
                     MTCompositeEntity releasedEntity = new MTCompositeEntity(entity.getParserRuleContext(), entity.getModule(), compositEntityNamePrefix + entity.getName());
@@ -304,7 +272,9 @@ public class MTVReleasedTransform extends MTBaseTransform {
                     releasedEntity.addConstituentEntity(MTCompositeEntity.ObjectTag, entity);
                     compositeEntityConstituentMap.put(entity.getName(), releasedEntity);
                     releasedEntity.addRealm(realm);
-                    ECLog.logInfo("Creating Released Entity related to object/revision pair: " + releasedEntity.getName());
+                    compositeEntityList.add(releasedEntity);
+                    //ECLog.logInfo("Creating Released Entity: " + releasedEntity.getName() + " related to object: " + entity.getName());
+                    newReleasedEntities++;
 
                     //
                     // copy primary key
@@ -315,6 +285,7 @@ public class MTVReleasedTransform extends MTBaseTransform {
                     MTPrimaryKey newPrimaryKey = new MTPrimaryKey(entity.getPrimaryKey().getParserRuleContext());
                     newPrimaryKey.addAttribute(primaryKeyAttribute);
                     releasedEntity.setPrimaryKey(newPrimaryKey);
+
 
                     //
                     // Create relationship from this Released entity back to the "release" entity
@@ -328,6 +299,7 @@ public class MTVReleasedTransform extends MTBaseTransform {
                     releaseFKRelationship.addTag("ignore");
                     releasedEntity.addRelationship(releaseFKRelationship);
                     releasedEntity.addConstituentEntity(MTCompositeEntity.ReleaseTag, releaseEntity);
+                    relationshipsToResolve.add(releaseFKRelationship);
 
                     // create a one to many relationship on the release entity to this composite entity
                     MTRelationship releaseRelationship = new MTRelationship(
@@ -337,6 +309,7 @@ public class MTVReleasedTransform extends MTBaseTransform {
                         HalfRelationshipPlurality.MANY,
                         releasedEntity.getName(), true, false, null, null, null);
                     releaseEntity.addRelationship(releaseRelationship);
+                    relationshipsToResolve.add(releaseRelationship);
 
                     //
                     // copy attributes
@@ -354,7 +327,7 @@ public class MTVReleasedTransform extends MTBaseTransform {
 
                         //ECLog.logInfo("CHECKING relationships for: " + entity.getName() + " relationship to entity: " + toEntity.getName());
                         MTCompositeEntity toCompositeEntity = compositeEntityConstituentMap.get(toEntity.getName());
-                        if (toCompositeEntity != null && toCompositeEntity.isCompositeEntity() && !((MTCompositeEntity)releasedEntity).hasConstituentEntity(MTCompositeEntity.ReleaseTag)) {
+                        if (toCompositeEntity != null && toCompositeEntity.isCompositeEntity() && !((MTCompositeEntity) releasedEntity).hasConstituentEntity(MTCompositeEntity.ReleaseTag)) {
                             //ECLog.logInfo("COPYING CONSTITUENT ENTITY (" + MTCompositeEntity.ReleaseTag + ") "+ toCompositeEntity.getConstituentEntity(MTCompositeEntity.ReleaseTag).getName() + " to Composite Entity: " + toCompositeEntity.getName());
                             MTEntity toEntityReleaseEntity = toCompositeEntity.getConstituentEntity(MTCompositeEntity.ReleaseTag);
                             releasedEntity.addConstituentEntity(MTCompositeEntity.ReleaseTag, toEntityReleaseEntity);
@@ -384,6 +357,87 @@ public class MTVReleasedTransform extends MTBaseTransform {
             }
         }
         while (foundReleasedRelated);
+        //ECLog.logInfo("FOUND " + newReleasedEntities + " released entities");
+        //
+        // Now that all the composite entities have been created, we can copy the relationships.
+        //
+        //ECLog.logInfo("Resolving relationships...");
+        for (MTCompositeEntity compositeEntity : compositeEntityList) {
+            //ECLog.logInfo("Looking at composite entity: " + compositeEntity.getName());
+            MTEntity objectEntity = compositeEntity.getConstituentEntity(MTCompositeEntity.ObjectTag);
+            MTEntity versionEntity = compositeEntity.getConstituentEntity(MTCompositeEntity.VersionTag);
+            for (MTRelationship relationship : objectEntity.getRelationships()) {
+                if (compositeEntity.hasRelationshipNamed(relationship.getName())) {
+                    //ECLog.logWarning("We have already copied relationship: " + relationship);
+                    continue;
+                }
+                MTEntity toEntity = relationship.getTo().getEntity();
+                // don't take relationships to version
+                if (versionEntity != null && toEntity.getName().equals(versionEntity.getName())) {
+                    continue;
+                }
+                if (!compositeEntityConstituentMap.containsKey(toEntity.getName())) {
+                    // we can copy the relationship exactly - just have to fix the "from" which is done
+                    // in the Copy method.
+                    MTRelationship newRelationship = MTRelationship.Copy(relationship, compositeEntity, null);
+                    //ECLog.logInfo("---- Adding Composite Object Relationship to non-composite entity: " + newRelationship);
+                    compositeEntity.addRelationship(newRelationship);
+                    relationshipsToResolve.add(newRelationship);
+                    continue;
+                }
+                MTCompositeEntity toCompositeEntity = compositeEntityConstituentMap.get(toEntity.getName());
+                MTRelationship newRelationship = MTRelationship.Copy(relationship, compositeEntity, toCompositeEntity);
+                compositeEntity.addRelationship(newRelationship);
+                relationshipsToResolve.add(newRelationship);
+                //ECLog.logInfo("Adding Composite Object Relationship to Composite object: " + newRelationship);
+            }
+            if (versionEntity != null) {
+                //ECLog.logInfo("Entity " + compositeEntity.getName() + " has Version entity " + versionEntity.getName() + " has " + versionEntity.getRelationshipCount() + " relationships.");
+                for (MTRelationship relationship : versionEntity.getRelationships()) {
+                    MTEntity toEntity = relationship.getTo().getEntity();
+                    if (toEntity == null) {
+                        ECLog.logWarning("Relationship " + versionEntity.getName() + "." + relationship.getName() + " does NOT have a \"to\" entity!");
+                        continue;
+                    }
+                    // don't take relationships to object parent
+                    if (relationship.isParent() && toEntity.getName().equals(objectEntity.getName())) {
+                        continue;
+                    }
+                    if (!compositeEntityConstituentMap.containsKey(toEntity.getName())) {
+                        // we can copy the relationship exactly - just have to fix the "from" which is done
+                        // in the Copy method.
+                        MTRelationship newRelationship = MTRelationship.Copy(relationship, compositeEntity, null);
+                        //ECLog.logInfo("Adding Composite Version Relationship to non-composite entity: " + newRelationship.getName());
+                        compositeEntity.addRelationship(newRelationship);
+                        relationshipsToResolve.add(newRelationship);
+                        continue;
+                    }
+                    MTCompositeEntity toCompositeEntity = compositeEntityConstituentMap.get(toEntity.getName());
+                    MTRelationship newRelationship = MTRelationship.Copy(relationship, compositeEntity, toCompositeEntity);
+                    //ECLog.logInfo("Adding Composite Version Relationship to Composite object: " + newRelationship);
+                    compositeEntity.addRelationship(newRelationship);
+                    relationshipsToResolve.add(newRelationship);
+                }
+            }
+            compositeEntity.getModule().addEntity(compositeEntity);
+            space.addEntity(compositeEntity);
+        }
+
+        // ------------------------------------------------
+        // It turns out that for any entity related to a
+        // Released entity we also need to create a Released
+        // version of it so it.
+        // ------------------------------------------------
+
+        for (MTRelationship relationship : relationshipsToResolve) {
+            relationship.resolveReferences(space, 3);
+            if (relationship.getTo().getEntity() == null) {
+                ECLog.logFatal("Why cant we resolve this relationship?: " + relationship.getName());
+            }
+            else {
+                //ECLog.logInfo("Newly created relationship is resolved: " + relationship.getFrom().getEntityName() + "." + relationship.getName());
+            }
+        }
 //        for (MTModule module : space.getModules()) {
 //
 //            if (module.isIncluded()) {

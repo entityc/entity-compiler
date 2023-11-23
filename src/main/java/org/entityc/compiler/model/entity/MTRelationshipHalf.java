@@ -8,6 +8,7 @@ package org.entityc.compiler.model.entity;
 
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.entityc.compiler.model.MTNode;
+import org.entityc.compiler.model.config.MTSpace;
 import org.entityc.compiler.model.visitor.MTVisitor;
 
 public class MTRelationshipHalf extends MTNode {
@@ -28,7 +29,15 @@ public class MTRelationshipHalf extends MTNode {
         this.entityName = entityName;
     }
 
-    public HalfRelationshipPlurality getPlurality() {
+    public boolean resolveReferences(MTSpace space, int pass) {
+        if (this.entity != null) {
+            return false;
+        }
+        this.entity = space.getEntityWithName(entityName);
+        return this.entity == null;
+    }
+
+        public HalfRelationshipPlurality getPlurality() {
         return plurality;
     }
 
