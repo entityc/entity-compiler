@@ -21,10 +21,10 @@ public class FTNameAsFilter extends FTFilter {
 
     public FTNameAsFilter() {
         super(null, "nameas",
-            "Places underscore between words then forces all characters to be lowercase.");
+            "Changes the input string (considered a \"name\" because it is using camel case) to another string based on the specified method.");
         this.addFilterParam(new FTFilterParam("method",
             "Specifies the naming method: " + String.join(", ", Arrays.stream(MTNamingMethod.values()).map(MTNamingMethod::getName).toArray(String[]::new))));
-        addSingleInputType(String.class, "The string to change into an underscore lowercase format.");
+        addSingleInputType(String.class, "The camel case name string to change.");
     }
 
     @Override
@@ -44,7 +44,7 @@ public class FTNameAsFilter extends FTFilter {
             }
             else
             {
-                ECLog.logFatal(ctx, "Naming method must be specified directly. For example: entity|nameas:uppercase");
+                ECLog.logFatal(ctx, "Naming method must be specified directly. For example: entity.name|nameas:uppercase");
             }
             MTNamingMethod namingMethod = MTNamingMethod.fromName(methodName);
             if (namingMethod == null) {
