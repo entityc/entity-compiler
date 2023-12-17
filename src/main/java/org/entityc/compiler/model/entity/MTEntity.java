@@ -868,6 +868,21 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
 
     @ModelMethod(
         category = ModelMethodCategory.RELATIONSHIP,
+        description = "Returns the first relationships from this entity to a specified entity by its name. This method should be used when only one is expected.")
+    public MTRelationship getRelationshipWithToEntityNamed(
+        @ModelMethodParameter(description = "The entity that the relationships are **to**.")
+        String toEntityName) {
+        List<MTRelationship> matchingRelationships = new ArrayList<>();
+        for (MTRelationship relationship : relationships) {
+            if (relationship.getTo().getEntityName().equals(toEntityName)) {
+                return relationship;
+            }
+        }
+        return null;
+    }
+
+    @ModelMethod(
+        category = ModelMethodCategory.RELATIONSHIP,
         description =
             "Returns the one relationship of this entity that is both declared as `parent` and **not** declared "
             + "as `optional` and is **to** the named entity.")

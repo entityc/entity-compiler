@@ -1,6 +1,7 @@
 package org.entityc.compiler.model.entity;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.entityc.compiler.doc.annotation.*;
 import org.entityc.compiler.model.MTModule;
 import org.entityc.compiler.util.ECLog;
 
@@ -8,6 +9,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 
+@ModelClass(type = ModelClassType.ENTITY, description = "Represents a composite entity in your model.")
 public class MTCompositeEntity extends MTEntity {
 
     public static final String ObjectTag = "object";

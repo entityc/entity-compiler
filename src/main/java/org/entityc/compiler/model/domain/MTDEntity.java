@@ -363,8 +363,14 @@ public class MTDEntity extends MTNode implements MTReferenceResolution, MTDomain
         return domainAttribute;
     }
 
-    @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
-        description = "Returns the domain specific version of the specified relationship.")
+    @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
+        description = "Returns the domain specific version of the specified attribute.")
+    public MTDEAttribute getDomainAttributeByName(
+        @ModelMethodParameter(description = "The name of the attribute to return.")
+        String attributeName) {
+        return getDomainAttributeByName(attributeName, false);
+    }
+
     public MTDERelationship getDomainEntityRelationshipByName(
         @ModelMethodParameter(description = "The name of the relationship to return.")
             String name,
