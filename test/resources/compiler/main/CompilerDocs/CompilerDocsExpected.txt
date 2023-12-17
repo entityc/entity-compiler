@@ -518,6 +518,7 @@ Model classes of this type are directly related to the entities in your model. T
 |[`MTAttribute`](#class_MTAttribute)|Represents an attribute of an entity.|
 |[`MTAttributeConstraint`](#class_MTAttributeConstraint)|Represents some type of constraint placed upon an attribute. Constraints can help prevent attributes from receiving values that are not valid for a specific application.|
 |[`MTBitField`](#class_MTBitField)|Represents a bit field of an attribute.|
+|[`MTCompositeEntity`](#class_MTCompositeEntity)|Represents a composite entity in your model.|
 |[`MTEntity`](#class_MTEntity)|Represents an entity in your model.|
 |[`MTEntityTemplate`](#class_MTEntityTemplate)|An Entity Template is the declaration of an entity in a parameterized way, such as `MyEntity<T,S>` where `T` and `S` are parameters that are used in the body of the definition to parameterize the entity. This entity template can then be used as a template to create other entities. Currently template entites can only be used in a special usage of a relationship.|
 |[`MTEnum`](#class_MTEnum)|Represents an enum in your model.|
@@ -730,6 +731,15 @@ These methods relate to attributes.
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `int` **`width`** |
 | The number of bits wide of the bit field. |
+
+
+<a name="class_MTCompositeEntity">
+## MTCompositeEntity Class
+</a>
+
+Represents a composite entity in your model.
+
+This class has the following methods broken up into categories:
 
 
 <a name="class_MTEntity">
@@ -1058,6 +1068,9 @@ These methods relate to relationships.
 | `MTRelationship` [**`relationshipWithToEntity(MTEntity toEntity)`**](#class_MTEntity_relationshipWithToEntity) |
 | Returns the first relationships from this entity to a specified entity. This method should be used when only one is expected. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRelationship` [**`relationshipWithToEntityNamed(String toEntityName)`**](#class_MTEntity_relationshipWithToEntityNamed) |
+| Returns the first relationships from this entity to a specified entity by its name. This method should be used when only one is expected. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `List` **`relationships`** |
 | Returns the list of relationships of this entity. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
@@ -1169,6 +1182,16 @@ Returns the first relationships from this entity to a specified entity. This met
 | Parameter | Description |
 |-----|-----|
 |`MTEntity toEntity` | The entity that the relationships are **to**. |
+
+<a name="class_MTEntity_relationshipWithToEntityNamed">
+#### Method `MTRelationship relationshipWithToEntityNamed(String toEntityName)`
+</a>
+
+Returns the first relationships from this entity to a specified entity by its name. This method should be used when only one is expected.
+
+| Parameter | Description |
+|-----|-----|
+|`String toEntityName` | The entity that the relationships are **to**. |
 
 
 <a name="class_MTEntity_relationshipsWithToEntity">
@@ -2316,6 +2339,9 @@ These methods relate to attributes.
 | `MTDEAttribute` [**`domainAttributeByName(String attributeName, boolean createIfNeeded)`**](#class_MTDEntity_domainAttributeByName) |
 | Returns the domain specific version of the specified attribute. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTDEAttribute` [**`domainAttributeByName(String attributeName)`**](#class_MTDEntity_domainAttributeByName) |
+| Returns the domain specific version of the specified attribute. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `Collection` **`domainAttributes`** |
 | Returns all the domain attributes from this domain entity. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
@@ -2357,6 +2383,16 @@ Returns the domain specific version of the specified attribute.
 |`String attributeName` | The name of the attribute to return. |
 |`boolean createIfNeeded` | If the domain based attribute has not yet been created, specifying `true` will make sure it is created before returning it. Otherwise `null` will be returned if it was not yet created. |
 
+<a name="class_MTDEntity_domainAttributeByName">
+#### Method `MTDEAttribute domainAttributeByName(String attributeName)`
+</a>
+
+Returns the domain specific version of the specified attribute.
+
+| Parameter | Description |
+|-----|-----|
+|`String attributeName` | The name of the attribute to return. |
+
 
 <a name="class_MTDEntity_flatDeclaredAttributeList">
 #### Method `Collection flatDeclaredAttributeList(MFArray ofTypes)`
@@ -2390,9 +2426,6 @@ These methods relate to relationships.
 | `List` **`declaredDomainRelationships`** |
 | Returns the list of domain relationships that are explicitly defined in the domain. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
-| `MTDERelationship` [**`domainEntityRelationshipByName(String name, boolean createIfNeeded)`**](#class_MTDEntity_domainEntityRelationshipByName) |
-| Returns the domain specific version of the specified relationship. |
-|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`hasDeclaredDomainRelationships`** |
 | Indicates if any relationships were declared in this domain entity declaration. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
@@ -2410,24 +2443,6 @@ These methods relate to relationships.
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `Collection` **`relationships`** |
 | Returns the all the domain relationships of this domain entity. |
-
-
-<a name="class_MTDEntity_domainEntityRelationshipByName">
-#### Method `MTDERelationship domainEntityRelationshipByName(String name, boolean createIfNeeded)`
-</a>
-
-Returns the domain specific version of the specified relationship.
-
-| Parameter | Description |
-|-----|-----|
-|`String name` | The name of the relationship to return. |
-|`boolean createIfNeeded` | If the domain based relationship has not yet been created, specifying `true` will make sure it is created before returning it. Otherwise `null` will be returned if it was not yet created. |
-
-
-
-
-
-
 
 ### Tagging Category
 
