@@ -10,6 +10,7 @@ import org.antlr.v4.runtime.ParserRuleContext;
 import org.entityc.compiler.model.foundation.MFArray;
 import org.entityc.compiler.transform.template.tree.FTTransformSession;
 import org.entityc.compiler.transform.template.tree.expression.FTExpression;
+import org.entityc.compiler.util.ECStringUtil;
 
 import java.util.List;
 import java.util.Map;
@@ -32,6 +33,7 @@ public class FTJoinFilter extends FTFilter {
         String delim = " ";
         if (hasOptionValue(options, delimiterOption)) {
             delim = getOptionStringValue(options, delimiterOption);
+            delim = ECStringUtil.ProcessParserString(delim);
         }
         if (input instanceof String) {
             String inputString = (String) input;

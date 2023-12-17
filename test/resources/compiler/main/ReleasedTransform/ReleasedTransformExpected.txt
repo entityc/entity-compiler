@@ -1,0 +1,77 @@
+
+entity ReleasedThing {
+
+    D ""
+
+    primarykey uuid thingId {
+        D ""
+    }
+
+    attributes {
+        string identifier  { D "" }
+        string title  { D "" }
+        string description  { D "" }
+        int64 number  { D "" }
+        string notes  { D "" }
+    }
+
+    relationships {
+        ONE ProductLineRelease productLineRelease {
+            D ""
+        }
+        ONE ReleasedWidget widget {
+            D ""
+        }
+    }
+}
+
+entity ReleasedWidget {
+
+    D ""
+
+    primarykey uuid widgetId {
+        D ""
+    }
+
+    attributes {
+        string identifier  { D "" }
+        string title  { D "" }
+        string description  { D "" }
+        int64 number  { D "" }
+        string notes  { D "" }
+    }
+
+    relationships {
+        ONE ProductLineRelease productLineRelease {
+            D ""
+        }
+        ONE ReleasedWidgetType type {
+            D ""
+        }
+    }
+}
+
+entity ReleasedWidgetType {
+
+    D ""
+
+    primarykey uuid widgetTypeId {
+        D ""
+    }
+
+    attributes {
+        string identifier  { D "" }
+        string title  { D "" }
+        string description  { D "" }
+    }
+
+    relationships {
+        ONE ProductLineRelease productLineRelease {
+            D ""
+        }
+        MANY ReleasedWidget widgets {
+            D ""
+        }
+    }
+}
+

@@ -104,6 +104,12 @@ public class MTDEntity extends MTNode implements MTReferenceResolution, MTDomain
         return declaredDomainAttributes.size() > 0;
     }
 
+    @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
+        description = "Indicates if any relationships were declared in this domain entity declaration.")
+    public boolean hasDeclaredDomainRelationships() {
+        return declaredDomainRelationships.size() > 0;
+    }
+
     public void addAttribute(MTAttribute attribute) {
         if (entity != null && entity.hasAttributeNamed(attribute.getName())) {
             ECLog.logFatal(attribute, "The entity already has an attribute by the name: " + attribute.getName());
@@ -357,8 +363,14 @@ public class MTDEntity extends MTNode implements MTReferenceResolution, MTDomain
         return domainAttribute;
     }
 
-    @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
-        description = "Returns the domain specific version of the specified relationship.")
+    @ModelMethod(category = ModelMethodCategory.ATTRIBUTE,
+        description = "Returns the domain specific version of the specified attribute.")
+    public MTDEAttribute getDomainAttributeByName(
+        @ModelMethodParameter(description = "The name of the attribute to return.")
+        String attributeName) {
+        return getDomainAttributeByName(attributeName, false);
+    }
+
     public MTDERelationship getDomainEntityRelationshipByName(
         @ModelMethodParameter(description = "The name of the relationship to return.")
             String name,
@@ -564,9 +576,16 @@ public class MTDEntity extends MTNode implements MTReferenceResolution, MTDomain
 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description = "Returns the primary parent relationship of this domain entity. A primary parent "
-                      + "relationship is one that has been declared as `parent` and **not** declared `optional`.")
+            + "relationship is one that has been declared as `parent` and **not** declared `optional`.")
     public MTDERelationship primaryParentRelationship() {
         return getDomainEntityRelationshipByName(entity.getPrimaryParentRelationship().getName(), true);
+    }
+
+    @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
+        description = "Indicates whether this domain entity has a parent relationship. A parent "
+            + "relationship is one that has been declared as `parent`")
+    public boolean hasParentRelationship() {
+        return entity != null && entity.hasParentRelationship();
     }
 
     public MTDView getDomainEntityViewByName(String viewName, boolean createIfNeeded) {
@@ -871,5 +890,10 @@ public class MTDEntity extends MTNode implements MTReferenceResolution, MTDomain
             return entity.getSpace();
         }
         return null;
+    }
+
+    @Override
+    public String toString() {
+        return domain.getName() + "." + entityName;
     }
 }

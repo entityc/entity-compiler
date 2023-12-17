@@ -6,6 +6,7 @@
 
 package org.entityc.compiler.model.domain;
 
+import org.entityc.compiler.util.ECLog;
 import org.entityc.compiler.util.ECStringUtil;
 
 public enum MTNamingMethod {
@@ -37,6 +38,10 @@ public enum MTNamingMethod {
             }
         }
         return null;
+    }
+
+    public String getName() {
+        return name;
     }
 
     public String getDelimiter() {

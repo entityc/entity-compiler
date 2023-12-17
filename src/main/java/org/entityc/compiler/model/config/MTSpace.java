@@ -13,10 +13,7 @@ import org.entityc.compiler.doc.annotation.ModelClassType;
 import org.entityc.compiler.doc.annotation.ModelMethod;
 import org.entityc.compiler.doc.annotation.ModelMethodCategory;
 import org.entityc.compiler.doc.annotation.ModelMethodParameter;
-import org.entityc.compiler.model.MTModule;
-import org.entityc.compiler.model.MTNamespace;
-import org.entityc.compiler.model.MTNode;
-import org.entityc.compiler.model.MTReferenceResolution;
+import org.entityc.compiler.model.*;
 import org.entityc.compiler.model.domain.MTDomain;
 import org.entityc.compiler.model.domain.MTNamed;
 import org.entityc.compiler.model.entity.MTEntity;
@@ -46,6 +43,7 @@ import java.util.Map;
                       + "list of modules or entities in your model.")
 public class MTSpace extends MTNode implements MTReferenceResolution, MTTemplateSupport, MTNamed {
 
+    private final Map<String, MTRealm>          realmMap             = new HashMap<>();
     private final Map<String, MTModule>         moduleMap            = new HashMap<>();
     private final Map<String, MTEntity>         entityMap            = new HashMap<>();
     private final Map<String, MTEntityTemplate> entityTemplateMap    = new HashMap<>();
@@ -130,6 +128,20 @@ public class MTSpace extends MTNode implements MTReferenceResolution, MTTemplate
             @ModelMethodParameter(description = "The name of the repository.")
             String name) {
         return repositoryMap.get(name);
+    }
+
+    public void addRealm(MTRealm realm) {
+        realmMap.put(realm.getName(), realm);
+    }
+
+    @ModelMethod(category = ModelMethodCategory.CONFIGURATION, description = "Returns the realm object by its name.")
+    public MTRealm getRealmWithName(String realm) {
+        return realmMap.get(realm);
+    }
+
+    @ModelMethod(category = ModelMethodCategory.CONFIGURATION, description = "Returns true if there is a realm by this name.")
+    public boolean hasRealmWithName(String realm) {
+        return realmMap.containsKey(realm);
     }
 
     public void addModule(MTModule module) {

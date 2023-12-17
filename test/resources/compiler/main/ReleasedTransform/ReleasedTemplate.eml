@@ -1,0 +1,73 @@
+$[*
+    The purpose of this template is to test that the ReleasedTransform worked correctly.
+*]
+$[ function CheckIfReleasedEntity
+   (entity
+   )->
+   (isReleasedEntity
+   ) ]
+    $[ let isReleasedEntity = entity.isCompositeEntity && entity.isInRealm("Released") ]
+$[/ function ]
+$[ function GetReleaseEntityPKAttribute
+   (entity
+   )->
+   (releaseEntityPKAttribute
+   ) ]
+    $[ let isReleasedEntity = entity.isCompositeEntity && entity.isInRealm("Released") ]
+    $[ if !isReleasedEntity ]
+        $[ return ]
+    $[/ if ]
+    $[ let releaseEntity = entity.getAnyConstituentEntity("release") ]
+    $[ if releaseEntity != null ]
+        $[ let releaseEntityPKAttribute = releaseEntity.primaryKeyAttribute ]
+    $[/ if ]
+$[/ function ]
+$[ function GetRelationshipToReleaseEntity
+   (entity
+   )->
+   (relationship
+   ) ]
+    $[ let isReleasedEntity = entity.isCompositeEntity && entity.isInRealm("Released") ]
+    $[ if !isReleasedEntity ]
+        $[ return ]
+    $[/ if ]
+    $[ let releaseEntity = entity.getAnyConstituentEntity("release") ]
+    $[ let relationship = null ]
+    $[ if releaseEntity != null ]
+        $[ if entity.hasRelationshipToEntityNamed(releaseEntity.name) ]
+            $[ let relationship = entity.getRelationshipWithToEntity(releaseEntity) ]
+        $[/ if ]
+    $[/ if ]
+$[/ function ]
+$[ file "" "ReleasedTransform" "txt" ]
+
+    $[ foreach entity in space.entities ]
+        $[ call CheckIfReleasedEntity(entity: entity)->(isReleasedEntity: isReleasedEntity) ]
+        $[ if !isReleasedEntity ]
+            $[ continue ]
+        $[/ if ]
+entity ${entity.name} {
+
+    D "${entity.description}"
+
+    primarykey ${entity.primaryKeyAttribute.type} ${entity.primaryKeyAttribute.name} {
+        D "${entity.primaryKeyAttribute.description}"
+    }
+
+    attributes {
+        $[ foreach attribute in entity.attributes ]
+        ${attribute.type} ${attribute.name}  { D "${attribute.description}" }
+        $[/ foreach ]
+    }
+
+    relationships {
+        $[ foreach relationship in entity.relationships ]
+        ${relationship.to.plurality} ${relationship.to.entity.name} ${relationship.name} {
+            D "${relationship.description}"
+        }
+        $[/ foreach ]
+    }
+}
+
+    $[/ foreach ]
+$[/ file ]

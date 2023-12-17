@@ -15,7 +15,7 @@ public class MTSecondaryRelationship extends MTRelationship {
     private       MTRelationship     relationship;
 
     public MTSecondaryRelationship(String fullName, Stack<MTAttribute> path, MTRelationship relationship) {
-        super(fullName, relationship);
+        super(fullName, relationship, relationship.getFrom(), null);
         this.fullName = fullName;
         this.path     = path;
     }

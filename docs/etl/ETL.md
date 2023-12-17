@@ -128,6 +128,7 @@ Here is the full list of filters:
 | [`lowercase`](#filter_detail_lowercase) | Forces all characters of the input to be lowercase. |
 | [`map`](#filter_detail_map) | This filter is probably the most complicated one but can be very powerful in helping to pattern match an expression at its input with one provided as a parameter. When the expressions match, it not only returns true but also maps operands from the input expression to the parameter expression. |
 | [`name`](#filter_detail_name) | This simply calls `getName()` on the input. It is more of a convenient way to get the name by using a filter. |
+| [`nameas`](#filter_detail_nameas) | Places underscore between words then forces all characters to be lowercase. |
 | [`path`](#filter_detail_path) | This will convert a string or namespace object into a string where by a '/' character is used as a delimiter instead of a '.'. This is useful when you need to convert a namespace into a filepath. |
 | [`plural`](#filter_detail_plural) | This will attempt to pluralize the last word of the input string. If it can't determine the pluralization it may just return the same string. |
 | [`reverse`](#filter_detail_reverse) | Given a collection of objects, this will return a collection that has the reverse order of the input. |
@@ -413,6 +414,25 @@ Valid inputs for this filter are:
 | Class of Valid Input | Description |
 |---|---|
 | `MTNamed` | Any class that has a `name` property or `getName()` method. |
+
+<hr/>
+
+<a name="filter_detail_nameas"></a>
+##### Filter: `nameas`
+
+Places underscore between words then forces all characters to be lowercase.
+
+Valid inputs for this filter are:
+
+| Class of Valid Input | Description |
+|---|---|
+| `String` | The string to change into an underscore lowercase format. |
+
+This filter has the following parameters:
+
+| Usage with Parameter | Description |
+|---|---|
+| `nameas:`*method* | Specifies the naming method: standard, underscore, underscoreLowercase, underscoreUppercase, lowercase, uppercase, capitalize, dashesLowercase, dashesUppercase, parentPrefix |
 
 <hr/>
 

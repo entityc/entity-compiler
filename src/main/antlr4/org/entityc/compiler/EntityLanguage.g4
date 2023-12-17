@@ -91,6 +91,7 @@ HUMAN        : 'human' ;
 READABLE     : 'readable' ;
 IDENTIFICATION : 'identification' ;
 
+REALM        : 'realm' ;
 DOMAIN       : 'domain' ;
 ATTRIBUTES   : 'attributes' ;
 REPLACES     : 'replaces' ;
@@ -189,7 +190,7 @@ ident
   | INTERFACE | OPERATION | QUERY | STATUS | CUSTOM | PARAM | TYPE | ENDPOINT
   | CONFIG | CONTEXT | ARGUMENT | HUMAN | READABLE | IDENTIFICATION | NAME | ORGANIZATION
   | REQUIRES | ROLE | READ | WRITE | WHEN | USER | ARRAY
-  | APPLY | DESCRIPTION | TAGS | METADATA | FORMATTING | FORMAT | COMMENTS
+  | APPLY | DESCRIPTION | TAGS | METADATA | FORMATTING | FORMAT | COMMENTS | REALM
   ;
 
 macro
@@ -274,6 +275,7 @@ root
     | entity
     | enumStatement
     | domain
+    | realm
     | configuration
     | units
     | language
@@ -364,7 +366,8 @@ attributes
 
 attributesBody
     :
-    ( attribute
+    ( tagStatement
+    | attribute
     )*
     ;
 
@@ -411,7 +414,8 @@ relationships
 
 relationshipsBody
     :
-    ( relationshipStatement
+    ( tagStatement
+    | relationshipStatement
     )*
     ;
 
@@ -583,6 +587,17 @@ bitCount
     : '(' INTEGER ')'
     ;
 
+realm
+    : REALM id '{' realmBody '}'
+    ;
+
+realmBody
+    :
+    ( descriptionStatement
+    | tagStatement
+    | domain
+    )*
+    ;
 /*
  *
  DOMAIN
@@ -753,7 +768,7 @@ domainApplyTemplateBody
     :
     ( descriptionStatement
     | tagStatement
-    | templateConfig
+    | transformConfig
     )*
     ;
 
@@ -761,7 +776,7 @@ defaultTemplateConfig
     : DEFAULT CONFIG jsonObj
     ;
 
-templateConfig
+transformConfig
     : CONFIG jsonObj
     ;
 
@@ -835,7 +850,8 @@ domainAttributes
 
 domainAttributesBody
     :
-    ( domainAttributesRenameTo
+    ( tagStatement
+    | domainAttributesRenameTo
     | domainAttributesRenameAppendPrepend
     | domainAttributeReplaces
     | domainAttributeExclude
@@ -895,13 +911,40 @@ domainAttributeBody
     )*
     ;
 
+/*
+These are attributes of the "to" entity of a relationship. This allows
+tagging of attributes with respect to its "path" from a relationship.
+*/
+domainRelationshipAttributes
+    : ATTRIBUTES '{' domainRelationshipAttributesBody '}'
+    ;
+
+domainRelationshipAttributesBody
+    :
+    ( tagStatement
+    | domainRelationshipAttribute
+    )*
+    ;
+
+domainRelationshipAttribute
+    : id '{' domainRelationshipAttributeBody '}'
+    ;
+
+domainRelationshipAttributeBody
+    :
+    ( descriptionStatement
+    | tagStatement
+    )*
+    ;
+
 domainRelationships
     : RELATIONSHIPS '{' domainRelationshipsBody '}'
     ;
 
 domainRelationshipsBody
     :
-    ( domainRelationship
+    ( tagStatement
+    | domainRelationship
     )*
     ;
 
@@ -913,6 +956,7 @@ domainRelationshipBody
     :
     ( descriptionStatement
     | tagStatement
+    | domainRelationshipAttributes
     )*
     ;
 
@@ -1216,7 +1260,7 @@ templateBody
     ( descriptionStatement
     | tagStatement
     | outputSpec
-    | templateConfig
+    | transformConfig
     )*
     ;
 
@@ -1236,6 +1280,8 @@ transform
 transformBody
     :
     ( outputSpec
+    | transformConfig
+    | REALM id
     )*
     ;
 

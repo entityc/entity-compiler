@@ -11,8 +11,10 @@ import org.entityc.compiler.model.MTNode;
 import org.entityc.compiler.model.MTReferenceResolution;
 import org.entityc.compiler.model.config.MTSpace;
 import org.entityc.compiler.model.entity.HalfRelationshipPlurality;
+import org.entityc.compiler.model.entity.MTEntity;
 import org.entityc.compiler.model.entity.MTRelationshipHalf;
 import org.entityc.compiler.model.visitor.MTVisitor;
+import org.entityc.compiler.util.ECLog;
 
 public class MTDERelationshipHalf extends MTNode implements MTDomainBased, MTReferenceResolution {
 

@@ -374,6 +374,9 @@ These methods relate to a part of application configuration.
 | `boolean` [**`hasMetadataValue(String name)`**](#class_MTSpace_hasMetadataValue) |
 | Indicates whether this space has a metadata name/value for the specified name. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasRealmWithName(String realm)`**](#class_MTSpace_hasRealmWithName) |
+| Returns true if there is a realm by this name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `List` **`importEntityNames`** |
 | Returns the names of the entities that have been imported into this space. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
@@ -382,6 +385,9 @@ These methods relate to a part of application configuration.
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `Object` [**`metadataValue(String name)`**](#class_MTSpace_metadataValue) |
 | Spaces can define a dictionary of name/value pairs that provide some meta data about the space and basically the application. This method allows you to get a value by its name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRealm` [**`realmWithName(String realm)`**](#class_MTSpace_realmWithName) |
+| Returns the realm object by its name. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `MTRepository` [**`repository(String name)`**](#class_MTSpace_repository) |
 | Returns the repository object by its name. |
@@ -399,6 +405,16 @@ Indicates whether this space has a metadata name/value for the specified name.
 |-----|-----|
 |`String name` | The name of the metadata value to return. |
 
+<a name="class_MTSpace_hasRealmWithName">
+#### Method `boolean hasRealmWithName(String realm)`
+</a>
+
+Returns true if there is a realm by this name.
+
+| Parameter | Description |
+|-----|-----|
+|`String realm` | *no description* |
+
 
 
 <a name="class_MTSpace_metadataValue">
@@ -410,6 +426,16 @@ Spaces can define a dictionary of name/value pairs that provide some meta data a
 | Parameter | Description |
 |-----|-----|
 |`String name` | The name of the meta data. |
+
+<a name="class_MTSpace_realmWithName">
+#### Method `MTRealm realmWithName(String realm)`
+</a>
+
+Returns the realm object by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String realm` | *no description* |
 
 <a name="class_MTSpace_repository">
 #### Method `MTRepository repository(String name)`
@@ -729,6 +755,12 @@ These methods relate to an entity.
 
 | Method/Property |
 |---|
+| `void` [**`addRealm(String realm)`**](#class_MTEntity_addRealm) |
+| Adds the entity to a realm. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isCompositeEntity`** |
+| Returns true if this entity is a composite entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`isDeclaredAsPrimary`** |
 | Indicates whether this entity was **declared** `primary`. If the entity was **not** declared with the `primary` keyword then this will return false even if it is implied as primary. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
@@ -740,6 +772,9 @@ These methods relate to an entity.
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`isImplicit`** |
 | Indicates whether this entity was created by the compiler because it represents an implicit entity, such as in a many-to-many relationship. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`isInRealm(String realm)`**](#class_MTEntity_isInRealm) |
+| Returns true if this entity is part of a realm. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`isPrimary`** |
 | Indicates whether this entity was declared `primary` or if it was inferred as primary. If an entity has a primary key it is inferred to be a primary entity. |
@@ -758,6 +793,37 @@ These methods relate to an entity.
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `MTSpace` **`space`** |
 | Returns the space in which this entity was declared. |
+
+<a name="class_MTEntity_addRealm">
+#### Method `void addRealm(String realm)`
+</a>
+
+Adds the entity to a realm.
+
+| Parameter | Description |
+|-----|-----|
+|`String realm` | *no description* |
+
+
+
+
+
+
+<a name="class_MTEntity_isInRealm">
+#### Method `boolean isInRealm(String realm)`
+</a>
+
+Returns true if this entity is part of a realm.
+
+| Parameter | Description |
+|-----|-----|
+|`String realm` | *no description* |
+
+
+
+
+
+
 
 ### Entity Template Category
 
@@ -848,6 +914,9 @@ These methods relate to attributes.
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`hasBitFields`** |
 | Indicates whether this entity defines any bit fields. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRelationship` [**`relationshipNamed(String name)`**](#class_MTEntity_relationshipNamed) |
+| Returns an relationship of this entity with the specified name. |
 
 <a name="class_MTEntity_attributeByFullName">
 #### Method `MTAttribute attributeByFullName(String fullName)`
@@ -916,6 +985,16 @@ Indicates whether any of the attributes of this entity are of the specified data
 
 
 
+<a name="class_MTEntity_relationshipNamed">
+#### Method `MTRelationship relationshipNamed(String name)`
+</a>
+
+Returns an relationship of this entity with the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the relationship to return. |
+
 ### Relationship Category
 
 These methods relate to relationships.
@@ -949,6 +1028,9 @@ These methods relate to relationships.
 | `boolean` **`hasPrimaryParentRelationship`** |
 | Indicates whether this entity has a primary parent relationship. A primary parent relationship is one which is declared `parent` and **not** declared `optional`. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasRelationshipNamed(String name)`**](#class_MTEntity_hasRelationshipNamed) |
+| Indicates whether this entity has an relationship with the specified name. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`hasRelationships`** |
 | Indicates whether this entity defines any relationships. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
@@ -972,6 +1054,9 @@ These methods relate to relationships.
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `int` **`relationshipCount`** |
 | Returns the number of declared relationships. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTRelationship` [**`relationshipWithToEntity(MTEntity toEntity)`**](#class_MTEntity_relationshipWithToEntity) |
+| Returns the first relationships from this entity to a specified entity. This method should be used when only one is expected. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `List` **`relationships`** |
 | Returns the list of relationships of this entity. |
@@ -1039,6 +1124,16 @@ Indicates whether it has a least one relationship declared as parent to the spec
 |`MTEntity parentEntity` | *no description* |
 
 
+<a name="class_MTEntity_hasRelationshipNamed">
+#### Method `boolean hasRelationshipNamed(String name)`
+</a>
+
+Indicates whether this entity has an relationship with the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | *no description* |
+
 
 
 
@@ -1064,6 +1159,16 @@ Returns a relationship of this entity by name. If a relationship is not found wi
 |-----|-----|
 |`String relationshipName` | The name of the relationship to return. |
 
+
+<a name="class_MTEntity_relationshipWithToEntity">
+#### Method `MTRelationship relationshipWithToEntity(MTEntity toEntity)`
+</a>
+
+Returns the first relationships from this entity to a specified entity. This method should be used when only one is expected.
+
+| Parameter | Description |
+|-----|-----|
+|`MTEntity toEntity` | The entity that the relationships are **to**. |
 
 
 <a name="class_MTEntity_relationshipsWithToEntity">
@@ -1131,6 +1236,9 @@ These methods relate to the tagging.
 | `boolean` [**`hasRelationshipTagged(String tag)`**](#class_MTEntity_hasRelationshipTagged) |
 | Indicates whether this entity has at least one relationship with the specified tag. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`hasRelationshipToEntityNamed(String toEntityName)`**](#class_MTEntity_hasRelationshipToEntityNamed) |
+| Indicates whether this entity has at least one relationship to a named other entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` [**`hasRelationshipToEntityTagged(String tag)`**](#class_MTEntity_hasRelationshipToEntityTagged) |
 | Indicates whether the entity **to** which a relationship references is tagged with the specified tag. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
@@ -1189,6 +1297,16 @@ Indicates whether this entity has at least one relationship with the specified t
 | Parameter | Description |
 |-----|-----|
 |`String tag` | The tag with which to search. |
+
+<a name="class_MTEntity_hasRelationshipToEntityNamed">
+#### Method `boolean hasRelationshipToEntityNamed(String toEntityName)`
+</a>
+
+Indicates whether this entity has at least one relationship to a named other entity.
+
+| Parameter | Description |
+|-----|-----|
+|`String toEntityName` | The name of the other entity. |
 
 <a name="class_MTEntity_hasRelationshipToEntityTagged">
 #### Method `boolean hasRelationshipToEntityTagged(String tag)`
@@ -1262,6 +1380,9 @@ These methods relate to enums.
 | `boolean` **`isExtern`** |
 | Indicates whether this was declared as `extern`. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTEnumItem` [**`item(Long index)`**](#class_MTEnum_item) |
+| Returns an item by its index. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `List` **`items`** |
 | Gets the enum items. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
@@ -1270,6 +1391,22 @@ These methods relate to enums.
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `String` **`name`** |
 | Gets the name of this enum. |
+
+
+
+
+<a name="class_MTEnum_item">
+#### Method `MTEnumItem item(Long index)`
+</a>
+
+Returns an item by its index.
+
+| Parameter | Description |
+|-----|-----|
+|`Long index` | *no description* |
+
+
+
 
 ### Tagging Category
 
@@ -1572,6 +1709,9 @@ These methods relate to relationships.
 | `MTRelationshipHalf` **`from`** |
 | Returns the "from" part of the relationship which references the entity in which this relationship is defined. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MTEntity` **`implicitToEntity`** |
+| Gets the entity on the other side of an implicit many-to-many entity. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`isImplicit`** |
 | Indicates whether the relationship was created because although it was not declared it can be implied based on relationships declared to this entity. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
@@ -1651,6 +1791,9 @@ These methods relate to data types.
 | `boolean` **`isByteArrayType`** |
 | Indicates whether this type is both an array type and also `byte` data type. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isDataType`** |
+| Indicates whether this type is the `data` data type. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`isDateType`** |
 | Indicates whether this type is the `date` data type. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
@@ -1674,6 +1817,7 @@ These methods relate to data types.
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`isUUIDType`** |
 | Indicates whether this type is a UUID. |
+
 
 
 
@@ -1764,6 +1908,7 @@ Model classes that are domain specific are of this type. The classes are briefly
 |[`MTDEAttribute`](#class_MTDEAttribute)|Represents an attribute in your model in the context of a domain.|
 |[`MTDEAttributeConstraintExpression`](#class_MTDEAttributeConstraintExpression)|Represents a constraint on an attribute in the form of an expression.|
 |[`MTDERelationship`](#class_MTDERelationship)|Represents a relationship in your model in the context of a domain.|
+|[`MTDERelationshipField`](#class_MTDERelationshipField)|Represents a field (attribute or relationship) associated with the __to__ entity of the relationship.|
 |[`MTDEntity`](#class_MTDEntity)|Represents an entity in your model in the context of a domain.|
 |[`MTDEnum`](#class_MTDEnum)|Represents an enum in the context of a domain.|
 |[`MTDEnumItem`](#class_MTDEnumItem)|Represents an enum item in the context of a domain.|
@@ -1957,6 +2102,9 @@ These methods relate to relationships.
 | `String` **`explicitName`** |
 | If this relationship was explicitly renamed within its domain, it will return that name. Otherwise it will return `null`. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` **`fields`** |
+| Returns all the declared fields of this relationship. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `String` [**`fullname(String delim)`**](#class_MTDERelationship_fullname) |
 | This returns the full name of this domain relationship which includes not only its domain based name but is also preceded with the domain's entity's full name. The delimiter can be provided which is used between all parts of the full name. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
@@ -1989,6 +2137,7 @@ These methods relate to relationships.
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `MTDERelationshipHalf` **`to`** |
 | Returns the "to" half of this domain relationship. |
+
 
 
 
@@ -2030,6 +2179,15 @@ Returns whether this relationship's "to" entity is tagged with the specified tag
 | Parameter | Description |
 |-----|-----|
 |`String tag` | The tag with which to check. |
+
+
+<a name="class_MTDERelationshipField">
+## MTDERelationshipField Class
+</a>
+
+Represents a field (attribute or relationship) associated with the __to__ entity of the relationship.
+
+This class has the following methods broken up into categories:
 
 
 <a name="class_MTDEntity">
@@ -2235,6 +2393,12 @@ These methods relate to relationships.
 | `MTDERelationship` [**`domainEntityRelationshipByName(String name, boolean createIfNeeded)`**](#class_MTDEntity_domainEntityRelationshipByName) |
 | Returns the domain specific version of the specified relationship. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasDeclaredDomainRelationships`** |
+| Indicates if any relationships were declared in this domain entity declaration. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`hasParentRelationship`** |
+| Indicates whether this domain entity has a parent relationship. A parent relationship is one that has been declared as `parent` |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `boolean` **`hasPrimaryParentRelationship`** |
 | Indicates whether this domain entity has a primary parent relationship. A primary parent relationship is one that has been declared as `parent` and **not** declared `optional`. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
@@ -2258,6 +2422,8 @@ Returns the domain specific version of the specified relationship.
 |-----|-----|
 |`String name` | The name of the relationship to return. |
 |`boolean createIfNeeded` | If the domain based relationship has not yet been created, specifying `true` will make sure it is created before returning it. Otherwise `null` will be returned if it was not yet created. |
+
+
 
 
 
@@ -2706,6 +2872,7 @@ The model classes of this type are intended to provide support for foundation ty
 | Class | Description |
 |-----|-----|
 |[`MFArray`](#class_MFArray)|This class represents a ordered array of objects. To create an empty array you can use: `$[let myList = @[]@]` then can use these methods on that variable (`myList` in this example) to access the array functionality that is exposed here.|
+|[`MFMap`](#class_MFMap)|This class represents a map of objects. To create an empty map you can use: `$[let myMap = @{}@]` then can use these methods on that variable (`myMap` in this example) to access the map functionality that is exposed here.|
 |[`MFSet`](#class_MFSet)|This class represents a unique set of objects. You cannot create an object of this class in template code, however, some classes have methods that will return such an object. Since this class does not offer methods to manipulate the object, it should be considered immutable. You can iterate through the items in a set using the `foreach` instruction. For example: `$[foreach item in mySet] ... $[/foreach]` would allow you to process each item(object) in the set.|
 
 <a name="class_MFArray">
@@ -2742,6 +2909,9 @@ These methods don't really have a category.
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `Object` **`first`** |
 | Returns the first item in the array. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Object` [**`get(Integer index)`**](#class_MFArray_get) |
+| Returns the specified item by its index into the array. |
 |<hr style="border-bottom:1px solid #77c;"><tr></tr>|
 | `Object` [**`get(Long index)`**](#class_MFArray_get) |
 | Returns the specified item by its index into the array. |
@@ -2796,6 +2966,16 @@ Indicates if the array contains the specified object.
 
 
 <a name="class_MFArray_get">
+#### Method `Object get(Integer index)`
+</a>
+
+Returns the specified item by its index into the array.
+
+| Parameter | Description |
+|-----|-----|
+|`Integer index` | The index into the array that points to the item to be returned. |
+
+<a name="class_MFArray_get">
 #### Method `Object get(Long index)`
 </a>
 
@@ -2826,6 +3006,138 @@ Allows you to remove a specified object from the array. This method returns the 
 | Parameter | Description |
 |-----|-----|
 |`Object o` | The object to remove from this array. |
+
+
+
+<a name="class_MFMap">
+## MFMap Class
+</a>
+
+This class represents a map of objects. To create an empty map you can use: `$[let myMap = @{}@]` then can use these methods on that variable (`myMap` in this example) to access the map functionality that is exposed here.
+
+This class has the following methods broken up into categories:
+
+### Other Category
+
+These methods don't really have a category.
+
+| Method/Property |
+|---|
+| `MFMap` **`clear`** |
+| This method removes all items in the map. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`containsKey(Object key)`**](#class_MFMap_containsKey) |
+| Indicates if the map contains the specified key. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` [**`containsValue(Object value)`**](#class_MFMap_containsValue) |
+| Indicates if the map contains the specified value. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MFMap` **`copy`** |
+| Allows you to make a copy of this map. Since it returns the new map you can chain other map methods after this one. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `int` **`count`** |
+| Returns the number of items in the map. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Object` [**`get(Object key)`**](#class_MFMap_get) |
+| Returns the value in the map by its specified key. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `boolean` **`isEmpty`** |
+| Indicates if the map is empty (no items). |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` **`keys`** |
+| Returns all the keys of the map |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MFMap` [**`put(Object key, Object o)`**](#class_MFMap_put) |
+| Allows you to add an object to this array. The `do` template instruction can be used to do this (e.g., `$[do array.add(obj)]`. This method returns the array itself so you can chain other array methods after this one. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MFMap` [**`putAll(MFMap otherMap)`**](#class_MFMap_putAll) |
+| Allows you to add all elements of another map to this map. The `do` template instruction can be used to do  this (e.g., `$[do map.putAll(otherMap)]`. This method returns the map itself so you can chain other map methods after this one. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MFMap` [**`remove(Object key)`**](#class_MFMap_remove) |
+| Allows you to remove a specified entry from the map based on its key. This method returns the map itself so you can chain other map methods after this one. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `MFMap` [**`remove(Object key, Object o)`**](#class_MFMap_remove) |
+| Allows you to remove a specified object from the map based on its key. This method returns the map itself so you can chain other map methods after this one. |
+|<hr style="border-bottom:1px solid #77c;"><tr></tr>|
+| `Collection` **`values`** |
+| Returns all the values of the map. When iterating this array of values with a `foreach` you do **not** need to use this method. |
+
+
+<a name="class_MFMap_containsKey">
+#### Method `boolean containsKey(Object key)`
+</a>
+
+Indicates if the map contains the specified key.
+
+| Parameter | Description |
+|-----|-----|
+|`Object key` | The key of which to determine its presence in the map. |
+
+<a name="class_MFMap_containsValue">
+#### Method `boolean containsValue(Object value)`
+</a>
+
+Indicates if the map contains the specified value.
+
+| Parameter | Description |
+|-----|-----|
+|`Object value` | The object of which to determine its presence in the map. |
+
+
+
+<a name="class_MFMap_get">
+#### Method `Object get(Object key)`
+</a>
+
+Returns the value in the map by its specified key.
+
+| Parameter | Description |
+|-----|-----|
+|`Object key` | The key. |
+
+
+
+<a name="class_MFMap_put">
+#### Method `MFMap put(Object key, Object o)`
+</a>
+
+Allows you to add an object to this array. The `do` template instruction can be used to do this (e.g., `$[do array.add(obj)]`. This method returns the array itself so you can chain other array methods after this one.
+
+| Parameter | Description |
+|-----|-----|
+|`Object key` | The key to put to the map. |
+|`Object o` | The object to set to the map. |
+
+<a name="class_MFMap_putAll">
+#### Method `MFMap putAll(MFMap otherMap)`
+</a>
+
+Allows you to add all elements of another map to this map. The `do` template instruction can be used to do  this (e.g., `$[do map.putAll(otherMap)]`. This method returns the map itself so you can chain other map methods after this one.
+
+| Parameter | Description |
+|-----|-----|
+|`MFMap otherMap` | The other map to add to this map. |
+
+<a name="class_MFMap_remove">
+#### Method `MFMap remove(Object key)`
+</a>
+
+Allows you to remove a specified entry from the map based on its key. This method returns the map itself so you can chain other map methods after this one.
+
+| Parameter | Description |
+|-----|-----|
+|`Object key` | The key to remove from this map. |
+
+<a name="class_MFMap_remove">
+#### Method `MFMap remove(Object key, Object o)`
+</a>
+
+Allows you to remove a specified object from the map based on its key. This method returns the map itself so you can chain other map methods after this one.
+
+| Parameter | Description |
+|-----|-----|
+|`Object key` | The key to remove from this map. |
+|`Object o` | The object to remove from this map. |
 
 
 

@@ -95,6 +95,9 @@ public class MTAttribute extends MTNode implements MTReferenceResolution, MTName
     protected MTAttribute(String secondaryName, MTAttribute primaryAttribute) {
         super(primaryAttribute.getParserRuleContext());
         this.name                        = secondaryName;
+        this.description = primaryAttribute.getDescription();
+        this.setSummary(primaryAttribute.getSummary());;
+        this.setDetail(primaryAttribute.getDetail());;
         this.entityName                  = primaryAttribute.entityName;
         this.entity                      = primaryAttribute.entity;
         this.unit                        = primaryAttribute.unit;

@@ -18,31 +18,36 @@ import org.entityc.compiler.model.config.MTSpace;
 import org.entityc.compiler.model.entity.MTRelationship;
 import org.entityc.compiler.model.visitor.MTVisitor;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 @ModelClass(type = ModelClassType.DOMAIN,
     description = "Represents a relationship in your model in the context of a domain.")
 public class MTDERelationship extends MTNode implements MTNamed, MTDomainBased, MTReferenceResolution {
 
-    private final String               relationshipName;
-    private       MTDomain             domain;
-    private       MTDEntity            domainEntity;
-    private       MTRelationship       relationship;
-    private       String               explicitName;
-    private       String               withViewName; // to-entity should map to a specific view
-    private       boolean              withPrimaryKey; // to-entity should map as its primary key only
-    private       MTDERelationshipHalf to;
-    private       boolean              resolvedReferences = false;
+    private final String relationshipName;
+    private MTDomain domain;
+    private MTDEntity domainEntity;
+    private MTRelationship relationship;
+    private String explicitName;
+    private String withViewName; // to-entity should map to a specific view
+    private boolean withPrimaryKey; // to-entity should map as its primary key only
+    private MTDERelationshipHalf to;
+    private boolean resolvedReferences = false;
+    private List<MTDERelationshipField> fields;
 
     public MTDERelationship(ParserRuleContext ctx, MTDEntity domainEntity, String relationshipName) {
         super(ctx);
-        this.domain           = domainEntity.getDomain();
-        this.domainEntity     = domainEntity;
+        this.domain = domainEntity.getDomain();
+        this.domainEntity = domainEntity;
         this.relationshipName = relationshipName;
     }
 
     public MTDERelationship(ParserRuleContext ctx, MTDomain domain, MTRelationship relationship) {
         super(ctx);
-        this.domain           = domain;
-        this.relationship     = relationship;
+        this.domain = domain;
+        this.relationship = relationship;
         this.relationshipName = relationship.getName();
     }
 
@@ -77,7 +82,7 @@ public class MTDERelationship extends MTNode implements MTNamed, MTDomainBased, 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description =
             "If this relationship was explicitly renamed within its domain, it will return that name. Otherwise "
-            + "it will return `null`.")
+                + "it will return `null`.")
     public String getExplicitName() {
         return explicitName;
     }
@@ -99,13 +104,29 @@ public class MTDERelationship extends MTNode implements MTNamed, MTDomainBased, 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description = "Indicates if this relationship is a one-to-many.")
     public boolean isOneToMany() {
-        return relationship.isOneToMany();
+        return relationship != null && relationship.isOneToMany();
     }
 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description = "Indicates if this relationship is a many-to-many.")
     public boolean isManyToMany() {
-        return relationship.isManyToMany();
+        return relationship != null && relationship.isManyToMany();
+    }
+
+    public void addField(MTDERelationshipField field) {
+        if (this.fields == null) {
+            this.fields = new ArrayList<>();
+        }
+        this.fields.add(field);
+    }
+
+    public boolean hasFields() {
+        return this.fields != null && this.fields.size() > 0;
+    }
+    @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
+        description = "Returns all the declared fields of this relationship.")
+    public Collection<MTDERelationshipField> getFields() {
+        return this.fields;
     }
 
     @Override
@@ -126,10 +147,17 @@ public class MTDERelationship extends MTNode implements MTNamed, MTDomainBased, 
         }
         if (relationship != null && to == null) {
             to = new MTDERelationshipHalf(relationship.getParserRuleContext(), domain, relationship.getTo(),
-                                          withViewName);
+                withViewName);
             to.setAsPrimaryKey(withPrimaryKey);
             if (to.resolveReferences(space, pass)) {
                 anotherPass = true;
+            }
+        }
+        if (fields != null) {
+            for (MTDERelationshipField field : fields) {
+                if (field.resolveReferences(space, pass)) {
+                    anotherPass = true;
+                }
             }
         }
         if (!anotherPass) {
@@ -146,21 +174,21 @@ public class MTDERelationship extends MTNode implements MTNamed, MTDomainBased, 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description =
             "This returns the full name of this domain relationship which includes not only its domain based name "
-            + "but is also preceded with the domain's entity's full name. The delimiter can be provided which "
-            + "is used between all parts of the full name.")
+                + "but is also preceded with the domain's entity's full name. The delimiter can be provided which "
+                + "is used between all parts of the full name.")
     @Override
     public String getFullname(
         @ModelMethodParameter(description = "A delimiter to place between the segments of the domain namespace as well "
-                                            + "as between that namespace and the domain entity name and between the "
-                                            + "domain entity name and the domain relationship name.")
-            String delim) {
+            + "as between that namespace and the domain entity name and between the "
+            + "domain entity name and the domain relationship name.")
+        String delim) {
         return domainEntity.getFullname(delim) + delim + getName();
     }
 
     @ModelMethod(category = ModelMethodCategory.RELATIONSHIP,
         description =
             "Returns the domain relationship name which is the result of applying any defined naming conventions "
-            + "or explicit renaming.")
+                + "or explicit renaming.")
     @Override
     public String getName() {
         if (explicitName != null) {
@@ -230,7 +258,7 @@ public class MTDERelationship extends MTNode implements MTNamed, MTDomainBased, 
         description = "Returns whether this relationship's \"to\" entity is tagged with the specified tag.")
     public boolean hasToEntityTagged(
         @ModelMethodParameter(description = "The tag with which to check.")
-            String tag) {
+        String tag) {
         return to != null && to.getEntity().hasTag(tag);
     }
 }

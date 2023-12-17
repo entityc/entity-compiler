@@ -350,6 +350,16 @@ Indicates whether this space has a metadata name/value for the specified name.
 
 <hr/>
 
+#### `boolean hasRealmWithName(String realm)`
+
+Returns true if there is a realm by this name.
+
+| Parameter | Description |
+|-----|-----|
+|`String realm` | *no description* |
+
+<hr/>
+
 #### `List` **`importEntityNames`**
 
 Returns the names of the entities that have been imported into this space.
@@ -369,6 +379,16 @@ Spaces can define a dictionary of name/value pairs that provide some meta data a
 | Parameter | Description |
 |-----|-----|
 |`String name` | The name of the meta data. |
+
+<hr/>
+
+#### `MTRealm realmWithName(String realm)`
+
+Returns the realm object by its name.
+
+| Parameter | Description |
+|-----|-----|
+|`String realm` | *no description* |
 
 <hr/>
 

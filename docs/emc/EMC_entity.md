@@ -355,6 +355,16 @@ These methods relate to an entity.
 
 <hr/>
 
+#### `void addRealm(String realm)`
+
+Adds the entity to a realm.
+
+| Parameter | Description |
+|-----|-----|
+|`String realm` | *no description* |
+
+<hr/>
+
 #### `boolean` **`isDeclaredAsPrimary`**
 
 Indicates whether this entity was **declared** `primary`. If the entity was **not** declared with the `primary` keyword then this will return false even if it is implied as primary.
@@ -376,6 +386,16 @@ Indicates whether an entity was declared with the `extern` keyword. This would h
 #### `boolean` **`isImplicit`**
 
 Indicates whether this entity was created by the compiler because it represents an implicit entity, such as in a many-to-many relationship.
+
+<hr/>
+
+#### `boolean isInRealm(String realm)`
+
+Returns true if this entity is part of a realm.
+
+| Parameter | Description |
+|-----|-----|
+|`String realm` | *no description* |
 
 <hr/>
 
@@ -576,6 +596,16 @@ Indicates whether this entity has any attributes.
 
 Indicates whether this entity defines any bit fields.
 
+<hr/>
+
+#### `MTRelationship relationshipNamed(String name)`
+
+Returns an relationship of this entity with the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | The name of the relationship to return. |
+
 
 ### Relationship Category
 
@@ -654,6 +684,16 @@ Indicates whether it has a least one relationship declared as parent to the spec
 #### `boolean` **`hasPrimaryParentRelationship`**
 
 Indicates whether this entity has a primary parent relationship. A primary parent relationship is one which is declared `parent` and **not** declared `optional`.
+
+<hr/>
+
+#### `boolean hasRelationshipNamed(String name)`
+
+Indicates whether this entity has an relationship with the specified name.
+
+| Parameter | Description |
+|-----|-----|
+|`String name` | *no description* |
 
 <hr/>
 
@@ -828,6 +868,16 @@ Indicates whether this entity has at least one relationship with the specified t
 
 <hr/>
 
+#### `boolean hasRelationshipToEntityNamed(String toEntityName)`
+
+Indicates whether this entity has at least one relationship to a named other entity.
+
+| Parameter | Description |
+|-----|-----|
+|`String toEntityName` | The name of the other entity. |
+
+<hr/>
+
 #### `boolean hasRelationshipToEntityTagged(String tag)`
 
 Indicates whether the entity **to** which a relationship references is tagged with the specified tag.
@@ -901,6 +951,16 @@ Indicates if this enum was defined inside a module.
 #### `boolean` **`isExtern`**
 
 Indicates whether this was declared as `extern`.
+
+<hr/>
+
+#### `MTEnumItem item(Long index)`
+
+Returns an item by its index.
+
+| Parameter | Description |
+|-----|-----|
+|`Long index` | *no description* |
 
 <hr/>
 
@@ -1226,6 +1286,12 @@ Returns the "from" part of the relationship which references the entity in which
 
 <hr/>
 
+#### `MTEntity` **`implicitToEntity`**
+
+Gets the entity on the other side of an implicit many-to-many entity.
+
+<hr/>
+
 #### `boolean` **`isImplicit`**
 
 Indicates whether the relationship was created because although it was not declared it can be implied based on relationships declared to this entity.
@@ -1337,6 +1403,12 @@ Indicates whether this type is one of the integer data types.
 #### `boolean` **`isByteArrayType`**
 
 Indicates whether this type is both an array type and also `byte` data type.
+
+<hr/>
+
+#### `boolean` **`isDataType`**
+
+Indicates whether this type is the `data` data type.
 
 <hr/>
 

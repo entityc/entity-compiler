@@ -21,13 +21,7 @@ import org.entityc.compiler.model.visitor.MTVisitor;
 import org.entityc.compiler.util.ECLog;
 import org.entityc.compiler.util.ECStringUtil;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
-import java.util.Vector;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.entityc.compiler.doc.annotation.ModelMethodCategory.ENTITY_TEMPLATE;
@@ -59,6 +53,7 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
     private         int                                      largestFieldNumber        = 0;
     private         MTSpace                                  space;
     private         MTAttribute                              manyAttribute             = null; // if the entity was created from a "many <Entity> attributeName"
+    protected       Set<String>                              realms = new HashSet<>(); // a space entities can live in separate from the others - such as for composite entities
 
     public MTEntity(ParserRuleContext ctx, MTModule module, String name) {
         super(ctx);
@@ -87,6 +82,25 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
     @Override
     public String getName() {
         return name;
+    }
+
+    @ModelMethod(category = ModelMethodCategory.ENTITY,
+        description = "Adds the entity to a realm.")
+    public void addRealm(String realm) {
+        //ECLog.logInfo("Added entity: " + getName() + " to realm " + realm);
+        realms.add(realm);
+    }
+
+    @ModelMethod(category = ModelMethodCategory.ENTITY,
+        description = "Returns true if this entity is part of a realm.")
+    public boolean isInRealm(String realm) {
+        return this.realms.contains(realm);
+    }
+
+    @ModelMethod(category = ModelMethodCategory.ENTITY,
+        description = "Returns true if this entity is a composite entity.")
+    public boolean isCompositeEntity() {
+        return this instanceof MTCompositeEntity;
     }
 
     public static MTEntity AddImplicitManyToManyEntity(MTSpace space, MTEntity fromEntity, MTEntity toEntity) {
@@ -785,6 +799,27 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
 
     @ModelMethod(
         category = ModelMethodCategory.RELATIONSHIP,
+        description = "Indicates whether this entity has an relationship with the specified name.")
+    public boolean hasRelationshipNamed(String name) {
+        for (MTRelationship relationship : relationships) {
+            if (relationship.getName().equals(name)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @ModelMethod(
+        category = ModelMethodCategory.ATTRIBUTE,
+        description = "Returns an relationship of this entity with the specified name.")
+    public MTRelationship relationshipNamed(
+        @ModelMethodParameter(description = "The name of the relationship to return.")
+        String name) {
+        return getRelationshipByName(name);
+    }
+
+    @ModelMethod(
+        category = ModelMethodCategory.RELATIONSHIP,
         description = "Returns the number of declared relationships.")
     public int getRelationshipCount() {
         return relationships.size();
@@ -806,7 +841,7 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
         description = "Returns a list of relationships from this entity to a specified entity.")
     public List<MTRelationship> getRelationshipsWithToEntity(
         @ModelMethodParameter(description = "The entity that the relationships are **to**.")
-            MTEntity toEntity) {
+        MTEntity toEntity) {
         List<MTRelationship> matchingRelationships = new ArrayList<>();
         for (MTRelationship relationship : relationships) {
             if (relationship.getTo().getEntityName().equals(toEntity.getName())) {
@@ -814,6 +849,36 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
             }
         }
         return matchingRelationships;
+    }
+
+    @ModelMethod(
+        category = ModelMethodCategory.RELATIONSHIP,
+        description = "Returns the first relationships from this entity to a specified entity. This method should be used when only one is expected.")
+    public MTRelationship getRelationshipWithToEntity(
+        @ModelMethodParameter(description = "The entity that the relationships are **to**.")
+        MTEntity toEntity) {
+        List<MTRelationship> matchingRelationships = new ArrayList<>();
+        for (MTRelationship relationship : relationships) {
+            if (relationship.getTo().getEntityName().equals(toEntity.getName())) {
+                return relationship;
+            }
+        }
+        return null;
+    }
+
+    @ModelMethod(
+        category = ModelMethodCategory.RELATIONSHIP,
+        description = "Returns the first relationships from this entity to a specified entity by its name. This method should be used when only one is expected.")
+    public MTRelationship getRelationshipWithToEntityNamed(
+        @ModelMethodParameter(description = "The entity that the relationships are **to**.")
+        String toEntityName) {
+        List<MTRelationship> matchingRelationships = new ArrayList<>();
+        for (MTRelationship relationship : relationships) {
+            if (relationship.getTo().getEntityName().equals(toEntityName)) {
+                return relationship;
+            }
+        }
+        return null;
     }
 
     @ModelMethod(
@@ -908,9 +973,23 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
         description = "Indicates whether this entity has at least one relationship with the specified tag.")
     public boolean hasRelationshipTagged(
         @ModelMethodParameter(description = "The tag with which to search.")
-            String tag) {
+        String tag) {
         for (MTRelationship relationship : getRelationships()) {
             if (relationship.hasTag(tag)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @ModelMethod(
+        category = ModelMethodCategory.TAGGING,
+        description = "Indicates whether this entity has at least one relationship to a named other entity.")
+    public boolean hasRelationshipToEntityNamed(
+        @ModelMethodParameter(description = "The name of the other entity.")
+        String toEntityName) {
+        for (MTRelationship relationship : getRelationships()) {
+            if (relationship.getTo().getEntityName().equals(toEntityName)) {
                 return true;
             }
         }

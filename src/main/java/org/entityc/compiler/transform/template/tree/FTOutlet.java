@@ -68,6 +68,9 @@ public class FTOutlet extends FTContainerNode {
                     session.setValue("__outlet", this);
                     session.setValue("__author", author);
                     author.transformFromOutlet(session);
+                    if (session.isPendingReturn()) {
+                        session.setPendingReturn(false); // now clear it
+                    }
                     session.removeValue("__outlet");
                     session.removeValue("__author");
                     if (author.getScope() == FTPublishScope.Author) {
