@@ -92,13 +92,14 @@ public class CLSetup extends CLCommand {
             directoryName = args[1];
         }
         EntityCompiler.ensureDirectory(directoryName);
+        EntityCompiler.SetDefineValue("SetupDirectoryName", directoryName);
 
         ProjectManager.getInstance().setProjectBaseDirPath(directoryName);
         ProjectManager.getInstance().start(false);
 
         configureSetupRepo(setupUri);
 
-        String configurationName = "Setup";
+        final String configurationName = "Setup";
 
         ArrayList<String> sourceFilenames = new ArrayList<>();
         sourceFilenames.add(repositoryFile.getFilepath());
