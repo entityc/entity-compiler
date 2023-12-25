@@ -509,9 +509,9 @@ public class TemplateFormatController {
     public void addInstructionBlockEnd(int indentLevel, FTNode node) {
         int startLineNumber = node.getStartLineNumber();
         int endLineNumber   = node.getEndLineNumber();
-        if ((node instanceof FTContainerNode) && (((FTContainerNode) node).getBlockEndContext() != null)) {
-            startLineNumber = ((FTContainerNode) node).getBlockEndContext().start.getLine();
-            endLineNumber   = ((FTContainerNode) node).getBlockEndContext().stop.getLine();
+        if (node instanceof FTContainerNode) {
+            startLineNumber = ((FTContainerNode) node).getBlockEndStartLine();
+            endLineNumber   = ((FTContainerNode) node).getBlockEndEndLine();
         }
         TextSegment prefixSegment = new TextSegment(TextSegmentType.Instruction,
                                                     ConfigurableElement.InstructionBlockEndPrefix,

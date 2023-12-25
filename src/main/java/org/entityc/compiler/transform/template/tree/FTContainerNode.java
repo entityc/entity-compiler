@@ -25,7 +25,9 @@ public class FTContainerNode extends FTNode {
     static int            possibleIndentsTextBodyLevel = 0;
     static int            currentTextBodyLevel = 0;
 
-    TemplateGrammer.BlockEndContext blockEndContext;
+    String blockEndInstruction = "";
+    int blockEndStartLine = 0;
+    int blockEndEndLine = 0;
 
     /**
      * A child node such that inside a foreach or if or anything
@@ -106,16 +108,23 @@ public class FTContainerNode extends FTNode {
         }
     }
 
-    public TemplateGrammer.BlockEndContext getBlockEndContext() {
-        return blockEndContext;
-    }
-
     public void setBlockEndContext(TemplateGrammer.BlockEndContext blockEndContext) {
-        this.blockEndContext = blockEndContext;
+        this.blockEndInstruction = blockEndContext.getChildCount() > 1 ? blockEndContext.getChild(1).getText(): "";
+        this.blockEndStartLine = blockEndContext.start.getLine();
+        this.blockEndEndLine = blockEndContext.stop.getLine();
     }
 
-    public boolean isSameAsContext(TemplateGrammer.BlockEndContext ctx) {
-        return ctx.getChildCount() > 1 && ctx.getChild(1).getText().equals(getInstructionName());
+    public void setBlockEndContext(TemplateGrammer.EndTagContext blockEndContext) {
+        this.blockEndInstruction = blockEndContext.getChildCount() > 0 ? blockEndContext.getChild(0).getText(): "";
+        if (this.blockEndInstruction.startsWith("end")) {
+            this.blockEndInstruction = this.blockEndInstruction.substring("end".length());
+        }
+        this.blockEndStartLine = blockEndContext.start.getLine();
+        this.blockEndEndLine = blockEndContext.stop.getLine();
+    }
+
+    public String getBlockEndInstructionName() {
+        return this.blockEndInstruction;
     }
 
     FTContainerNode getParent() {
@@ -287,5 +296,12 @@ public class FTContainerNode extends FTNode {
      */
     public boolean hasOwnBody() {
         return false;
+    }
+
+    public int getBlockEndStartLine() {
+        return this.blockEndStartLine;
+    }
+    public int getBlockEndEndLine() {
+        return this.blockEndEndLine;
     }
 }

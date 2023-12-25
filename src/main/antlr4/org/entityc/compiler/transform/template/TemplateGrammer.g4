@@ -98,10 +98,32 @@ instruction
   | publisherTag
   | outletTag
   | authorTag
+  | endTag
+  ;
+
+endTag
+  : EndFunction
+  | EndForeach
+  | EndIf
+  | EndFile
+  | EndCapture
+  | EndSwitch
+  | EndLog
+  | EndAssert
+  | EndPrompt
+  | EndSend
+  | EndPreserve
+  | EndAuthor
+  | EndPublisher
+  | EndOutlet
+  ;
+
+instructionBlob
+  : instruction (LineBreak+ instruction)*
   ;
 
 block
-  : BlockTagStart instruction BlockTagEnd
+  : BlockTagStart LineBreak* instructionBlob LineBreak* BlockTagEnd
   ;
 
 blockEnd
@@ -113,7 +135,7 @@ descriptionTag
   ;
 
 nodeDescription
-  : Description (identifier (',' identifier)*)? STRING
+  : Description (identifier (',' identifier)*)? STRING (LineBreak)*
   ;
 
 languageTag
@@ -149,19 +171,19 @@ loadTag
   ;
 
 functionDeclTag
-  : Function identifier nodeDescription* '(' functionDeclArgList? ')' ('->' '(' functionDeclArgList ')' )?
+  : Function identifier LineBreak* nodeDescription* LineBreak* '(' LineBreak* functionDeclArgList? ')' LineBreak* ('->' LineBreak* '(' LineBreak* functionDeclArgList LineBreak* ')'  LineBreak* )?
   ;
 
 functionDeclArgList
-  : functionDeclArg (',' functionDeclArg )*
+  : functionDeclArg (',' LineBreak* functionDeclArg )*
   ;
 
 functionDeclArg
-  : identifier nodeDescription*
+  : identifier LineBreak* nodeDescription* LineBreak*
   ;
 
 callTag
-  : Call Explicit? identifier '(' inputCallArgList? ')' ('->' '(' outputCallArgList ')' )?
+  : Call Explicit? identifier '(' inputCallArgList? LineBreak* ')' LineBreak* ('->' LineBreak* '(' outputCallArgList ')' )?
   ;
 
 callArg
@@ -169,11 +191,11 @@ callArg
   ;
 
 inputCallArgList
-  : callArg (',' callArg)*
+  : callArg (',' LineBreak* callArg)*
   ;
 
 outputCallArgList
-  : callArg (',' callArg)*
+  : callArg (',' LineBreak* callArg)*
   ;
 
 returnTag
@@ -382,7 +404,7 @@ namespaceIdentList
    ;
 
 publisherTag
-  : Publisher namespaceIdent nodeDescription*
+  : Publisher namespaceIdent  LineBreak* nodeDescription*  LineBreak*
   ;
 
 authorOption
@@ -390,9 +412,9 @@ authorOption
   ;
 
 authorTag
-  : Author To namespaceIdentList? (Outlet IDENT authorOption* nodeDescription*)?
+  : Author To namespaceIdentList? (Outlet IDENT authorOption*  LineBreak* nodeDescription* LineBreak*)?
   ;
 
 outletTag
-  : Outlet IDENT nodeDescription*
+  : Outlet IDENT  LineBreak* nodeDescription* LineBreak*
   ;
