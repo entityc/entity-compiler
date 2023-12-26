@@ -29,6 +29,8 @@ Other
 
 mode IN_BLOCK_TAG;
 
+LINE_COMMENT     : '//' ~[\r\n]* ;
+
 True             : 'true' ;
 False            : 'false' ;
 COMMA            : ',' ;
@@ -70,8 +72,6 @@ Language         : 'language' ;
 Version          : 'version' ;
 Install          : 'install' ;
 Copy             : 'copy' ;
-
-// Procedural
 Import           : 'import' ;
 From             : 'from' ;
 Function         : 'function' ;
@@ -126,7 +126,6 @@ EndAuthor        : 'endauthor' ;
 To               : 'to' ;
 
 Description      : 'D' ;
-Test      : 'Test' ;
 
 BOOLEAN_TYPE     : 'boolean' ;
 INT32_TYPE       : 'int32' ;

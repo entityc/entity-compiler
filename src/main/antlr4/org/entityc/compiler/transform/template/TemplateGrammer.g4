@@ -119,11 +119,15 @@ endTag
   ;
 
 instructionBlob
-  : instruction (LineBreak+ instruction)*
+  : instruction LineBreak+
+  | (instruction LINE_COMMENT)
+  | LINE_COMMENT
+  | LineBreak
   ;
 
 block
-  : BlockTagStart LineBreak* instructionBlob LineBreak* BlockTagEnd
+  : BlockTagStart instruction BlockTagEnd
+  | BlockTagStart instructionBlob+ instruction? BlockTagEnd
   ;
 
 blockEnd
@@ -135,7 +139,7 @@ descriptionTag
   ;
 
 nodeDescription
-  : Description (identifier (',' identifier)*)? STRING (LineBreak)*
+  : Description (identifier (',' identifier)*)? STRING LineBreak*
   ;
 
 languageTag
