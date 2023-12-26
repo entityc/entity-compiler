@@ -64,6 +64,7 @@ MapOpen          : '@{' ;
 MapClose         : '}@' ;
 Dollar           : '$' ;
 File             : 'file' ;
+EndFile          : 'endfile' ;
 IfDoesNotExist   : 'ifdoesnotexist' ;
 Language         : 'language' ;
 Version          : 'version' ;
