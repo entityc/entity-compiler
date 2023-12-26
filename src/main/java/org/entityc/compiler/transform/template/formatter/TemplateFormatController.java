@@ -30,30 +30,32 @@ import java.util.Map;
 import java.util.Stack;
 import java.util.Vector;
 
+import static org.entityc.compiler.transform.template.formatter.ConfigurableElement.*;
+
 public class TemplateFormatController {
 
-    private final static String                  INSTRUCTION_PREFIX           = "$[";
-    private final static String                  INSTRUCTION_END_BLOCK_PREFIX = "$[/";
-    private final static String                  INSTRUCTION_SUFFIX           = "]";
-    private final static String                  INDENT                       = "    ";
-    private final static int                     WRAP_MARGIN                  = 80;
-    private final        StringBuilder           builder                      = new StringBuilder();
-    private final        Stack<TextSegment>      textStack                    = new Stack<>();
-    private final        FormatPreferenceManager formatPreferenceManager;
-    private              int                     currentTextBodyLevel         = 0;
-    private              boolean                 forceDescriptionNodes        = false;
+    private final static String INSTRUCTION_PREFIX = "$[";
+    private final static String INSTRUCTION_END_BLOCK_PREFIX = "$[/";
+    private final static String INSTRUCTION_SUFFIX = "]";
+    private final static String INDENT = "    ";
+    private final static int WRAP_MARGIN = 80;
+    private final StringBuilder builder = new StringBuilder();
+    private final Stack<TextSegment> textStack = new Stack<>();
+    private final FormatPreferenceManager formatPreferenceManager;
+    private int currentTextBodyLevel = 0;
+    private boolean forceDescriptionNodes = false;
 
     public TemplateFormatController(MTCodeFormat codeFormat) {
         formatPreferenceManager = new FormatPreferenceManager(codeFormat);
     }
 
     public static String FormatCodeAsString(String code, MTCodeFormat codeFormat) {
-        MTRoot  root  = new MTRoot(null);
+        MTRoot root = new MTRoot(null);
         MTSpace space = new MTSpace(null, "formatSpace");
         root.setSpace(space);
         StringTemplateTransform transform = new StringTemplateTransform(root, code);
         transform.load(true);
-        FTTemplate               ftTemplate       = transform.getTemplate();
+        FTTemplate ftTemplate = transform.getTemplate();
         TemplateFormatController formatController = new TemplateFormatController(codeFormat);
         ftTemplate.format(formatController, -1);
         String resultText = formatController.getResult();
@@ -73,19 +75,19 @@ public class TemplateFormatController {
         for (int i = 0; i < textStack.size(); i++) {
             TextSegment segment = textStack.elementAt(i);
             TextSegment nextSegment = (i < (textStack.size() - 1)) ?
-                                      textStack.elementAt(i + 1) :
-                                      null;
+                textStack.elementAt(i + 1) :
+                null;
             if (segment.type == TextSegmentType.Source) {
                 continue;
             }
             ElementFormatPreference preference = (ElementFormatPreference) formatPreferenceManager.getPreferenceByName(
-                    ElementFormatPreference.getPreferenceName(segment.element));
+                ElementFormatPreference.getPreferenceName(segment.element));
             boolean requireBefore = segment.element.requiredSpaceBefore;
             if (requireBefore || (preference != null && preference.isSpaceBefore())) {
                 segment.spaceBefore = true;
             }
             boolean requiredAfter = segment.element.requiredSpaceAfter && (nextSegment != null
-                                                                           && !nextSegment.element.cancelPriorRequiredAfter);
+                && !nextSegment.element.cancelPriorRequiredAfter);
             if (requiredAfter || (preference != null && preference.isSpaceAfter())) {
                 segment.spaceAfter = true;
             }
@@ -98,16 +100,19 @@ public class TemplateFormatController {
 
         // output resolved segments
         boolean previousSegmentEnabledLineAfter = false;
-        int     currentCharPos                  = 0;
+        int currentCharPos = 0;
         for (int i = 0; i < textStack.size(); i++) {
+            TextSegment prevSegment = i > 0 ?
+                textStack.elementAt(i - 1) :
+                null;
             TextSegment segment = textStack.elementAt(i);
             TextSegment nextSegment = (i < (textStack.size() - 1)) ?
-                                      textStack.elementAt(i + 1) :
-                                      null;
+                textStack.elementAt(i + 1) :
+                null;
             if (segment.type.inSourceFlow() || segment.type == TextSegmentType.Comment) {
                 builder.append(segment.text);
-                segment.finalCharPos            = currentCharPos;
-                currentCharPos                  = ECStringUtil.CharPositionOfLastChar(currentCharPos, segment.text);
+                segment.finalCharPos = currentCharPos;
+                currentCharPos = ECStringUtil.CharPositionOfLastChar(currentCharPos, segment.text);
                 previousSegmentEnabledLineAfter = false;
                 continue;
             }
@@ -123,15 +128,25 @@ public class TemplateFormatController {
                     builder.append(" ");
                 }
                 currentCharPos = segment.getAlignToSegment().finalCharPos;
-            } else if (!previousSegmentEnabledLineAfter && segment.enableNewLineBefore) {
+            }
+            else if (!previousSegmentEnabledLineAfter && segment.enableNewLineBefore) {
                 builder.append("\n");
                 currentCharPos = 0;
-            } else if (segment.spaceBefore) {
+            }
+            else if (segment.spaceBefore) {
                 builder.append(" ");
                 currentCharPos++;
             }
 
-            if (segment.text != null) {
+            boolean includeNextElement = true;
+            if (nextSegment != null && !(nextSegment.isSource() || nextSegment.isVariable()) && (segment.element == InstructionBlockEndSuffix || segment.element == InstructionBlockStartSuffix || segment.element == InstructionSuffix) && nextSegment.startLineNumber != segment.endLineNumber) {
+                includeNextElement = false;
+            }
+            if (prevSegment != null && !(prevSegment.isSource() || prevSegment.isVariable()) && (segment.element == InstructionPrefix || segment.element == InstructionBlockEndPrefix || segment.element == InstructionBlockStartPrefix) && prevSegment.startLineNumber != segment.endLineNumber) {
+                includeNextElement = false;
+            }
+
+            if (segment.text != null && includeNextElement) {
                 // the actual segment
                 builder.append(segment.text);
                 segment.finalCharPos = currentCharPos;
@@ -155,7 +170,8 @@ public class TemplateFormatController {
             if (segment.enableNewLineAfter) {
                 builder.append("\n");
                 currentCharPos = 0;
-            } else if (addSpace && !nextSegment.enableNewLineBefore) {
+            }
+            else if (addSpace && !nextSegment.enableNewLineBefore) {
                 builder.append(" ");
                 currentCharPos++;
             }
@@ -164,16 +180,16 @@ public class TemplateFormatController {
     }
 
     void removeUnnecessaryIndents() {
-        ArrayList<TextSegment> potentiallyRemovableSegments              = new ArrayList<>();
-        boolean                foundNonBlankSource                       = false;
-        int                    level                                     = 0;
-        TextSegment            firstConsecutiveInstructionSegmentOfALine = null;
-        boolean                foundInstruction                          = false;
+        ArrayList<TextSegment> potentiallyRemovableSegments = new ArrayList<>();
+        boolean foundNonBlankSource = false;
+        int level = 0;
+        TextSegment firstConsecutiveInstructionSegmentOfALine = null;
+        boolean foundInstruction = false;
         for (int i = 0; i < textStack.size(); i++) {
             TextSegment segment = textStack.elementAt(i);
             TextSegment nextSegment = (i + 1) < textStack.size() ?
-                                      textStack.elementAt(i + 1) :
-                                      null;
+                textStack.elementAt(i + 1) :
+                null;
             if (nextSegment == null) {
                 continue;
             }
@@ -181,12 +197,13 @@ public class TemplateFormatController {
                 foundInstruction = true;
             }
             if (firstConsecutiveInstructionSegmentOfALine == null && (
-                    segment.element == ConfigurableElement.InstructionPrefix
+                segment.element == ConfigurableElement.InstructionPrefix
                     || segment.element
-                       == ConfigurableElement.InstructionBlockStartPrefix)) {
+                    == ConfigurableElement.InstructionBlockStartPrefix)) {
                 firstConsecutiveInstructionSegmentOfALine = segment;
-            } else if ((segment.isVariable() && segment.element == ConfigurableElement.VariablePrefix)
-                       || segment.isSource()) {
+            }
+            else if ((segment.isVariable() && segment.element == ConfigurableElement.VariablePrefix)
+                || segment.isSource()) {
                 firstConsecutiveInstructionSegmentOfALine = null;
             }
             if (nextSegment.startLineNumber != -1 && segment.endLineNumber != -1
@@ -205,12 +222,13 @@ public class TemplateFormatController {
 //                    //firstConsecutiveInstructionSegmentOfALine.enableNewLineBefore = true;
 //                }
                 firstConsecutiveInstructionSegmentOfALine = null;
-                foundNonBlankSource                       = false;
-                foundInstruction                          = false;
-                level                                     = nextSegment.textBodyLevel;
+                foundNonBlankSource = false;
+                foundInstruction = false;
+                level = nextSegment.textBodyLevel;
                 if (nextSegment.isSource() && !nextSegment.text.equals("\n") && nextSegment.isBlank()) {
                     potentiallyRemovableSegments.add(nextSegment);
-                } else if (nextSegment.isVariable() || (nextSegment.isSource() && !nextSegment.isBlank())) {
+                }
+                else if (nextSegment.isVariable() || (nextSegment.isSource() && !nextSegment.isBlank())) {
                     potentiallyRemovableSegments.clear();
                     foundNonBlankSource = true;
                 }
@@ -223,11 +241,13 @@ public class TemplateFormatController {
                         if (!foundNonBlankSource) {
                             potentiallyRemovableSegments.add(segment);
                         }
-                    } else {
+                    }
+                    else {
                         potentiallyRemovableSegments.clear();
                         foundNonBlankSource = true;
                     }
-                } else if (segment.type == TextSegmentType.Variable) {
+                }
+                else if (segment.type == TextSegmentType.Variable) {
                     potentiallyRemovableSegments.clear();
                     foundNonBlankSource = true;
                 }
@@ -250,8 +270,8 @@ public class TemplateFormatController {
         for (int i = 0; i < textStack.size(); i++) {
             TextSegment segment = textStack.elementAt(i);
             TextSegment nextSegment = (i + 1) < textStack.size() ?
-                                      textStack.elementAt(i + 1) :
-                                      null;
+                textStack.elementAt(i + 1) :
+                null;
             if (nextSegment == null) {
                 continue;
             }
@@ -269,18 +289,18 @@ public class TemplateFormatController {
     private void performPreAlignment() {
         // As we go through the inside of instructions, make note of segments that the preferences say should be
         // aligned TO. Then when we find the FROM, match up with the TO.
-        Stack<ConfigurableElementScope> currentScopeStack            = new Stack<>();
-        ConfigurableElementScope        currentScope                 = ConfigurableElementScope.TopScope;
+        Stack<ConfigurableElementScope> currentScopeStack = new Stack<>();
+        ConfigurableElementScope currentScope = ConfigurableElementScope.TopScope;
         Stack<Map<String, TextSegment>> alignToAvailableTargetsStack = new Stack<>();
-        Map<String, TextSegment>        alignToAvailableTargets      = new HashMap<>();
-        Stack<Map<String, TextSegment>> ifElementStack               = new Stack<>();
-        Map<String, TextSegment>        ifElements                   = new HashMap<>();
+        Map<String, TextSegment> alignToAvailableTargets = new HashMap<>();
+        Stack<Map<String, TextSegment>> ifElementStack = new Stack<>();
+        Map<String, TextSegment> ifElements = new HashMap<>();
         for (int i = 0; i < textStack.size(); i++) {
             TextSegment segment = textStack.elementAt(i);
 
             // LOOK FOR SCOPE START
             ConfigurableElementScope possibleNextScope = ConfigurableElementScope.FindWithStartElement(currentScope,
-                                                                                                       segment.element);
+                segment.element);
             if (possibleNextScope != null) {
                 // push this scope and the align targets, pop when it sees the end element of the scope
                 currentScopeStack.push(possibleNextScope);
@@ -312,15 +332,16 @@ public class TemplateFormatController {
             }
             for (TextSegment alignToSegment : segmentsCanAlignTo) {
                 if (formatPreferenceManager.hasAlignmentPreference(currentScope, segment.element /* from */,
-                                                                   alignToSegment.element /* to */)) {
+                    alignToSegment.element /* to */)) {
                     ElementFormatPreference preference = formatPreferenceManager.getAlignmentPreference(currentScope,
-                                                                                                        segment.element,
-                                                                                                        alignToSegment.element);
+                        segment.element,
+                        alignToSegment.element);
                     if (preference.getIfBetweenElement() == null) {
                         if (segment != alignToSegment) {
                             segment.setAlignToSegment(alignToSegment);
                         }
-                    } else {
+                    }
+                    else {
                         if (ifElements.containsKey(preference.getIfBetweenElement().name())) {
                             if (preference.getIfBetweenElement()
                                 == ifElements.get(preference.getIfBetweenElement().name()).element) {
@@ -339,11 +360,12 @@ public class TemplateFormatController {
                 currentScopeStack.pop();
                 if (currentScopeStack.isEmpty()) {
                     currentScope = ConfigurableElementScope.TopScope;
-                } else {
+                }
+                else {
                     currentScope = currentScopeStack.peek();
                 }
                 alignToAvailableTargets = alignToAvailableTargetsStack.pop();
-                ifElements              = ifElementStack.pop();
+                ifElements = ifElementStack.pop();
             }
         }
     }
@@ -356,35 +378,37 @@ public class TemplateFormatController {
 
             if (segment.element == ConfigurableElement.DescriptionString) {
                 int startOfDescriptionInstruction = rewindToElement(textStack, i,
-                                                                    new ConfigurableElement[]{ConfigurableElement.Description, ConfigurableElement.InstructionName});
+                    new ConfigurableElement[]{ConfigurableElement.Description, ConfigurableElement.InstructionName});
                 // this could either be an instruction or a node, look back one to find out
-                TextSegment backOneSegment           = textStack.elementAt(startOfDescriptionInstruction - 1);
-                boolean     isDescriptionInstruction = backOneSegment.element == ConfigurableElement.InstructionPrefix;
+                TextSegment backOneSegment = textStack.elementAt(startOfDescriptionInstruction - 1);
+                boolean isDescriptionInstruction = backOneSegment.element == ConfigurableElement.InstructionPrefix;
                 if (isDescriptionInstruction) {
                     startOfDescriptionInstruction--; // include this instruction prefix in what is duplicated for extra lines
                 }
                 Vector<TextSegment> descriptionStartSegments = getSegmentsInRange(textStack,
-                                                                                  startOfDescriptionInstruction, i - 1);
+                    startOfDescriptionInstruction, i - 1);
 
-                String       textToWrap = ECStringUtil.ProcessParserString(segment.text);
+                String textToWrap = ECStringUtil.ProcessParserString(segment.text);
                 List<String> lines;
                 if (textToWrap.contains("\n") || textToWrap.equals("")) {
                     lines = new ArrayList<>();
                     lines.add(textToWrap);
-                } else {
+                }
+                else {
                     lines = ECStringUtil.SplitIntoLines(textToWrap,
-                                                        WRAP_MARGIN);
+                        WRAP_MARGIN);
                 }
                 TextSegment endSegment = isDescriptionInstruction ?
-                                         textStack.elementAt(i + 1) :
-                                         null;
+                    textStack.elementAt(i + 1) :
+                    null;
                 boolean first = true;
                 for (String line : lines) {
                     if (first) {
                         // reuse this node, just overwrite its text
                         segment.text = "\"" + line + "\"";
                         transformedTextStack.push(segment);
-                    } else {
+                    }
+                    else {
                         if (endSegment != null) {
                             transformedTextStack.push(new TextSegment(endSegment));
                         }
@@ -399,7 +423,8 @@ public class TemplateFormatController {
 
                     first = false;
                 }
-            } else {
+            }
+            else {
                 transformedTextStack.push(segment);
             }
         }
@@ -408,7 +433,7 @@ public class TemplateFormatController {
     }
 
     private int rewindToElement(Stack<TextSegment> textStack, int fromIndex, ConfigurableElement[] untilElements) {
-        int         offset = 0;
+        int offset = 0;
         TextSegment backSegment;
         do {
             offset--;
@@ -434,7 +459,7 @@ public class TemplateFormatController {
 
     public void addSourceString(String sourceStr, int startLine, int endLine) {
         TextSegment sourceTextSegment = new TextSegment(TextSegmentType.Source, ConfigurableElement.None, startLine,
-                                                        endLine, sourceStr);
+            endLine, sourceStr);
         sourceTextSegment.textBodyLevel = currentTextBodyLevel;
         textStack.push(sourceTextSegment);
     }
@@ -458,7 +483,7 @@ public class TemplateFormatController {
     public void addExpressionElement(ConfigurableElement element, String expressionText, int lineNumber) {
         TextSegment segment = new TextSegment(TextSegmentType.Expression, element, expressionText);
         segment.startLineNumber = segment.endLineNumber = lineNumber;
-        segment.textBodyLevel   = currentTextBodyLevel;
+        segment.textBodyLevel = currentTextBodyLevel;
         textStack.push(segment);
     }
 
@@ -466,7 +491,8 @@ public class TemplateFormatController {
         ConfigurableElement element;
         if (operator.isUnary()) {
             element = ConfigurableElement.ExpressionOperatorUnary;
-        } else {
+        }
+        else {
             switch (operator) {
                 case DOT:
                     element = ConfigurableElement.ExpressionOperatorDot;
@@ -480,65 +506,65 @@ public class TemplateFormatController {
         }
         TextSegment segment = new TextSegment(TextSegmentType.Expression, element, expressionText);
         segment.startLineNumber = segment.endLineNumber = lineNumber;
-        segment.operator        = operator;
-        segment.textBodyLevel   = currentTextBodyLevel;
+        segment.operator = operator;
+        segment.textBodyLevel = currentTextBodyLevel;
         textStack.push(segment);
     }
 
     public void addInstructionInside(ConfigurableElement element, String insideText, int lineNumber) {
         TextSegment segment = new TextSegment(TextSegmentType.Instruction, element, insideText);
         segment.startLineNumber = segment.endLineNumber = lineNumber;
-        segment.textBodyLevel   = currentTextBodyLevel;
+        segment.textBodyLevel = currentTextBodyLevel;
         textStack.push(segment);
     }
 
     public void addVariableExpressionStart(String insideText, int lineNumber) {
         TextSegment segment = new TextSegment(TextSegmentType.Variable, ConfigurableElement.VariablePrefix, insideText);
         segment.startLineNumber = segment.endLineNumber = lineNumber;
-        segment.textBodyLevel   = currentTextBodyLevel;
+        segment.textBodyLevel = currentTextBodyLevel;
         textStack.push(segment);
     }
 
     public void addVariableExpressionEnd(String insideText, int lineNumber) {
         TextSegment segment = new TextSegment(TextSegmentType.Variable, ConfigurableElement.VariableSuffix, insideText);
         segment.startLineNumber = segment.endLineNumber = lineNumber;
-        segment.textBodyLevel   = currentTextBodyLevel;
+        segment.textBodyLevel = currentTextBodyLevel;
         textStack.push(segment);
     }
 
     public void addInstructionBlockEnd(int indentLevel, FTNode node) {
         int startLineNumber = node.getStartLineNumber();
-        int endLineNumber   = node.getEndLineNumber();
+        int endLineNumber = node.getEndLineNumber();
         if (node instanceof FTContainerNode) {
             startLineNumber = ((FTContainerNode) node).getBlockEndStartLine();
-            endLineNumber   = ((FTContainerNode) node).getBlockEndEndLine();
+            endLineNumber = ((FTContainerNode) node).getBlockEndEndLine();
         }
         TextSegment prefixSegment = new TextSegment(TextSegmentType.Instruction,
-                                                    ConfigurableElement.InstructionBlockEndPrefix,
-                                                    startLineNumber, endLineNumber, INSTRUCTION_END_BLOCK_PREFIX);
+            ConfigurableElement.InstructionPrefix,
+            startLineNumber, endLineNumber, INSTRUCTION_PREFIX);
         if (node.canSuppressIndent()) {
             String instructionSettingName = InstructionFormatPreference.getPreferenceName(node.getInstructionName());
             if (formatPreferenceManager.hasPreferenceByName(instructionSettingName)) {
                 InstructionFormatPreference preference = (InstructionFormatPreference) formatPreferenceManager.getPreferenceByName(
-                        instructionSettingName);
+                    instructionSettingName);
                 prefixSegment.suppressIndent = preference.isSuppressIndent();
             }
         }
-        prefixSegment.indentLevel   = indentLevel;
+        prefixSegment.indentLevel = indentLevel;
         prefixSegment.textBodyLevel = currentTextBodyLevel;
         textStack.push(prefixSegment);
 
         TextSegment instructionNameSegment = new TextSegment(TextSegmentType.Instruction,
-                                                             ConfigurableElement.InstructionNameBlockEnd,
-                                                             startLineNumber, endLineNumber, node.getInstructionName());
-        instructionNameSegment.indentLevel   = indentLevel;
+            ConfigurableElement.InstructionNameBlockEnd,
+            startLineNumber, endLineNumber, "end" + node.getInstructionName());
+        instructionNameSegment.indentLevel = indentLevel;
         instructionNameSegment.textBodyLevel = currentTextBodyLevel;
         textStack.push(instructionNameSegment);
 
         TextSegment suffixSegment = new TextSegment(TextSegmentType.Instruction,
-                                                    ConfigurableElement.InstructionBlockEndSuffix,
-                                                    startLineNumber, endLineNumber, INSTRUCTION_SUFFIX);
-        suffixSegment.indentLevel   = indentLevel;
+            InstructionBlockEndSuffix,
+            startLineNumber, endLineNumber, INSTRUCTION_SUFFIX);
+        suffixSegment.indentLevel = indentLevel;
         suffixSegment.textBodyLevel = currentTextBodyLevel;
         textStack.push(suffixSegment);
         if ((node instanceof FTContainerNode) && ((FTContainerNode) node).hasOwnBody()) {
@@ -554,25 +580,25 @@ public class TemplateFormatController {
     public void addInstructionStart(int indentLevel, FTNode node) {
         boolean isContainerType = node instanceof FTContainerNode;
         TextSegment startSegment = new TextSegment(TextSegmentType.Instruction,
-                                                   isContainerType ?
-                                                   ConfigurableElement.InstructionBlockStartPrefix :
-                                                   ConfigurableElement.InstructionPrefix,
-                                                   node.getStartLineNumber(), node.getEndLineNumber(),
-                                                   INSTRUCTION_PREFIX);
+            isContainerType ?
+                ConfigurableElement.InstructionBlockStartPrefix :
+                ConfigurableElement.InstructionPrefix,
+            node.getStartLineNumber(), node.getEndLineNumber(),
+            INSTRUCTION_PREFIX);
         String instructionSettingName = InstructionFormatPreference.getPreferenceName(node.getInstructionName());
         if (formatPreferenceManager.hasPreferenceByName(instructionSettingName)) {
             InstructionFormatPreference preference = (InstructionFormatPreference) formatPreferenceManager.getPreferenceByName(
-                    instructionSettingName);
+                instructionSettingName);
             startSegment.suppressIndent = preference.isSuppressIndent();
         }
-        startSegment.indentLevel   = indentLevel;
+        startSegment.indentLevel = indentLevel;
         startSegment.textBodyLevel = currentTextBodyLevel;
         textStack.push(startSegment);
         TextSegment instructionNameSegment = new TextSegment(TextSegmentType.Instruction,
-                                                             ConfigurableElement.InstructionName,
-                                                             node.getStartLineNumber(), node.getEndLineNumber(),
-                                                             node.getInstructionName());
-        instructionNameSegment.indentLevel   = indentLevel;
+            ConfigurableElement.InstructionName,
+            node.getStartLineNumber(), node.getEndLineNumber(),
+            node.getInstructionName());
+        instructionNameSegment.indentLevel = indentLevel;
         instructionNameSegment.textBodyLevel = currentTextBodyLevel;
         textStack.push(instructionNameSegment);
         if (isContainerType && ((FTContainerNode) node).hasOwnBody()) {
@@ -583,10 +609,10 @@ public class TemplateFormatController {
     public void addInstructionEnd(FTNode node) {
         boolean isContainerType = node instanceof FTContainerNode;
         TextSegment segment = new TextSegment(TextSegmentType.Instruction,
-                                              isContainerType ?
-                                              ConfigurableElement.InstructionBlockStartSuffix :
-                                              ConfigurableElement.InstructionSuffix,
-                                              node.getStartLineNumber(), node.getEndLineNumber(), INSTRUCTION_SUFFIX);
+            isContainerType ?
+                ConfigurableElement.InstructionBlockStartSuffix :
+                ConfigurableElement.InstructionSuffix,
+            node.getStartLineNumber(), node.getEndLineNumber(), INSTRUCTION_SUFFIX);
         segment.textBodyLevel = currentTextBodyLevel;
         textStack.push(segment);
     }
@@ -594,31 +620,31 @@ public class TemplateFormatController {
     public void addExplicitInstructionStart(int indentLevel, String instructionName, int startLineNumber,
                                             int endLineNumber) {
         TextSegment startSegment = new TextSegment(TextSegmentType.Instruction,
-                                                   ConfigurableElement.InstructionPrefix,
-                                                   startLineNumber, endLineNumber, INSTRUCTION_PREFIX);
-        startSegment.indentLevel   = indentLevel;
+            ConfigurableElement.InstructionPrefix,
+            startLineNumber, endLineNumber, INSTRUCTION_PREFIX);
+        startSegment.indentLevel = indentLevel;
         startSegment.textBodyLevel = currentTextBodyLevel;
         textStack.push(startSegment);
         TextSegment instructionNameSegment = new TextSegment(TextSegmentType.Instruction,
-                                                             ConfigurableElement.InstructionName,
-                                                             startLineNumber, endLineNumber, instructionName);
+            ConfigurableElement.InstructionName,
+            startLineNumber, endLineNumber, instructionName);
         instructionNameSegment.indentLevel = indentLevel;
         textStack.push(instructionNameSegment);
     }
 
     public void addExplicitInstructionEnd(int startLineNumber, int endLineNumber, boolean forceLineAfter) {
         TextSegment segment = new TextSegment(TextSegmentType.Instruction,
-                                              ConfigurableElement.InstructionSuffix,
-                                              startLineNumber, endLineNumber, INSTRUCTION_SUFFIX);
+            ConfigurableElement.InstructionSuffix,
+            startLineNumber, endLineNumber, INSTRUCTION_SUFFIX);
         segment.enableNewLineAfter = forceLineAfter;
-        segment.textBodyLevel      = currentTextBodyLevel;
+        segment.textBodyLevel = currentTextBodyLevel;
         textStack.push(segment);
     }
 
     public void addComment(FTComment comment) {
         TextSegment segment = new TextSegment(TextSegmentType.Comment, ConfigurableElement.None,
-                                              comment.getStartLineNumber(),
-                                              comment.getEndLineNumber(), comment.getText());
+            comment.getStartLineNumber(),
+            comment.getEndLineNumber(), comment.getText());
         segment.textBodyLevel = currentTextBodyLevel;
         textStack.push(segment);
     }
