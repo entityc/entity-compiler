@@ -115,18 +115,14 @@ public class TemplateFormatController {
                 textStack.elementAt(i + 2) :
                 null;
 
-//            ECLog.logInfo("-----------------------------------------------------------------------");
-//            ECLog.logInfo(segment.text);
-
-//            boolean isOldCommentType = segment.type == TextSegmentType.Comment && segment.text.startsWith("$[*");
-//            if (segment.type.inSourceFlow() || isOldCommentType) {
-//                String segmentText = segment.text;
-//                builder.append(segmentText);
-//                segment.finalCharPos = currentCharPos;
-//                currentCharPos = ECStringUtil.CharPositionOfLastChar(currentCharPos, segment.text);
-//                previousSegmentEnabledLineAfter = false;
-//                continue;
-//            }
+            if (segment.type.inSourceFlow()) {
+                String segmentText = segment.text;
+                builder.append(segmentText);
+                segment.finalCharPos = currentCharPos;
+                currentCharPos = ECStringUtil.CharPositionOfLastChar(currentCharPos, segment.text);
+                previousSegmentEnabledLineAfter = false;
+                continue;
+            }
 
             if (segment.enableIndent && !segment.suppressIndent) {
                 for (int j = 0; j < segment.indentLevel; j++) {
