@@ -1,94 +1,90 @@
 $[language nothing]
-$[domain test]
-$[log]
+$[domain test
+  log]
 // foreach
     $[foreach entity in space.entities]
 
-        $[let qualifier = entity.isSecondary ? "Secondary ":""]
+        $[let qualifier = entity.isSecondary ? "Secondary ":""  /* let block comment */]
 ${qualifier}Entity: ${entity.name}
-        $[foreach attribute in entity.attributes]
+        $[foreach attribute in entity.attributes
+              /* This is a comment here */
+]
 // switch / case
-            $[switch attribute.type]
-                $[case uuid]
-                    $[let typeLongName = "Unique Identifier - 128 bits"]
-                $[case int32]
-                    $[let typeLongName = "32-bit Integer"]
-                $[case int64]
-                    $[let typeLongName = "64-bit Integer"]
-                $[case float]
-                    $[let typeLongName = "32-bit Floating Point"]
-                $[case double]
-                    $[let typeLongName = "64-bit Floating Point"]
-                $[case string]
-                    $[let typeLongName = "String of characters"]
-                $[case enum]
-                    $[let typeLongName = "Enum named " + attribute.type.name]
-                $[case typedef]
-                    $[let typeLongName = "Typedef named " + attribute.type.name]
-                $[case entity]
-                    $[let typeLongName = "Entity named " + attribute.type.name]
-                $[default]
-                    $[let typeLongName = "Unknown"]
-            $[/switch]
+            $[switch attribute.type  // single comment
+                  /* this is a
+ new block comment type */
+                  case uuid
+                      let typeLongName = "Unique Identifier - 128 bits"
+                  case int32
+                      let typeLongName = "32-bit Integer"
+                  case int64
+                      let typeLongName = "64-bit Integer"
+                  case float
+                      let typeLongName = "32-bit Floating Point"
+                  case double
+                      let typeLongName = "64-bit Floating Point"
+                  case string
+                      let typeLongName = "String of characters"
+                  case enum
+                      let typeLongName = "Enum named " + attribute.type.name
+                  case typedef
+                      let typeLongName = "Typedef named " + attribute.type.name
+                  case entity
+                      let typeLongName = "Entity named " + attribute.type.name
+                  default
+                      let typeLongName = "Unknown"
+              endswitch]
   Attribute
     Name: ${attribute.name}
     Type: ${typeLongName}
-            $[if attribute.name == "test"]inline if for ${attribute.description}$[/if]
-            $[if attribute.name == "test2"]
+            $[if attribute.name == "test"]inline if for ${attribute.description}$[endif
+              if attribute.name == "test2"]
 attribute is test2
-            $[/if]
-        $[/foreach]
-    $[/foreach]
+            $[endif
+          endforeach
+      endforeach]
 // function
     $[function func
-      D "Simple function"
-      (in1
-       D "first input",
-       in2,
-       in3
-       D "third input"
-      )->
-      (out1,
-       out2
-       D "second output",
-       out3
-      )
-    ]
-        $[if in1 == 2 && (in2 == "x" || in3 == 4.534)]
-            $[return]
-        $[/if]
+              D "Simple function"(in1
+              D "first input",in2,in3
+              D "third input")->(out1,out2
+              D "second output",out3)
+          if in1 == 2 && (in2 == "x" || in3 == 4.534)
+              return
+            
+          endif]
 // do
         $[do it.call(this)]
 // let
-        $[let i1 = 1]
-        $[let s1 = "hello"]
-        $[let f1 = 1.24353]
+        $[let i1 = 1
+          let s1 = "hello"
+          let f1 = 1.24353]
 // filters
         $[let name = entity|domain:outerspace|name]
 ${attribute|domain:earth|title}
   ${attribute|domain:earth|title}  space before and stuff after
  ${list|sort:ing asc case:false}
  // escaped strings
-        $[let strwithesc = "this word is surrounded by escaped \"double quotes\" so the output should also!"]
-        $[let another = entity|title arg:"somet\"h\"ing"]
-        $[let startandend = "\"something\""]
-    $[/function]
+        $[let strwithesc = "this word is surrounded by escaped \"double quotes\" so the output should also!"
+          let another = entity|title arg:"somet\"h\"ing"
+          let startandend = "\"something\""
+      endfunction]
 // publisher
     $[publisher com.example.bigpublisher]
 // outlet
 $[outlet someoutlet]
 // default stuff
-$[/outlet]
-    $[/publisher]
+$[endoutlet
+      endpublisher]
 // author
-    $[author to com.example]
-        $[author to bigpublisher]
-            $[author to outlet someoutlet]
+    $[author to com.example
+          author to bigpublisher
+              author to outlet someoutlet]
 // read all about it
-            $[/author]
-            $[author to somepublisher outlet someoutlet]
+            $[endauthor
+              author to somepublisher outlet someoutlet]
 // read all about it
-            $[/author]
-        $[/author]
-    $[/author]
-$[/log]
+            $[endauthor
+          endauthor
+      endauthor
+  endlog]

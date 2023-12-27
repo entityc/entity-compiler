@@ -147,6 +147,7 @@ public class TemplateFormatController {
             }
 
             boolean includeThisElement = true;
+            boolean replaceWithSpace = false;
 
             // Look for instruction SUFFIX ( ] )
             if (nextSegment != null
@@ -154,7 +155,7 @@ public class TemplateFormatController {
                 && (segment.element == InstructionBlockEndSuffix
                 || segment.element == InstructionBlockStartSuffix
                 || segment.element == InstructionSuffix)
-                && (prevSegment.type == TextSegmentType.Comment || nextNextSegment.type == TextSegmentType.Comment ||  nextSegment.startLineNumber != segment.endLineNumber)) {
+                && (prevSegment.type == TextSegmentType.Comment || nextNextSegment.type == TextSegmentType.Comment || nextSegment.startLineNumber != segment.endLineNumber)) {
                 includeThisElement = false;
             }
             // Look for instruction PREFIX ( $[, $[/ )
@@ -165,13 +166,23 @@ public class TemplateFormatController {
                 || segment.element == InstructionBlockStartPrefix)
                 && (nextSegment.type == TextSegmentType.Comment || prevPrevSegment.type == TextSegmentType.Comment || prevSegment.startLineNumber != segment.endLineNumber)) {
                 includeThisElement = false;
+                replaceWithSpace = true;
             }
 
-            if (segment.text != null && includeThisElement) {
-                // the actual segment
-                builder.append(segment.text);
-                segment.finalCharPos = currentCharPos;
-                currentCharPos += segment.text.length();
+            if (segment.text != null) {
+                String textToInsert = "";
+
+                if (includeThisElement) {
+                    // the actual segment
+                    textToInsert = segment.text;
+                } else if (replaceWithSpace) {
+                    textToInsert = "  ";
+                }
+                if (textToInsert.length() > 0) {
+                    builder.append(textToInsert);
+                    segment.finalCharPos = currentCharPos;
+                    currentCharPos += textToInsert.length();
+                }
             }
             boolean addSpace = false;
             if (segment.spaceAfter &&
