@@ -27,7 +27,9 @@ public class FTComment extends FTNode {
 
     @Override
     public boolean format(TemplateFormatController formatController, int indentLevel) {
+        formatController.addInstructionPrefix(indentLevel, this);
         formatController.addComment(this);
+        formatController.addInstructionEnd(this);
         return true;
     }
 

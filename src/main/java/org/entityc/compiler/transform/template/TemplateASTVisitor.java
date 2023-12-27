@@ -210,10 +210,18 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         return super.visitOther(ctx);
     }
 
-    @Override
-    public Object visitBlock(TemplateGrammer.BlockContext ctx) {
-        return super.visitBlock(ctx);
-    }
+//    @Override
+//    public Object visitBlock(TemplateGrammer.BlockContext ctx) {
+//
+//        Object object = super.visitBlock(ctx);
+//        if (ctx.blockComment() != null) {
+//            for (TemplateGrammer.BlockCommentContext commentNode : ctx.blockComment()) {
+//                FTComment comment = new FTComment(commentNode);
+//                currentContainer(ctx).addChild(comment);
+//            }
+//        }
+//        return object;
+//    }
 
     @Override
     public Object visitEndTag(TemplateGrammer.EndTagContext ctx) {
@@ -352,6 +360,49 @@ public class TemplateASTVisitor extends TemplateGrammerBaseVisitor {
         containerNode.addDescription(descriptionNode);
         return descriptionNode;
     }
+
+//    @Override
+//    public Object visitInstructionBlob(TemplateGrammer.InstructionBlobContext ctx) {
+//        if (ctx.blockComment() != null) {
+//            for (TemplateGrammer.BlockCommentContext commentNode : ctx.blockComment()) {
+//                FTComment comment = new FTComment(commentNode);
+//                currentContainer(ctx).addChild(comment);
+//            }
+//        }
+//        return super.visitInstructionBlob(ctx);
+//    }
+
+    @Override
+    public Object visitBlockComment(TemplateGrammer.BlockCommentContext ctx) {
+        FTComment comment = new FTComment(ctx);
+        currentContainer(ctx).addChild(comment);
+        return null;
+    }
+
+    @Override
+    public Object visitLineComment(TemplateGrammer.LineCommentContext ctx) {
+        FTComment comment = new FTComment(ctx);
+        currentContainer(ctx).addChild(comment);
+        return null;
+    }
+
+    public Object visitComment(TemplateGrammer.BlockCommentContext ctx) {
+        FTComment comment = new FTComment(ctx);
+        currentContainer(ctx).addChild(comment);
+        return null;
+    }
+
+//    @Override
+//    public Object visitInstructionWithOptionalBlockComment(TemplateGrammer.InstructionWithOptionalBlockCommentContext ctx) {
+//        Object object = super.visitInstructionWithOptionalBlockComment(ctx);
+//        if (ctx.blockComment() != null) {
+//            for (TemplateGrammer.BlockCommentContext commentNode : ctx.blockComment()) {
+//                FTComment comment = new FTComment(commentNode);
+//                currentContainer(ctx).addChild(comment);
+//            }
+//        }
+//        return object;
+//    }
 
     @Override
     public FTInstall visitInstallTag(TemplateGrammer.InstallTagContext ctx) {

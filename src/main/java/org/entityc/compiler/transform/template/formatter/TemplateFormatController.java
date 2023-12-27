@@ -35,7 +35,6 @@ import static org.entityc.compiler.transform.template.formatter.ConfigurableElem
 public class TemplateFormatController {
 
     private final static String INSTRUCTION_PREFIX = "$[";
-    private final static String INSTRUCTION_END_BLOCK_PREFIX = "$[/";
     private final static String INSTRUCTION_SUFFIX = "]";
     private final static String INDENT = "    ";
     private final static int WRAP_MARGIN = 80;
@@ -102,6 +101,9 @@ public class TemplateFormatController {
         boolean previousSegmentEnabledLineAfter = false;
         int currentCharPos = 0;
         for (int i = 0; i < textStack.size(); i++) {
+            TextSegment prevPrevSegment = i > 1 ?
+                textStack.elementAt(i - 2) :
+                null;
             TextSegment prevSegment = i > 0 ?
                 textStack.elementAt(i - 1) :
                 null;
@@ -109,13 +111,23 @@ public class TemplateFormatController {
             TextSegment nextSegment = (i < (textStack.size() - 1)) ?
                 textStack.elementAt(i + 1) :
                 null;
-            if (segment.type.inSourceFlow() || segment.type == TextSegmentType.Comment) {
-                builder.append(segment.text);
-                segment.finalCharPos = currentCharPos;
-                currentCharPos = ECStringUtil.CharPositionOfLastChar(currentCharPos, segment.text);
-                previousSegmentEnabledLineAfter = false;
-                continue;
-            }
+            TextSegment nextNextSegment = (i < (textStack.size() - 2)) ?
+                textStack.elementAt(i + 2) :
+                null;
+
+//            ECLog.logInfo("-----------------------------------------------------------------------");
+//            ECLog.logInfo(segment.text);
+
+//            boolean isOldCommentType = segment.type == TextSegmentType.Comment && segment.text.startsWith("$[*");
+//            if (segment.type.inSourceFlow() || isOldCommentType) {
+//                String segmentText = segment.text;
+//                builder.append(segmentText);
+//                segment.finalCharPos = currentCharPos;
+//                currentCharPos = ECStringUtil.CharPositionOfLastChar(currentCharPos, segment.text);
+//                previousSegmentEnabledLineAfter = false;
+//                continue;
+//            }
+
             if (segment.enableIndent && !segment.suppressIndent) {
                 for (int j = 0; j < segment.indentLevel; j++) {
                     builder.append(INDENT);
@@ -138,15 +150,28 @@ public class TemplateFormatController {
                 currentCharPos++;
             }
 
-            boolean includeNextElement = true;
-            if (nextSegment != null && !(nextSegment.isSource() || nextSegment.isVariable()) && (segment.element == InstructionBlockEndSuffix || segment.element == InstructionBlockStartSuffix || segment.element == InstructionSuffix) && nextSegment.startLineNumber != segment.endLineNumber) {
-                includeNextElement = false;
+            boolean includeThisElement = true;
+
+            // Look for instruction SUFFIX ( ] )
+            if (nextSegment != null
+                && !nextSegment.type.inSourceFlow()
+                && (segment.element == InstructionBlockEndSuffix
+                || segment.element == InstructionBlockStartSuffix
+                || segment.element == InstructionSuffix)
+                && (prevSegment.type == TextSegmentType.Comment || nextNextSegment.type == TextSegmentType.Comment ||  nextSegment.startLineNumber != segment.endLineNumber)) {
+                includeThisElement = false;
             }
-            if (prevSegment != null && !(prevSegment.isSource() || prevSegment.isVariable()) && (segment.element == InstructionPrefix || segment.element == InstructionBlockEndPrefix || segment.element == InstructionBlockStartPrefix) && prevSegment.startLineNumber != segment.endLineNumber) {
-                includeNextElement = false;
+            // Look for instruction PREFIX ( $[, $[/ )
+            if (prevSegment != null
+                && !prevSegment.type.inSourceFlow()
+                && (segment.element == InstructionPrefix
+                || segment.element == InstructionBlockEndPrefix
+                || segment.element == InstructionBlockStartPrefix)
+                && (nextSegment.type == TextSegmentType.Comment || prevPrevSegment.type == TextSegmentType.Comment || prevSegment.startLineNumber != segment.endLineNumber)) {
+                includeThisElement = false;
             }
 
-            if (segment.text != null && includeNextElement) {
+            if (segment.text != null && includeThisElement) {
                 // the actual segment
                 builder.append(segment.text);
                 segment.finalCharPos = currentCharPos;
@@ -577,7 +602,7 @@ public class TemplateFormatController {
         this.addInstructionEnd(node);
     }
 
-    public void addInstructionStart(int indentLevel, FTNode node) {
+    public void addInstructionPrefix(int indentLevel, FTNode node) {
         boolean isContainerType = node instanceof FTContainerNode;
         TextSegment startSegment = new TextSegment(TextSegmentType.Instruction,
             isContainerType ?
@@ -594,6 +619,12 @@ public class TemplateFormatController {
         startSegment.indentLevel = indentLevel;
         startSegment.textBodyLevel = currentTextBodyLevel;
         textStack.push(startSegment);
+
+    }
+
+    public void addInstructionStart(int indentLevel, FTNode node) {
+        boolean isContainerType = node instanceof FTContainerNode;
+        addInstructionPrefix(indentLevel, node);
         TextSegment instructionNameSegment = new TextSegment(TextSegmentType.Instruction,
             ConfigurableElement.InstructionName,
             node.getStartLineNumber(), node.getEndLineNumber(),
@@ -642,9 +673,11 @@ public class TemplateFormatController {
     }
 
     public void addComment(FTComment comment) {
+        String commentText = comment.getText();
+        commentText = commentText.replace("$[*", "/*").replace("*]", "*/");
         TextSegment segment = new TextSegment(TextSegmentType.Comment, ConfigurableElement.None,
             comment.getStartLineNumber(),
-            comment.getEndLineNumber(), comment.getText());
+            comment.getEndLineNumber(), commentText);
         segment.textBodyLevel = currentTextBodyLevel;
         textStack.push(segment);
     }

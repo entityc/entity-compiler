@@ -118,16 +118,27 @@ endTag
   | EndOutlet
   ;
 
-instructionBlob
-  : instruction LineBreak+
-  | (instruction LINE_COMMENT)
-  | LINE_COMMENT
-  | LineBreak
+blockComment
+  : BLOCK_COMMENT
+  ;
+
+lineComment
+  : LINE_COMMENT
+  ;
+
+filler
+  : LineBreak
+  | lineComment
+  | blockComment
+  ;
+
+instructionSequence
+  : filler* instruction filler*
+  | instructionSequence filler+ instructionSequence
   ;
 
 block
-  : BlockTagStart instruction BlockTagEnd
-  | BlockTagStart instructionBlob+ instruction? BlockTagEnd
+  : BlockTagStart instructionSequence BlockTagEnd
   ;
 
 blockEnd

@@ -30,7 +30,7 @@ Other
 mode IN_BLOCK_TAG;
 
 LINE_COMMENT     : '//' ~[\r\n]* ;
-
+BLOCK_COMMENT    : '/*' .*? '*/' ;
 True             : 'true' ;
 False            : 'false' ;
 COMMA            : ',' ;
