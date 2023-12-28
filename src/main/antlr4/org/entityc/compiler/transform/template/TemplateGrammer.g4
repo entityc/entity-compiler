@@ -135,6 +135,7 @@ filler
 instructionSequence
   : filler* instruction filler*
   | instructionSequence filler+ instructionSequence
+  | filler*
   ;
 
 block
