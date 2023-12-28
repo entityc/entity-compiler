@@ -7,6 +7,7 @@
 package org.entityc.compiler.transform.template.formatter;
 
 import org.entityc.compiler.transform.template.tree.expression.FTOperation;
+import org.entityc.compiler.util.ECLog;
 
 class TextSegment {
 
@@ -25,7 +26,8 @@ class TextSegment {
     int                  textBodyLevel; // for source types
     boolean              suppressIndent;
     int                  finalCharPos;
-    private TextSegment alignToSegment;
+    private TextSegment  alignToSegment;
+    private boolean      copied = false;
 
     TextSegment(TextSegmentType type, ConfigurableElement element, int startLineNumber, int endLineNumber, String text) {
         this.type            = type;
@@ -68,10 +70,15 @@ class TextSegment {
         this.suppressIndent      = otherSegment.suppressIndent;
         this.finalCharPos        = otherSegment.finalCharPos;
         this.alignToSegment      = otherSegment.alignToSegment;
+        this.copied              = true;
     }
 
     public TextSegment getAlignToSegment() {
         return alignToSegment;
+    }
+
+    public boolean isCopied() {
+        return copied;
     }
 
     public void setAlignToSegment(TextSegment alignToSegment) {

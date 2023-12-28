@@ -1,5 +1,6 @@
 $[domain test]
 $[language nothing]
+$[D "This is a very long description that will be wrapped by formatter but we need to test to make sure the formatter will disolve the end and start tokens."]
 $[log]
 // foreach
 $[foreach entity in space.entities]

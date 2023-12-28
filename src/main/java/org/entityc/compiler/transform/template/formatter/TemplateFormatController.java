@@ -153,18 +153,26 @@ public class TemplateFormatController {
             if (nextSegment != null
                 && !nextSegment.type.inSourceFlow()
                 && (segment.element == InstructionBlockEndSuffix
-                || segment.element == InstructionBlockStartSuffix
-                || segment.element == InstructionSuffix)
-                && (prevSegment.type == TextSegmentType.Comment || nextNextSegment.type == TextSegmentType.Comment || nextSegment.startLineNumber != segment.endLineNumber)) {
+                    || segment.element == InstructionBlockStartSuffix
+                    || segment.element == InstructionSuffix)
+                && (prevSegment.type == TextSegmentType.Comment
+                    || nextNextSegment.type == TextSegmentType.Comment
+                    || nextSegment.startLineNumber != segment.endLineNumber
+                    || (segment.isCopied() && prevSegment.element == DescriptionString)
+            )) {
                 includeThisElement = false;
             }
             // Look for instruction PREFIX ( $[, $[/ )
             if (prevSegment != null
                 && !prevSegment.type.inSourceFlow()
                 && (segment.element == InstructionPrefix
-                || segment.element == InstructionBlockEndPrefix
-                || segment.element == InstructionBlockStartPrefix)
-                && (nextSegment.type == TextSegmentType.Comment || prevPrevSegment.type == TextSegmentType.Comment || prevSegment.startLineNumber != segment.endLineNumber)) {
+                    || segment.element == InstructionBlockEndPrefix
+                    || segment.element == InstructionBlockStartPrefix)
+                && (nextSegment.type == TextSegmentType.Comment
+                    || prevPrevSegment.type == TextSegmentType.Comment
+                    || prevSegment.startLineNumber != segment.endLineNumber
+                    || (segment.isCopied() && nextNextSegment.element == DescriptionString)
+            )) {
                 includeThisElement = false;
                 replaceWithSpace = true;
             }
@@ -176,7 +184,7 @@ public class TemplateFormatController {
                     // the actual segment
                     textToInsert = segment.text;
                 } else if (replaceWithSpace) {
-                    textToInsert = "  ";
+                    textToInsert = "  "; // matches width of $[
                 }
                 if (textToInsert.length() > 0) {
                     builder.append(textToInsert);

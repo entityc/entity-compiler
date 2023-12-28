@@ -1,5 +1,7 @@
 $[language nothing]
 $[domain test
+  D "This is a very long description that will be wrapped by formatter but we need to test to make"
+  D "sure the formatter will disolve the end and start tokens."
   log]
 // foreach
     $[foreach entity in space.entities]
@@ -7,10 +9,10 @@ $[domain test
         $[let qualifier = entity.isSecondary ? "Secondary ":""  /* let block comment */]
 ${qualifier}Entity: ${entity.name}
         $[foreach attribute in entity.attributes
-              /* This is a comment here */
-]
+              /* This is a comment here */]
 // switch / case
             $[switch attribute.type  // single comment
+
                   /* this is a
  new block comment type */
                   case uuid
