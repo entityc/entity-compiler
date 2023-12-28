@@ -14,7 +14,7 @@ BlockTagStart
   ;
 
 BlockEndTagStart
-  : ( '$[/'
+  : ( '$[/' { _input.LA(1) != '*' && _input.LA(1) != '/' }?
     ) -> pushMode(IN_BLOCK_TAG)
   ;
 

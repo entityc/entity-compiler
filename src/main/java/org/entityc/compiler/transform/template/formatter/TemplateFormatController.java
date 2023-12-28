@@ -681,7 +681,15 @@ public class TemplateFormatController {
 
     public void addComment(FTComment comment) {
         String commentText = comment.getText();
-        commentText = commentText.replace("$[*", "/*").replace("*]", "*/");
+        boolean isOldStyleComment = commentText.contains("$[*");
+        if (isOldStyleComment) {
+            commentText = commentText.replace("$[*", "/*").replace("*]", "*/");
+            while (commentText.endsWith("\n") || commentText.endsWith("\r")) {
+                commentText = commentText.substring(0, commentText.length() - 1);
+            }
+        } else if (commentText.startsWith("//") && !commentText.endsWith("\n")) {
+            commentText += "\n";
+        }
         TextSegment segment = new TextSegment(TextSegmentType.Comment, ConfigurableElement.None,
             comment.getStartLineNumber(),
             comment.getEndLineNumber(), commentText);
