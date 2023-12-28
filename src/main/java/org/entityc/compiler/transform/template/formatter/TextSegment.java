@@ -27,7 +27,7 @@ class TextSegment {
     boolean              suppressIndent;
     int                  finalCharPos;
     private TextSegment  alignToSegment;
-    private boolean      copied = false;
+    private boolean      copiedForDescriptionWrap = false;
 
     TextSegment(TextSegmentType type, ConfigurableElement element, int startLineNumber, int endLineNumber, String text) {
         this.type            = type;
@@ -70,15 +70,18 @@ class TextSegment {
         this.suppressIndent      = otherSegment.suppressIndent;
         this.finalCharPos        = otherSegment.finalCharPos;
         this.alignToSegment      = otherSegment.alignToSegment;
-        this.copied              = true;
     }
 
     public TextSegment getAlignToSegment() {
         return alignToSegment;
     }
 
-    public boolean isCopied() {
-        return copied;
+    public boolean isCopiedForDescriptionWrap() {
+        return copiedForDescriptionWrap;
+    }
+
+    public void setCopiedForDescriptionWrap(boolean copied) {
+        this.copiedForDescriptionWrap = copied;
     }
 
     public void setAlignToSegment(TextSegment alignToSegment) {

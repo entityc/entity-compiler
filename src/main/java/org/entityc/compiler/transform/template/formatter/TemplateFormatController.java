@@ -158,7 +158,7 @@ public class TemplateFormatController {
                 && (prevSegment.type == TextSegmentType.Comment
                     || nextNextSegment.type == TextSegmentType.Comment
                     || nextSegment.startLineNumber != segment.endLineNumber
-                    || (segment.isCopied() && prevSegment.element == DescriptionString)
+                    || segment.isCopiedForDescriptionWrap()
             )) {
                 includeThisElement = false;
             }
@@ -171,7 +171,7 @@ public class TemplateFormatController {
                 && (nextSegment.type == TextSegmentType.Comment
                     || prevPrevSegment.type == TextSegmentType.Comment
                     || prevSegment.startLineNumber != segment.endLineNumber
-                    || (segment.isCopied() && nextNextSegment.element == DescriptionString)
+                    || segment.isCopiedForDescriptionWrap()
             )) {
                 includeThisElement = false;
                 replaceWithSpace = true;
@@ -450,10 +450,14 @@ public class TemplateFormatController {
                     }
                     else {
                         if (endSegment != null) {
-                            transformedTextStack.push(new TextSegment(endSegment));
+                            TextSegment copiedEndSegment = new TextSegment(endSegment);
+                            copiedEndSegment.setCopiedForDescriptionWrap(true);
+                            transformedTextStack.push(copiedEndSegment);
                         }
                         for (TextSegment startSegment : descriptionStartSegments) {
-                            transformedTextStack.push(new TextSegment(startSegment));
+                            TextSegment copiedStartSegment = new TextSegment(startSegment);
+                            copiedStartSegment.setCopiedForDescriptionWrap(true);
+                            transformedTextStack.push(copiedStartSegment);
                         }
 
                         TextSegment dupSegment = new TextSegment(segment);
