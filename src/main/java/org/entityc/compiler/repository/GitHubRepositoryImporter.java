@@ -29,6 +29,15 @@ public class GitHubRepositoryImporter implements RepositoryImporter {
         super();
     }
 
+    private void showGithubConnectionError( MTRepository repository )
+    {
+        ECLog.logError(
+            "Unable to connect to GitHub: " + repository.getOrganization() + "/" + repository.getRepoName());
+        ECLog.log("This program uses the following Github API library: https://github-api.kohsuke.org\n" +
+            "One of the easiest ways to configure Github access is to set the GITHUB_OAUTH environment variable to your\n" +
+            "Github Personal Access Token. See the above URL for other ways to configure Github access.");
+        System.exit(1);
+    }
     @Override
     public RepositoryFile importFromRepository(MTRepository repository, MTRepositoryImport repositoryImport, RepositoryFile cachedRepositoryFile, String extension, String alternatePath) {
         try {
@@ -36,9 +45,7 @@ public class GitHubRepositoryImporter implements RepositoryImporter {
                 github = GitHub.connect();
             }
         } catch (IOException e) {
-            ECLog.logFatal(
-                    "Unable to connect to GitHub: " + repository.getOrganization() + "/" + repository.getRepoName()
-                    + "\n" + e.getMessage());
+            showGithubConnectionError(repository);
         }
         String pathPart = alternatePath != null ?
                           (alternatePath + "/") :
@@ -105,9 +112,7 @@ public class GitHubRepositoryImporter implements RepositoryImporter {
                 github = GitHub.connect();
             }
         } catch (IOException e) {
-            ECLog.logFatal(
-                    "Unable to connect to GitHub: " + repository.getOrganization() + "/" + repository.getRepoName()
-                    + "\n" + e.getMessage());
+            showGithubConnectionError(repository);
         }
 
         GHRepository repo = null;
