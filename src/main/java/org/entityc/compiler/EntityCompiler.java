@@ -54,7 +54,7 @@ import static java.lang.System.exit;
 
 public class EntityCompiler {
 
-    public static final  String              COMPILER_VERSION   = "0.18.1";
+    public static final  String              COMPILER_VERSION   = "0.18.2";
     public static final  String              LANGUAGE_VERSION   = "0.15.0";
     private static final Map<String, String> defineValues       = new HashMap<>();
     private static final Set<String>         templateSearchPath = new HashSet<>();
