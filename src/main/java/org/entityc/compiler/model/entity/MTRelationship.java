@@ -282,7 +282,7 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
             return false;
         }
 
-        // find a list of possble relationships between entities
+        // find a list of possible relationships between entities
         boolean anotherPass = this.to.resolveReferences(space, pass);
         if (anotherPass) {
             if (pass > 7) {
@@ -327,6 +327,7 @@ public class MTRelationship extends MTNode implements MTReferenceResolution, MTT
                 for (MTRelationship fromRelationship : possibleFromRelationships) {
                     if (found) {
                         duplicates = true;
+                        // TODO: Maybe this is because two tables are used for two relationships...
                         ECLog.logWarning(fromRelationship,
                             "Found duplicate relationship matches between " + from.getEntity().getName()
                                 + "." + this.getName() + " and " + to.getEntity().getName() + "."

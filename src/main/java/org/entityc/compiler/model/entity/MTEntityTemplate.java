@@ -44,6 +44,7 @@ public class MTEntityTemplate extends MTEntity {
     }
 
     public MTEntity makeEntity(MTEntity parentEntity, String asEntityName, MTEntityTemplateInstantiation instantiation, MTSpace space) {
+
         List<String> templateArgEntityNames = instantiation.getTemplateArgEntityNames();
         MTEntity entity = new MTEntity(instantiation.getParserRuleContext(),
                                        parentEntity.getModule(), asEntityName);
@@ -62,30 +63,44 @@ public class MTEntityTemplate extends MTEntity {
         }
         entity.primaryKey = copiedPrimaryKey;
 
-        // Map the template arguments to the entity names in the instantiation
-        Map<String, String> argToEntityName = new HashMap<>();
+        // Map the template argument names (e.g., <A, B>) to the entity names
+        // in the instantiation (e.g., <MyEntity, OtherEntity>)
+        Map<String, String> templateArgToEntityName = new HashMap<>();
         if (templateArgs.size() != templateArgEntityNames.size()) {
             ECLog.logFatal(this, "The number of arguments of the template do not match that of its instantiation.");
         }
         for (int i = 0; i < templateArgs.size(); i++) {
-            argToEntityName.put(templateArgs.get(i), templateArgEntityNames.get(i));
+            templateArgToEntityName.put(templateArgs.get(i), templateArgEntityNames.get(i));
         }
 
+        // Copy the attributes
         for (MTAttribute attribute : this.getAttributes()) {
             entity.addAttribute(MTAttribute.Copy(attribute, entity));
         }
 
-        Map<String, MTRelationship> argToRelationship = new HashMap<>();
+        Map<String, MTRelationship> templateArgToRelationship = new HashMap<>();
 
         MTRelationship parentRelationship = null;
-        // copy the relationships, substituting template variable with instantiated entity
+        ArrayList<MTRelationship> sameToEntityRelationships = new ArrayList<>();
+
+        for (MTRelationship relationship : this.relationships) {
+            if (this.hasRelationshipToEntityNamed(relationship.getTo().getEntityName())) {
+                sameToEntityRelationships.add(relationship);
+            }
+        }
+
+        //
+        // Copy the relationships
+        // -- substituting template argument with instantiated entity name
+        //
         for (MTRelationship relationship : this.relationships) {
             //  look for template arguments that need to be resolved.
             String templateArgName  = relationship.getTo().getEntityName();
-            String mappedEntityName = argToEntityName.get(templateArgName);
+            String mappedEntityName = templateArgToEntityName.get(templateArgName);
             if (mappedEntityName != null) {
+                String relationshipName = relationship.getName() + mappedEntityName;
                 MTRelationship resolvedRelationship = new MTRelationship(instantiation.getParserRuleContext(),
-                                                                         ECStringUtil.Uncapitalize(mappedEntityName),
+                                                                         relationshipName,
                                                                          entity.getName(),
                                                                          relationship.getTo().getPlurality(),
                                                                          mappedEntityName,
@@ -95,7 +110,7 @@ public class MTEntityTemplate extends MTEntity {
                                                                          relationship.getToEntityIdName(),
                                                                          templateArgName);
                 entity.addRelationship(resolvedRelationship);
-                argToRelationship.put(relationship.getTo().getEntityName(), resolvedRelationship);
+                templateArgToRelationship.put(templateArgName, resolvedRelationship);
                 if (relationship.isParent() && !relationship.isOptional()) {
                     parentRelationship = resolvedRelationship;
                 }
@@ -125,7 +140,7 @@ public class MTEntityTemplate extends MTEntity {
                 if (unique) {
                     MTUniqueness uniqueness = new MTUniqueness(instantiation.getParserRuleContext(),
                                                                parentRelationship);
-                    MTRelationship relationship = argToRelationship.get(templateArg);
+                    MTRelationship relationship = templateArgToRelationship.get(templateArg);
                     if (relationship != null) {
                         uniqueness.setRelationship(relationship);
                         entity.addUniqueness(uniqueness);
