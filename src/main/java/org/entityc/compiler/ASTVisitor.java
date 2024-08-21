@@ -1372,7 +1372,11 @@ public class ASTVisitor extends EntityLanguageBaseVisitor {
             instantiation = new MTEntityTemplateInstantiation(ctx.relationshipTemplateAs(),
                 ctx.relationshipTemplateAs().id().getText());
             for (EntityLanguageParser.RelationshipTemplateArgContext argContext : ctx.relationshipTemplateAs().relationshipTemplateArg()) {
-                instantiation.addTemplateArgEntityName(argContext.id().getText(), argContext.UNIQUE() != null);
+                String argEntityName = argContext.id().getText();
+                if (argEntityName.equals("self")) {
+                    argEntityName = fromEntityName;
+                }
+                instantiation.addTemplateArgEntityName(argEntityName, argContext.UNIQUE() != null);
             }
         }
         toEntityName = ctx.id(0).getText();
