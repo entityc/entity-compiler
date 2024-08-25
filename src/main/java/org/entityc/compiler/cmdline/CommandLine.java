@@ -77,28 +77,35 @@ public class CommandLine {
 
         reset(); // in case it is executed multiple times in a single java vm
 
-        String commandName = args[0];
+        int commandIndex = 0;
 
-        if (commandName.equals("-h") || commandName.equals("-help") || commandName.equals("--help")) {
+        String option = args[0];
+
+        if (option.equals("--verbose")) {
+            if (args.length == 1) {
+                printUsage();
+                exit(0);
+            }
+            verbose = true;
+            commandIndex = 1;
+        }
+
+        if (option.equals("-h") || option.equals("-help") || option.equals("--help")) {
             printUsage();
             exit(0);
         }
 
-        if (commandName.equals("-v") || commandName.equals("-version") || commandName.equals("--version")) {
+        if (option.equals("-v") || option.equals("-version") || option.equals("--version")) {
             System.out.println("ec compiler version " + COMPILER_VERSION + ", language version " + LANGUAGE_VERSION);
             exit(0);
         }
 
-        if (!commands.containsKey(commandName)) {
-            System.err.println("Unknown command: " + commandName);
-            printUsage();
-            exit(1);
-        }
+        String commandName = args[commandIndex];
 
         CLCommand command = commands.get(commandName);
         String cmdArgString = args.length == 1 ?
                               null :
-                              args[1];
+                              args[commandIndex + 1];
 
         if (cmdArgString != null && (cmdArgString.equals("-h") || cmdArgString.equals("-help") || cmdArgString.equals(
                 "--help"))) {
@@ -106,9 +113,9 @@ public class CommandLine {
             exit(0);
         }
 
-        String[] cmdArgsArray = new String[args.length - 1];
-        for (int i = 1; i < args.length; i++) {
-            cmdArgsArray[i - 1] = args[i];
+        String[] cmdArgsArray = new String[args.length - (commandIndex+1)];
+        for (int i = commandIndex+1; i < args.length; i++) {
+            cmdArgsArray[i - (commandIndex+1)] = args[i];
         }
         command.run(cmdArgsArray);
     }
