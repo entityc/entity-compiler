@@ -7,11 +7,13 @@
 package org.entityc.compiler.transform.template.tree;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.entityc.compiler.EntityCompiler;
 import org.entityc.compiler.doc.annotation.TemplateInstruction;
 import org.entityc.compiler.doc.annotation.TemplateInstructionArgument;
 import org.entityc.compiler.doc.annotation.TemplateInstructionCategory;
 import org.entityc.compiler.transform.template.TemplateLexer;
 import org.entityc.compiler.transform.template.formatter.TemplateFormatController;
+import org.entityc.compiler.util.ECLog;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +67,9 @@ public class FTOutlet extends FTContainerNode {
                     if (author.getScope() == FTPublishScope.Author) {
                         session.pushAuthorScope(author);
                     }
+                    if (EntityCompiler.isVerbose()) {
+                        ECLog.logInfo("Transforming OUTLET " + getName() + " by AUTHOR " + author.getUniqueId());
+                    }
                     session.setValue("__outlet", this);
                     session.setValue("__author", author);
                     author.transformFromOutlet(session);
@@ -75,6 +80,9 @@ public class FTOutlet extends FTContainerNode {
                     session.removeValue("__author");
                     if (author.getScope() == FTPublishScope.Author) {
                         session.popAuthorScope();
+                    }
+                    if (EntityCompiler.isVerbose()) {
+                        ECLog.logInfo("DONE Transforming OUTLET " + getName() + " by AUTHOR " + author.getUniqueId());
                     }
                 }
             }

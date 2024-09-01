@@ -90,6 +90,9 @@ public class TemplateTransform extends MTBaseTransform {
         }
         template.transform(session);
         session.close();
+        if (EntityCompiler.isVerbose()) {
+            ECLog.logInfo("  DONE running template: " + getName());
+        }
     }
 
     private void applyConfig(FTTransformSession session, JsonObject config) {
