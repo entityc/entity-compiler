@@ -7,11 +7,13 @@
 package org.entityc.compiler.transform.template.tree;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.entityc.compiler.EntityCompiler;
 import org.entityc.compiler.doc.annotation.TemplateInstruction;
 import org.entityc.compiler.doc.annotation.TemplateInstructionArgument;
 import org.entityc.compiler.doc.annotation.TemplateInstructionCategory;
 import org.entityc.compiler.transform.template.TemplateLexer;
 import org.entityc.compiler.transform.template.formatter.TemplateFormatController;
+import org.entityc.compiler.util.ECLog;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -101,6 +103,9 @@ public class FTFunction extends FTContainerNode {
 
     public Map<String, Object> call(FTTransformSession session) {
 
+        if (EntityCompiler.isVerbose()) {
+            ECLog.logInfo("Calling function: " + getName());
+        }
         // run the function code
         super.transform(session);
 

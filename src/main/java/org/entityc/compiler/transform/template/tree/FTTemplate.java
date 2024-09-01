@@ -7,6 +7,7 @@
 package org.entityc.compiler.transform.template.tree;
 
 import org.antlr.v4.runtime.ParserRuleContext;
+import org.entityc.compiler.EntityCompiler;
 import org.entityc.compiler.doc.DocumentationManager;
 import org.entityc.compiler.doc.annotation.ModelClass;
 import org.entityc.compiler.doc.annotation.ModelClassType;
@@ -23,6 +24,7 @@ import org.entityc.compiler.model.language.MTLanguage;
 import org.entityc.compiler.transform.template.TemplateDocExtractor;
 import org.entityc.compiler.transform.template.TemplatePublishing;
 import org.entityc.compiler.transform.template.formatter.TemplateFormatController;
+import org.entityc.compiler.util.ECLog;
 import org.entityc.compiler.util.ECStringUtil;
 import org.entityc.compiler.util.ECVersion;
 
@@ -162,6 +164,9 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
         session.setTemplate(this);
         session.addReadonlyNamedValue("__template", this);
 
+        if (EntityCompiler.isVerbose()) {
+            ECLog.logInfo("Transforming template: " + getName());
+        }
         MTDomain   previousDomain   = (MTDomain) session.getValue("domain");
         MTLanguage previousLanguage = (MTLanguage) session.getValue("language");
         if (defaultDomainName != null) {
@@ -188,6 +193,9 @@ public class FTTemplate extends FTContainerNode implements MTNamed {
         if (prevTemplate != null) {
             session.setTemplate(prevTemplate);
             session.addReadonlyNamedValue("__template", prevTemplate);
+        }
+        if (EntityCompiler.isVerbose()) {
+            ECLog.logInfo("DONE Transforming template: " + getName());
         }
     }
 

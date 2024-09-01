@@ -1124,6 +1124,9 @@ public class MTEntity extends MTType implements MTReferenceResolution, MTNamed, 
         Vector<MTEntity> list   = new Vector<>();
         MTEntity         entity = this;
         while (entity.hasPrimaryParentRelationship()) {
+            if (list.contains(entity)) {
+                break;
+            }
             entity = entity.getPrimaryParentRelationship().getTo().getEntity();
             list.insertElementAt(entity, 0);
         }
